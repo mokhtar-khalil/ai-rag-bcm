@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.py[cod]
+.env
+.DS_Store
+.pytest_cache/
+logs/
+storage/models/
+storage/chart_pages/
+storage/chart_ocr
+evaluation/results/*.json

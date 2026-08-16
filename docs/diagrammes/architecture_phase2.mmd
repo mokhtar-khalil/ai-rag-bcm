@@ -1,0 +1,38 @@
+flowchart LR
+    classDef start fill:#DBEAFE,stroke:#2563EB,color:#172554,stroke-width:2px
+    classDef local fill:#FEF3C7,stroke:#D97706,color:#451A03,stroke-width:2px
+    classDef decision fill:#FEE2E2,stroke:#DC2626,color:#450A0A,stroke-width:2px
+    classDef output fill:#DCFCE7,stroke:#16A34A,color:#052E16,stroke-width:2px
+    classDef planner fill:#E0F2FE,stroke:#0284C7,color:#082F49,stroke-width:2px
+
+    Q["Question utilisateur"]:::start
+    HIST["Historique court<br/>du navigateur"]:::start
+    FOLLOW{"Référence à un échange<br/>ou ancien sujet nommé ?"}:::decision
+    CONTEXT["Résoudre le sujet actif<br/>et épingler ses pages"]:::local
+    R0["Recherche hybride initiale"]:::local
+    NEED{"Appariement faible,<br/>question courte ou ambiguë ?"}:::decision
+    PLAN["Créer jusqu'à 4 reformulations<br/>sans envoyer le rapport"]:::planner
+    SEARCH["Rechercher chaque formulation<br/>dans l'index local"]:::local
+    RRF["Fusionner les rangs<br/>12 candidats maximum"]:::local
+    AMBIG{"Au moins deux périmètres<br/>confirmés par les passages ?"}:::decision
+    OPTIONS["Suggérer des formulations<br/>extraites des preuves locales"]:::output
+    USER["L'utilisateur confirme<br/>le périmètre"]:::start
+    RERANK["Reranker les candidats"]:::local
+    FOUND{"Preuve suffisante ?"}:::decision
+    ANSWER["Réponse directe,<br/>écart, citations et sources"]:::output
+    REFUSE["Refus documentaire"]:::output
+
+    Q --> HIST --> FOLLOW
+    FOLLOW -->|"Non"| R0
+    FOLLOW -->|"Oui"| CONTEXT --> R0
+    R0 --> NEED
+    NEED -->|"Non"| RRF
+    NEED -->|"Oui"| PLAN --> SEARCH --> RRF
+    RRF --> AMBIG
+    AMBIG -->|"Oui"| OPTIONS --> USER --> Q
+    AMBIG -->|"Non"| RERANK --> FOUND
+    FOUND -->|"Oui"| ANSWER
+    FOUND -->|"Non"| REFUSE
+
+    NOTE["La conversation est transmise par le client.<br/>Aucun fait n'est appris ni partagé entre utilisateurs."]:::planner
+    OPTIONS -.-> NOTE

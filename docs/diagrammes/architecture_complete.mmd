@@ -1,0 +1,116 @@
+flowchart TB
+    classDef user fill:#DBEAFE,stroke:#2563EB,color:#172554,stroke-width:2px
+    classDef front fill:#EDE9FE,stroke:#7C3AED,color:#2E1065,stroke-width:2px
+    classDef api fill:#DCFCE7,stroke:#16A34A,color:#052E16,stroke-width:2px
+    classDef rag fill:#FEF3C7,stroke:#D97706,color:#451A03,stroke-width:2px
+    classDef data fill:#FCE7F3,stroke:#DB2777,color:#500724,stroke-width:2px
+    classDef gen fill:#E0F2FE,stroke:#0284C7,color:#082F49,stroke-width:2px
+    classDef guard fill:#FEE2E2,stroke:#DC2626,color:#450A0A,stroke-width:2px
+
+    subgraph PREP["A. Préparation locale du rapport"]
+        direction LR
+        PDF["Rapport BCM<br/>127 pages"]:::data
+        HASH["Contrôle<br/>SHA-256"]:::data
+        CLEAN["Extraction et<br/>nettoyage"]:::data
+        CHUNKS["Passages textuels<br/>et lignes de tableaux"]:::data
+        TFIDF["TF-IDF mots<br/>et caractères"]:::rag
+        DENSE["Embeddings multilingues<br/>locaux - 384 dimensions"]:::rag
+        INDEX["Index persistant<br/>2 415 passages"]:::data
+
+        PDF --> HASH --> CLEAN --> CHUNKS
+        CHUNKS --> TFIDF --> INDEX
+        CHUNKS --> DENSE --> INDEX
+        HASH -. "PDF modifié" .-> CLEAN
+    end
+
+    subgraph RUN["B. Traitement d'une question"]
+        direction LR
+        U["Utilisateur"]:::user
+        GRADIO["Interface Gradio<br/>Français ou العربية"]:::front
+        MEMORY["Mémoire transmise par le client<br/>isolée par conversation"]:::front
+        FLASK["API Flask<br/>validation"]:::api
+        LANG["Langue explicite transmise<br/>fr ou ar"]:::api
+        FOLLOW{"Question liée à<br/>un échange antérieur ?"}:::guard
+        FOCUS["Sujet actif, ancien tour ciblé<br/>et pages déjà citées"]:::rag
+        PAGEMAP["Résolution tableau ou graphique<br/>page imprimée vers page PDF"]:::rag
+        REPEAT{"Répétition<br/>exacte ?"}:::guard
+        SCANNED{"Page citée<br/>peu textuelle ?"}:::guard
+        DOCOCR["OCR documentaire local<br/>ordre des colonnes"]:::rag
+        EXPAND["Glossaire métier<br/>sans réponse mémorisée"]:::rag
+        FIRST["Recherche hybride<br/>initiale"]:::rag
+        ARFAST{"Arabe et correspondance<br/>locale forte ?"}:::guard
+        PLANQ{"Question courte,<br/>faible ou ambiguë ?"}:::guard
+        PLANNER["Jusqu'à 4 reformulations<br/>question seule"]:::gen
+        MULTI["Recherches locales<br/>par formulation"]:::rag
+        FUSION["Fusion RRF<br/>12 standard - 30 graphique"]:::rag
+        CHARTQ{"Question sur<br/>un graphique ?"}:::guard
+        CHARTPAGE["Sélection thématique<br/>jusqu'à 30 candidats"]:::rag
+        RENDER["Rendu PNG local<br/>pages ciblées à 170 dpi"]:::data
+        OCR["OCR Apple Vision local<br/>libellés et coordonnées"]:::rag
+        CHARTREAD["Cadrage, séries, calculs<br/>et explication citée"]:::gen
+        AMBIG{"Plusieurs périmètres<br/>confirmés localement ?"}:::guard
+        SUGGEST["Formulations proches<br/>tirées du rapport"]:::front
+        CONFIRM["Choix de<br/>l'utilisateur"]:::user
+        RELEVANT{"Preuves<br/>suffisantes ?"}:::guard
+        FASTGEN{"Voie arabe<br/>rapide ?"}:::guard
+        RERANK["Reranking<br/>jusqu'à 8 passages"]:::rag
+        PROMPT["Contexte strict<br/>extraits uniquement"]:::gen
+        ANSWER["Réponse directe,<br/>calculs et citations"]:::gen
+        BIDI["Mise en forme arabe RTL<br/>nombres et citations isolés"]:::front
+        DISPLAY["Réponse, pages<br/>et extraits"]:::front
+        REFUS["Information absente<br/>du rapport"]:::guard
+        FALLBACK["Réponse extractive<br/>de secours"]:::gen
+
+        U --> GRADIO --> MEMORY --> FLASK --> LANG --> PAGEMAP --> FOLLOW
+        FOLLOW -->|"Non"| EXPAND
+        FOLLOW -->|"Oui"| FOCUS --> REPEAT
+        REPEAT -->|"Oui"| DISPLAY
+        REPEAT -->|"Non"| SCANNED
+        SCANNED -->|"Non"| EXPAND
+        SCANNED -->|"Oui"| DOCOCR --> EXPAND
+        EXPAND --> FIRST --> ARFAST
+        ARFAST -->|"Oui"| FUSION
+        ARFAST -->|"Non"| PLANQ
+        PLANQ -->|"Non"| FUSION
+        PLANQ -->|"Oui"| PLANNER --> MULTI --> FUSION
+        FUSION --> CHARTQ
+        CHARTQ -->|"Oui"| CHARTPAGE --> RENDER --> OCR --> CHARTREAD --> BIDI
+        CHARTQ -->|"Non"| AMBIG
+        AMBIG -->|"Oui"| SUGGEST --> CONFIRM --> GRADIO
+        AMBIG -->|"Non"| RELEVANT
+        RELEVANT -->|"Non"| REFUS --> DISPLAY
+        RELEVANT -->|"Oui"| FASTGEN
+        FASTGEN -->|"Oui - 1 appel"| PROMPT
+        FASTGEN -->|"Non"| RERANK
+        RERANK -->|"Aucune preuve"| REFUS
+        RERANK -->|"Passages utiles"| PROMPT --> ANSWER --> BIDI --> DISPLAY --> U
+        ANSWER -. "Erreur technique" .-> FALLBACK --> BIDI
+    end
+
+    INDEX -. "Matrices, vecteurs et lignes" .-> FIRST
+    INDEX -. "Même index local" .-> MULTI
+
+    subgraph PRIVACY["C. Limites de données"]
+        direction LR
+        QONLY["Planification<br/>question uniquement"]:::guard
+        LOCALDOC["Retrieval et embeddings<br/>rapport conservé localement"]:::guard
+        EVIDENCE["Reranking et réponse<br/>candidats strictement limités"]:::guard
+        LOCALCHART["Images et OCR des graphiques<br/>conservés sur la machine"]:::guard
+        QONLY --> LOCALDOC --> EVIDENCE --> LOCALCHART
+    end
+
+    PLANNER -.-> QONLY
+    MULTI -.-> LOCALDOC
+    RERANK -.-> EVIDENCE
+    OCR -.-> LOCALCHART
+
+    subgraph EVAL["D. Évaluation reproductible"]
+        direction LR
+        CASES["41 cas<br/>directs, reformulés, ambigus et absents"]:::data
+        METRICS["Hit@1/3/5/12, MRR<br/>acceptation et refus"]:::api
+        RESULT["Hit@5 97,14 %<br/>Hit@12 100 %<br/>Refus 100 %<br/>58 tests réussis"]:::guard
+        CASES --> METRICS --> RESULT
+    end
+
+    RESULT -. "calibrage" .-> EXPAND
+    RESULT -. "seuil 0,88" .-> RELEVANT
