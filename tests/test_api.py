@@ -245,6 +245,54 @@ def test_reindex_is_disabled_without_token_in_production() -> None:
     assert response.json["error"] == "Réindexation non autorisée."
 
 
+def test_cors_header_is_absent_by_default() -> None:
+    client = create_app().test_client()
+    response = client.get("/health", headers={"Origin": "https://bcm.mr"})
+    assert "Access-Control-Allow-Origin" not in response.headers
+
+
+def test_cors_header_allows_only_configured_origins() -> None:
+    settings = get_settings(
+        {
+            "APP_ENV": "test",
+            "GENERATION_PROVIDER": "extractive",
+            "CORS_ALLOWED_ORIGINS": "https://bcm.mr",
+        }
+    )
+    client = create_app(settings_override=settings).test_client()
+
+    allowed = client.get("/api/ask", headers={"Origin": "https://bcm.mr"})
+    assert allowed.headers.get("Access-Control-Allow-Origin") == "https://bcm.mr"
+
+    blocked = client.get("/health", headers={"Origin": "https://evil.example"})
+    assert "Access-Control-Allow-Origin" not in blocked.headers
+
+
+def test_ask_is_rate_limited_per_client() -> None:
+    settings = get_settings(
+        {
+            "APP_ENV": "development",
+            "GENERATION_PROVIDER": "extractive",
+            "SEMANTIC_RETRIEVAL": "false",
+            "CHART_ANALYSIS_ENABLED": "false",
+            "OPEN_BROWSER": "false",
+            "RATE_LIMIT_ASK": "2 per minute",
+        }
+    )
+    client = create_app(settings_override=settings).test_client()
+    payload = {"question": "Quel a été le taux de croissance du PIB réel en 2025 ?"}
+
+    first = client.post("/api/ask", json=payload)
+    second = client.post("/api/ask", json=payload)
+    third = client.post("/api/ask", json=payload)
+
+    assert first.status_code == 200
+    assert second.status_code == 200
+    assert third.status_code == 429
+    assert third.json["error"]
+    assert third.json["request_id"] == third.headers["X-Request-ID"]
+
+
 def test_unrelated_question_refuses() -> None:
     client = create_app().test_client()
     response = client.post(

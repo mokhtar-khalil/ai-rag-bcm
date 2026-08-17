@@ -73,6 +73,12 @@ def _path(env: Mapping[str, str], name: str, default: Path) -> Path:
     return path if path.is_absolute() else PROJECT_ROOT / path
 
 
+def _list(env: Mapping[str, str], name: str, default: str = "") -> tuple[str, ...]:
+    """Lit une liste d'origines/valeurs séparées par des virgules."""
+    raw = _text(env, name, default)
+    return tuple(item.strip() for item in raw.split(",") if item.strip())
+
+
 @dataclass(frozen=True)
 class Settings:
     """Regroupe les paramètres validés et immuables utilisés par l'application."""
@@ -88,9 +94,12 @@ class Settings:
     gradio_port: int
     open_browser: bool
     generation_provider: str
+    openai_api_key: str = field(repr=False)
     openai_model: str
     openai_rerank_model: str
     openai_reasoning_effort: str
+    gemini_api_key: str = field(repr=False)
+    gemini_model: str
     embedding_model: str
     embedding_cache_path: Path
     semantic_retrieval: bool
@@ -113,6 +122,8 @@ class Settings:
     max_history_messages: int
     max_request_bytes: int
     reindex_token: str = field(repr=False)
+    cors_allowed_origins: tuple[str, ...]
+    rate_limit_ask: str
 
     @property
     def is_production(self) -> bool:
@@ -133,9 +144,21 @@ def get_settings(environ: Mapping[str, str] | None = None) -> Settings:
         raise ConfigurationError("APP_ENV doit être development, test ou production.")
 
     provider = _text(env, "GENERATION_PROVIDER", "auto").casefold()
-    if provider not in {"auto", "openai", "ollama", "extractive"}:
+    if provider not in {"auto", "openai", "gemini", "ollama", "extractive"}:
         raise ConfigurationError(
-            "GENERATION_PROVIDER doit être auto, openai, ollama ou extractive."
+            "GENERATION_PROVIDER doit être auto, openai, gemini, ollama ou extractive."
+        )
+
+    openai_api_key = _text(env, "OPENAI_API_KEY", "")
+    if provider == "openai" and not openai_api_key and app_env == "production":
+        raise ConfigurationError(
+            "OPENAI_API_KEY est requis en production lorsque GENERATION_PROVIDER vaut openai."
+        )
+
+    gemini_api_key = _text(env, "GEMINI_API_KEY", "")
+    if provider == "gemini" and not gemini_api_key and app_env == "production":
+        raise ConfigurationError(
+            "GEMINI_API_KEY est requis en production lorsque GENERATION_PROVIDER vaut gemini."
         )
 
     top_k = _integer(env, "TOP_K", 5, 1, 10)
@@ -157,9 +180,12 @@ def get_settings(environ: Mapping[str, str] | None = None) -> Settings:
         gradio_port=_integer(env, "GRADIO_PORT", 7861, 1, 65535),
         open_browser=_boolean(env, "OPEN_BROWSER", True),
         generation_provider=provider,
+        openai_api_key=openai_api_key,
         openai_model=_text(env, "OPENAI_MODEL", "gpt-5.6-terra"),
         openai_rerank_model=_text(env, "OPENAI_RERANK_MODEL", "gpt-5.6-luna"),
         openai_reasoning_effort=_text(env, "OPENAI_REASONING_EFFORT", "medium"),
+        gemini_api_key=gemini_api_key,
+        gemini_model=_text(env, "GEMINI_MODEL", "gemini-2.5-flash"),
         embedding_model=_text(env, "EMBEDDING_MODEL", "intfloat/multilingual-e5-small"),
         embedding_cache_path=_path(
             env, "EMBEDDING_CACHE_PATH", PROJECT_ROOT / "storage" / "models"
@@ -192,4 +218,6 @@ def get_settings(environ: Mapping[str, str] | None = None) -> Settings:
         max_history_messages=_integer(env, "MAX_HISTORY_MESSAGES", 16, 0, 50),
         max_request_bytes=_integer(env, "MAX_REQUEST_BYTES", 65536, 1024, 1048576),
         reindex_token=_text(env, "REINDEX_TOKEN", ""),
+        cors_allowed_origins=_list(env, "CORS_ALLOWED_ORIGINS"),
+        rate_limit_ask=_text(env, "RATE_LIMIT_ASK", "20 per minute"),
     )

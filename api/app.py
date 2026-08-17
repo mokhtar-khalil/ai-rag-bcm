@@ -17,6 +17,9 @@ from typing import Any
 from uuid import uuid4
 
 from flask import Flask, g, jsonify, request
+from flask_cors import CORS
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from werkzeug.exceptions import BadRequest, HTTPException
 
 from api.providers import (
@@ -631,6 +634,13 @@ def create_app(
     app.extensions["bcm_engine"] = engine
     configure_logging(app, settings)
 
+    if settings.cors_allowed_origins:
+        CORS(app, resources={r"/api/*": {"origins": list(settings.cors_allowed_origins)}})
+
+    app.config["RATELIMIT_ENABLED"] = not settings.is_testing
+    limiter = Limiter(get_remote_address, app=app, default_limits=[], storage_uri="memory://")
+    app.extensions["bcm_limiter"] = limiter
+
     def ensure_loaded() -> None:
         """Charge l'index une seule fois, même en présence de requêtes concurrentes."""
         if not engine.chunks:
@@ -692,6 +702,7 @@ def create_app(
         )
 
     @app.post("/api/ask")
+    @limiter.limit(settings.rate_limit_ask)
     def ask() -> Any:
         """Répond à une question en exécutant toute la chaîne RAG."""
         ensure_loaded()
@@ -1414,6 +1425,11 @@ def create_app(
     def too_large(_: HTTPException) -> Any:
         """Refuse proprement une requête qui dépasse la taille autorisée."""
         return error_payload("Requête trop volumineuse.", 413)
+
+    @app.errorhandler(429)
+    def rate_limited(_: HTTPException) -> Any:
+        """Signale qu'un client a dépassé la limite d'appels autorisée."""
+        return error_payload("Trop de requêtes. Réessayez plus tard.", 429)
 
     @app.errorhandler(Exception)
     def unexpected_error(error: Exception) -> Any:

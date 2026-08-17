@@ -1,0 +1,57 @@
+name: CD - staging
+
+# Publie une image Docker versionnée à chaque fusion sur main. La promotion
+# vers la production reste manuelle (voir promote.yml) : ce workflow ne
+# déploie sur aucun serveur, il rend seulement l'image disponible pour un
+# déploiement contrôlé (staging BCM à connecter séparément selon l'infra
+# retenue).
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE: ghcr.io/${{ github.repository }}-api
+
+jobs:
+  build-and-push:
+    name: Construire et publier l'image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Tests avant publication
+        env:
+          APP_ENV: test
+          GENERATION_PROVIDER: extractive
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+          python -m pytest -q
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Connexion à GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Construire et publier (tag = commit + staging)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:${{ github.sha }}
+            ${{ env.IMAGE }}:staging
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

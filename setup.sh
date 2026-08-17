@@ -2,14 +2,9 @@
 set -euo pipefail
 
 PROJECT_DIR="${0:A:h}"
-BUNDLED_PYTHON="/Users/ledataspecialist/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3"
 cd "$PROJECT_DIR"
 
-if [[ -x "$BUNDLED_PYTHON" ]]; then
-  PYTHON_BIN="$BUNDLED_PYTHON"
-else
-  PYTHON_BIN="python3"
-fi
+PYTHON_BIN="${PYTHON_BIN:-python3}"
 
 if [[ ! -f ".env" ]]; then
   cp .env.example .env

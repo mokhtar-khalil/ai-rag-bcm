@@ -7,7 +7,6 @@ extractif déterministe. Tous reçoivent uniquement les passages du rapport.
 from __future__ import annotations
 
 import json
-import os
 import re
 import unicodedata
 from decimal import Decimal, InvalidOperation
@@ -114,9 +113,9 @@ def resolve_provider(settings: Settings | None = None) -> str:
     """Choisit le moteur configuré, puis applique les replis disponibles en mode auto."""
     settings = settings or get_settings()
     requested = settings.generation_provider
-    if requested in {"openai", "ollama", "extractive"}:
+    if requested in {"openai", "gemini", "ollama", "extractive"}:
         return requested
-    if os.getenv("OPENAI_API_KEY"):
+    if settings.openai_api_key:
         return "openai"
     try:
         if requests.get(f"{settings.ollama_base_url}/api/tags", timeout=0.6).ok:
@@ -266,6 +265,13 @@ def generate_openai(
         max_output_tokens=1000 if selected_language == "ar" else 1400,
     )
     answer = response.output_text.strip()
+    return _finalize_generated_answer(answer, selected_language, results)
+
+
+def _finalize_generated_answer(
+    answer: str, selected_language: str, results: list[dict[str, Any]]
+) -> str:
+    """Applique le rendu arabe, valide les citations et ajoute les sources manquantes."""
     if selected_language == "ar":
         answer = normalize_arabic_units(answer)
         if untranslated_latin_words(answer):
@@ -281,6 +287,46 @@ def generate_openai(
         pages = ", ".join(f"p. PDF {page}" for page in sorted(allowed_pages))
         answer += f"\n\nSources : {pages}."
     return answer
+
+
+def generate_gemini(
+    question: str,
+    results: list[dict[str, Any]],
+    history: list[dict[str, str]],
+    settings: Settings | None = None,
+    language: str | None = None,
+) -> str:
+    """Génère une réponse sourcée avec l'API Gemini (Google), même contrat que generate_openai.
+
+    Ajouté temporairement pour continuer les évaluations pendant qu'un quota
+    OpenAI se réinitialise ; generate_openai reste la voie par défaut.
+    """
+    from google import genai
+    from google.genai import types
+
+    settings = settings or get_settings()
+    selected_language = (
+        language if language in {"fr", "ar"} else response_language(question)
+    )
+    client = genai.Client(api_key=settings.gemini_api_key)
+    prompt = (
+        f"Historique utile (peut être vide) :\n{_history_text(history)}\n\n"
+        f"Question : {question}\n\nSources autorisées :\n{_context(results)}"
+    )
+    response = client.models.generate_content(
+        model=settings.gemini_model,
+        contents=prompt,
+        config=types.GenerateContentConfig(
+            system_instruction=(
+                f"{SYSTEM_INSTRUCTIONS}\n\n"
+                f"{answer_language_instruction(question, selected_language)}"
+            ),
+            max_output_tokens=1000 if selected_language == "ar" else 1400,
+            temperature=0.1,
+        ),
+    )
+    answer = (response.text or "").strip()
+    return _finalize_generated_answer(answer, selected_language, results)
 
 
 def generate_ollama(
@@ -678,6 +724,8 @@ def answer_with_provider(
     """Route la génération vers le fournisseur retenu par l'orchestrateur."""
     if provider == "openai":
         return generate_openai(question, results, history, settings, language)
+    if provider == "gemini":
+        return generate_gemini(question, results, history, settings, language)
     if provider == "ollama":
         return generate_ollama(question, results, history, settings, language)
     return generate_extractive(question, results)

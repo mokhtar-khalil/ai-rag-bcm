@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Un nouveau push sur une branche annule les exécutions précédentes en cours,
+# pour ne pas gaspiller de minutes CI sur un état déjà dépassé.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Lint et tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Installer les dépendances
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt ruff
+
+      # Uniquement les erreurs critiques (syntaxe, noms non définis) : ce
+      # dépôt n'a pas encore de style imposé, donc pas de règles cosmétiques.
+      - name: Lint (erreurs critiques uniquement)
+        run: ruff check --select=E9,F63,F7,F82 api core scripts tests frontend wsgi.py
+
+      - name: Tests
+        env:
+          APP_ENV: test
+          GENERATION_PROVIDER: extractive
+        run: python -m pytest -q
+
+  security:
+    name: Sécurité (dépendances et secrets)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Vulnérabilités connues des dépendances (pip-audit)
+        run: |
+          python -m pip install --upgrade pip pip-audit
+          pip-audit -r requirements-api.txt
+          pip-audit -r requirements.txt
+
+      - name: Recherche de secrets committés (gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  docker-build:
+    name: Build de l'image Docker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Construire l'image (sans la publier)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          tags: bcm-rag-api:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

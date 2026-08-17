@@ -1,0 +1,42 @@
+name: CD - promotion en production
+
+# Déclenchement manuel volontaire : la mise en production ne doit jamais être
+# automatique. Ce workflow republie une image déjà construite et testée par
+# cd.yml (identifiée par son SHA de commit) sous le tag "production", sans
+# reconstruire ni redéployer sur un serveur — le déploiement réel sur
+# l'infrastructure BCM reste à connecter séparément selon l'environnement
+# cible retenu.
+on:
+  workflow_dispatch:
+    inputs:
+      commit_sha:
+        description: >-
+          SHA complet du commit à promouvoir (doit déjà avoir une image
+          publiée par le workflow CD - staging).
+        required: true
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE: ghcr.io/${{ github.repository }}-api
+
+jobs:
+  promote:
+    name: Retag production
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Connexion à GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Retag ${{ github.event.inputs.commit_sha }} -> production
+        run: |
+          docker pull "${IMAGE}:${{ github.event.inputs.commit_sha }}"
+          docker tag "${IMAGE}:${{ github.event.inputs.commit_sha }}" "${IMAGE}:production"
+          docker push "${IMAGE}:production"

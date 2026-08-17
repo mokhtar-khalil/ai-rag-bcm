@@ -1,0 +1,23 @@
+# Environnement de démo/staging reproductible pour l'API Flask du chatbot RAG BCM.
+# Le frontend Gradio n'est pas inclus (voir Dockerfile) ; ce service expose
+# uniquement l'API que le widget web du site bcm.mr appellera (Phase 3).
+#
+# Usage :
+#   cp .env.production.example .env.production   # puis compléter les secrets
+#   docker compose up --build
+
+services:
+  api:
+    build: .
+    image: bcm-rag-api:local
+    restart: unless-stopped
+    env_file:
+      - .env.production
+    ports:
+      - "5000:5000"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:5000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
