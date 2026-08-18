@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Démo — site BCM avec le widget intégré</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; margin: 0; color: #111827; }
+  header { background: #0f2f4f; color: #fff; padding: 20px 32px; }
+  header h1 { margin: 0; font-size: 20px; }
+  main { max-width: 860px; margin: 40px auto; padding: 0 24px; line-height: 1.6; }
+  .note { background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px; padding: 14px 16px; font-size: 14px; }
+</style>
+</head>
+<body>
+<header><h1>bcm.mr — page d'exemple (ne fait pas partie du site réel)</h1></header>
+<main>
+  <p class="note">
+    Cette page simule une page quelconque du site de la BCM. Le widget de chat est injecté par
+    une seule balise <code>&lt;script&gt;</code> en bas de page, sans rien modifier au contenu
+    existant. Cliquez sur la bulle en bas à droite pour l'ouvrir.
+  </p>
+  <h2>Contenu de la page hôte (exemple)</h2>
+  <p>
+    Ce texte représente le contenu normal d'une page du site BCM. Le widget reste indépendant :
+    il ne lit ni ne modifie ce contenu, et son style est isolé (Shadow DOM) pour ne pas entrer en
+    conflit avec le CSS du site.
+  </p>
+</main>
+
+<!-- Intégration du widget : une seule ligne, à placer avant la fermeture de </body>. -->
+<script
+  src="./bcm-chat-widget.js"
+  data-api-url="http://127.0.0.1:5001"
+  data-language="fr"
+></script>
+</body>
+</html>

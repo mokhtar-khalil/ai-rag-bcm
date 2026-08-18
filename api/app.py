@@ -635,7 +635,13 @@ def create_app(
     configure_logging(app, settings)
 
     if settings.cors_allowed_origins:
-        CORS(app, resources={r"/api/*": {"origins": list(settings.cors_allowed_origins)}})
+        CORS(
+            app,
+            resources={
+                r"/api/*": {"origins": list(settings.cors_allowed_origins)},
+                r"/health": {"origins": list(settings.cors_allowed_origins)},
+            },
+        )
 
     app.config["RATELIMIT_ENABLED"] = not settings.is_testing
     limiter = Limiter(get_remote_address, app=app, default_limits=[], storage_uri="memory://")
