@@ -306,6 +306,45 @@ def _evidence_labels(text: str) -> list[str]:
     return unique
 
 
+def _label_is_usable(label: str) -> bool:
+    """Écarte les fragments de phrase capturés à la place d'un vrai intitulé.
+
+    L'extraction prend ce qui précède le premier nombre d'une ligne chiffrée.
+    Sur une phrase ordinaire, cela produit « a traité », « Total » ou
+    « » est constitué des intérêts courus du ». Proposer de tels libellés comme
+    reformulation donne l'impression que l'assistant n'a rien compris.
+    """
+    nettoye = label.strip()
+    if len(nettoye) < 8:
+        return False
+    # Une capture qui démarre sur une ponctuation de fermeture vient du milieu
+    # d'une phrase, jamais du début d'un intitulé.
+    if nettoye[0] in "»)],;:.":
+        return False
+    mots = re.findall(r"[A-Za-zÀ-ÿ']{2,}", nettoye)
+    if len(mots) < 2:
+        return False
+    # Un intitulé commence par un nom, pas par un verbe conjugué ni une
+    # conjonction ramassée en cours de phrase.
+    premier = _fold_text(mots[0])
+    if premier in {
+        # Verbes conjugués : la capture a démarré au milieu d'une phrase.
+        "a", "ont", "est", "sont", "etait", "etaient", "sera", "seront",
+        # Conjonctions et pronoms relatifs.
+        "et", "ou", "mais", "donc", "car", "dont", "que", "qui",
+        # Prépositions : un intitulé d'indicateur commence par un nom, jamais
+        # par « Pour les normes IFRS » ou « Selon la méthode retenue ».
+        "a", "au", "aux", "dans", "de", "des", "du", "en", "par", "pour",
+        "selon", "sans", "sous", "sur", "vers", "depuis", "apres", "avant",
+        "entre", "parmi", "chez", "avec", "malgre", "durant", "pendant",
+        # Déterminants et pronoms démonstratifs.
+        "soit", "ainsi", "cette", "ces", "ce", "cet", "il", "elle", "on",
+        "leur", "leurs", "son", "sa", "ses", "notre", "nos",
+    }:
+        return False
+    return True
+
+
 def _evidence_suggestions(
     question: str, results: list[dict[str, Any]], maximum: int = 2
 ) -> list[str]:
@@ -323,7 +362,12 @@ def _evidence_suggestions(
         best_terms: set[str] = set()
         best_overlap = 0
         for label in _evidence_labels(item["text"]):
-            label_terms = _matching_terms(label)
+            if not _label_is_usable(label):
+                continue
+            # Le recouvrement se mesure sur le libellé tel qu'il figure dans le
+            # document. Le mesurer après ajout du préfixe rendait éligible
+            # n'importe quel fragment : « étendue de » devenait
+            # « Dépôts — étendue de » et paraissait répondre à la question.
             context = _fold_text(item["text"])
             if (
                 "depot" in folded_question
@@ -331,16 +375,19 @@ def _evidence_suggestions(
                 and "depot" not in _fold_text(label)
             ):
                 label = f"Dépôts — {label}"
-                label_terms = _matching_terms(label)
             if "secteur bancaire" in context and "bancair" not in _fold_text(label):
                 label = f"{label} — secteur bancaire"
-                label_terms = _matching_terms(label)
+            label_terms = _matching_terms(label)
             overlap = len(query_terms & label_terms)
             if overlap > best_overlap:
                 best_label = label
                 best_terms = label_terms
                 best_overlap = overlap
-        if not best_label or best_overlap == 0:
+        # Un seul mot commun ne justifie pas de proposer une reformulation : le
+        # mot « dépôt » d'une question sur les wallets faisait remonter des
+        # lignes comptables du Trésor, sans rapport avec la demande. Une vraie
+        # alternative partage au moins deux termes avec la question.
+        if not best_label or best_overlap < 2:
             continue
         seen_pages.add(page)
         candidates.append(
@@ -1109,6 +1156,13 @@ def create_app(
             if language == "ar" and planner_suggestions
             else evidence_suggestions or planned_rephrasings
         )
+        # Note : une clarification est parfois demandée alors que la recherche a
+        # déjà trouvé la réponse (« quelle application bancaire… » renvoie vers
+        # des indicateurs de dépôts). Aucun seuil ne distingue ce faux positif
+        # d'une ambiguïté réelle : les deux cas mesurés donnent des scores
+        # quasi identiques (0,455 contre 0,486 ; sémantique 0,875 contre 0,878).
+        # Trancher demande d'abord d'étendre le banc d'évaluation à ce
+        # comportement, qu'il ne couvre pas aujourd'hui.
         clarification_needed = (
             not chart_requested
             and not followup
@@ -1535,11 +1589,16 @@ def create_app(
                 )
         if language == "ar":
             answer = format_arabic_bidi(answer)
+        # Une réponse qui ne cite aucune source n'est pas fondée : c'est le cas
+        # d'un refus rédigé par le modèle. Continuer à publier les passages
+        # candidats laisserait croire qu'ils appuient l'affirmation — le widget
+        # affichait « cette information est absente » suivi de cinq sources.
+        cite_une_source = bool(re.search(r"\[[^\]\n]{2,80}\]", answer))
         yield _evenement_reponse(
             {
                 "answer": answer,
-                "sources": sources,
-                "grounded": True,
+                "sources": sources if cite_une_source else [],
+                "grounded": cite_une_source,
                 "clarification_needed": False,
                 "suggestions": [],
                 "chart_analysis": False,

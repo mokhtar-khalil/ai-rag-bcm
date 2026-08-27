@@ -1,0 +1,18 @@
+{"id": "ar_gdp_01", "question": "ما هو معدل نمو الناتج المحلي الإجمالي الحقيقي في موريتانيا في عام 2025؟", "expected_pages": [5, 7, 17, 18, 21, 22], "category": "conjoncture", "difficulty": "direct", "answer_contains": ["4,0"]}
+{"id": "ar_gdp_03", "question": "هل تسارع النمو أم تباطأ بين 2024 و2025، وبكم؟", "expected_pages": [5, 21, 121, 122, 123, 124], "category": "conjoncture", "difficulty": "raisonnement", "answer_contains": ["6,3", "4,0"]}
+{"id": "ar_inflation_01", "question": "ما هو متوسط معدل التضخم في موريتانيا في عام 2025؟", "expected_pages": [5, 17, 18, 23, 27, 46], "category": "conjoncture", "difficulty": "direct", "answer_contains": ["1,6"]}
+{"id": "ar_inflation_02", "question": "بأي وتيرة ارتفعت أسعار الاستهلاك في المتوسط خلال السنة؟", "expected_pages": [5, 17, 18, 23, 27, 46], "category": "conjoncture", "difficulty": "paraphrase", "answer_contains": ["1,6"]}
+{"id": "ar_reserves_01", "question": "ما هو مستوى الاحتياطيات الرسمية الإجمالية في نهاية ديسمبر 2025؟", "expected_pages": [5, 7, 17, 18, 24, 30], "category": "exterieur", "difficulty": "direct", "answer_contains": ["2,2"]}
+{"id": "ar_money_01", "question": "ما هي نسبة الودائع تحت الطلب من الكتلة النقدية؟", "expected_pages": [10, 11, 14, 19, 24, 26], "category": "monnaie", "difficulty": "direct", "answer_contains": ["68"]}
+{"id": "ar_treasury_01", "question": "ما هو إجمالي رصيد سندات الخزينة في نهاية ديسمبر 2025؟", "expected_pages": [7, 25, 27], "category": "marches", "difficulty": "direct", "answer_contains": ["29,76"]}
+{"id": "ar_solvency_01", "question": "ما هو متوسط نسبة الملاءة المالية للبنوك في عام 2025؟", "expected_pages": [7, 33, 34, 40, 42, 122], "category": "supervision", "difficulty": "direct", "answer_contains": ["17,7"]}
+{"id": "ar_banks_01", "question": "كم بلغ إجمالي أصول القطاع المصرفي في نهاية 2025؟", "expected_pages": [7, 33, 40], "category": "supervision", "difficulty": "direct", "answer_contains": ["218,5"]}
+{"id": "ar_npl_01", "question": "ما هي نسبة القروض المتعثرة في المحفظة المصرفية في عام 2025؟", "expected_pages": [33, 34, 41, 43, 121, 123], "category": "supervision", "difficulty": "direct", "answer_contains": ["17,8"]}
+{"id": "ar_gas_01", "question": "كم بلغت صادرات الغاز من مشروع السلحفاة الكبرى أحميم في عام 2025؟", "expected_pages": [5, 54, 55], "category": "exterieur", "difficulty": "direct", "answer_contains": ["237"]}
+{"id": "ar_current_01", "question": "ما هو عجز الحساب الجاري في عام 2025؟", "expected_pages": [5, 54], "category": "exterieur", "difficulty": "direct", "answer_contains": ["416", "3,4"]}
+{"id": "ar_debt_01", "question": "ما هي النسبة المئوية التي يمثلها الدين من الناتج المحلي الإجمالي؟", "expected_pages": [5, 10, 11, 23, 24, 26], "category": "exterieur", "difficulty": "direct", "answer_contains": ["37"]}
+{"id": "ar_payment_01", "question": "ما هي الإصلاحات التي يجري طرحها لأنظمة الدفع؟", "expected_pages": [65], "category": "paiements", "difficulty": "liste", "answer_contains": ["ISO 20022"]}
+{"id": "ar_lettre_01", "question": "ماذا تقول الرسالة الإخبارية لشهر مارس 2026 عن التبرع بالدم؟", "expected_pages": [4, 7, 10, 11, 15, 16], "category": "lettres", "difficulty": "direct", "answer_contains": ["17"]}
+{"id": "ar_lettre_02", "question": "ما هو سعر الفائدة الرئيسي للبنك المركزي الموريتاني؟", "expected_pages": [25, 20601, 20608], "category": "lettres", "difficulty": "direct", "answer_contains": ["6,75"]}
+{"id": "ar_absent_01", "question": "ما هي وصفة السوشي الياباني التقليدية؟", "expected_pages": [], "category": "hors_corpus", "difficulty": "absent", "answer_contains": []}
+{"id": "ar_absent_02", "question": "ما هو عدد سكان اليابان في عام 2025؟", "expected_pages": [], "category": "hors_corpus", "difficulty": "absent", "answer_contains": []}

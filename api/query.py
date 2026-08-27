@@ -24,16 +24,55 @@ QUERY_EXPANSIONS: tuple[tuple[tuple[str, ...], str], ...] = (
      "croissance produit intérieur brut réel PIB réel activité économique"),
     (("السيولة المصرفية", "سيولة البنوك"),
      "liquidité bancaire réserves libres réserves obligatoires open market"),
+    (("الحساب الجاري", "الميزان الجاري", "عجز الحساب"),
+     "compte courant balance des paiements déficit courant transactions courantes "
+     "pourcentage du PIB"),
+    (("الميزان التجاري", "الصادرات", "الواردات"),
+     "balance commerciale exportations importations échanges extérieurs"),
     (("الاحتياطيات", "احتياطي العملات"),
      "réserves officielles brutes avoirs extérieurs mois importations"),
+    # « الدين » n'avait aucune entrée : une question arabe sur la dette n'était
+    # enrichie que par « الناتج المحلي », qui ajoute le vocabulaire de la
+    # croissance et emmène la recherche vers les mauvaises pages.
+    (("الدين", "المديونية", "الديون", "الدين الخارجي", "الدين العام"),
+     "dette extérieure encours de la dette dette publique service de la dette "
+     "pourcentage du PIB part de la dette endettement"),
+    (("خدمة الدين",),
+     "service de la dette remboursements intérêts échéances"),
     (("الودائع",),
      "dépôts clientèle secteur bancaire ressources banques"),
     (("القروض", "الائتمان"),
      "crédits créances secteur bancaire crédit à l'économie"),
+    # « القروض » seul menait au volume des crédits, jamais à leur qualité :
+    # une question sur les impayés retombait sur le total des actifs.
+    (("القروض المتعثرة", "المتعثرة", "التعثر", "القروض غير المنتظمة",
+      "جودة المحفظة", "المخصصات"),
+     "prêts non performants taux de sinistralité créances en souffrance "
+     "qualité du portefeuille provisions couverture des créances douteuses"),
+    (("الملاءة", "كفاية رأس المال", "الأموال الذاتية"),
+     "ratio de solvabilité fonds propres réglementaires adéquation des fonds propres"),
     (("المجاميع النقدية", "الكتلة النقدية"),
      "agrégats monétaires masse monétaire monnaie au sens large"),
     (("التحويلات", "الحوالات"),
      "virements transferts ACH systèmes de paiement volume valeur"),
+    # Le rapport dit « wallet bancaire » là où les utilisateurs disent
+    # « application » ou « app ». Sans ce pont, la page qui détaille les huit
+    # acteurs du marché n'est jamais retrouvée : « application bancaire »
+    # n'apparaît nulle part dans le corpus.
+    (("application bancaire", "applications bancaires", "app bancaire",
+      "apps bancaires", "appli bancaire", "applis bancaires",
+      "application mobile", "applications mobiles", "application de paiement",
+      # « wallet » est le terme du rapport lui-même : l'employer doit ramener le
+      # vocabulaire de la page qui compare les acteurs du marché.
+      "wallet", "wallets", "portefeuille electronique", "porte-monnaie electronique"),
+     "wallets bancaires wallet bancaire monnaie électronique mobile banking "
+     "portefeuille électronique transactions volumes montants"),
+    # Les marques citées dans le rapport : les nommer doit suffire à retrouver
+    # la page qui les compare.
+    (("bankily", "masrvi", "sedad", "bim-bank", "bimbank", "bci-pay", "bcipay",
+      "amanty", "bamis-digital", "bamis digital"),
+     "wallets bancaires actifs sur le marché parts de marché volumes montants "
+     "transactions monnaie électronique écosystème"),
     (("agregats monetaires", "aggregate monetaire"),
      "masse monétaire monnaie au sens large billets en circulation dépôts à vue dépôts à terme actifs extérieurs nets actifs intérieurs nets"),
     (("activite economique", "progresse en volume", "progression en volume"),

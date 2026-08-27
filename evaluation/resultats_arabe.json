@@ -1,0 +1,456 @@
+{
+  "dataset": "evaluation/questions_arabe.jsonl",
+  "metriques": {
+    "cas": 18,
+    "repondables": 16,
+    "hors_corpus": 2,
+    "faits_complets": 0.9375,
+    "faits_partiels": 0.0,
+    "faits_absents": 0.0625,
+    "fondees": 1.0,
+    "clarifications_parasites": 0.0,
+    "refus_corrects": 1.0,
+    "page_attendue_citee": 0.75,
+    "duree_moyenne": 5.31,
+    "par_difficulte": {
+      "direct": {
+        "n": 13,
+        "faits_complets": 1.0,
+        "clarifications": 0.0
+      },
+      "liste": {
+        "n": 1,
+        "faits_complets": 0.0,
+        "clarifications": 0.0
+      },
+      "paraphrase": {
+        "n": 1,
+        "faits_complets": 1.0,
+        "clarifications": 0.0
+      },
+      "raisonnement": {
+        "n": 1,
+        "faits_complets": 1.0,
+        "clarifications": 0.0
+      }
+    }
+  },
+  "cas": [
+    {
+      "id": "ar_gdp_01",
+      "question": "ما هو معدل نمو الناتج المحلي الإجمالي الحقيقي في موريتانيا في عام 2025؟",
+      "difficulty": "direct",
+      "category": "conjoncture",
+      "grounded": true,
+      "clarification": false,
+      "attendu_absent": false,
+      "refuse": false,
+      "faits_attendus": 1,
+      "faits_trouves": 1,
+      "faits_manquants": [],
+      "page_attendue_citee": true,
+      "pages_citees": [
+        5
+      ],
+      "sources": [
+        "p. PDF 5",
+        "p. PDF 23",
+        "p. PDF 12"
+      ],
+      "duree": 4.07,
+      "answer": "بلغ معدل نمو الناتج المحلي الإجمالي الحقيقي في موريتانيا ⁦4,0٪⁩ في عام ⁦2025⁩، بعد ⁦6,3٪⁩ في ⁦2024⁩ و⁦6,8٪⁩ في ⁦2023⁩. ⁦[p. PDF 5]⁩"
+    },
+    {
+      "id": "ar_gdp_03",
+      "question": "هل تسارع النمو أم تباطأ بين 2024 و2025، وبكم؟",
+      "difficulty": "raisonnement",
+      "category": "conjoncture",
+      "grounded": true,
+      "clarification": false,
+      "attendu_absent": false,
+      "refuse": false,
+      "faits_attendus": 2,
+      "faits_trouves": 2,
+      "faits_manquants": [],
+      "page_attendue_citee": true,
+      "pages_citees": [
+        5
+      ],
+      "sources": [
+        "p. PDF 5"
+      ],
+      "duree": 10.04,
+      "answer": "تباطأ النمو الاقتصادي بين ⁦2024⁩ و⁦2025⁩: انخفضت نمو الناتج المحلي الإجمالي الحقيقي من ⁦6,3٪⁩ إلى ⁦4,0٪⁩، أي بتراجع قدره ⁦2,3⁩ نقطة مئوية. ويُعزى هذا التباطؤ أساساً إلى انخفاض القيمة المضافة للقطاع الاستخراجي ⁦[p. PDF 5]⁩."
+    },
+    {
+      "id": "ar_inflation_01",
+      "question": "ما هو متوسط معدل التضخم في موريتانيا في عام 2025؟",
+      "difficulty": "direct",
+      "category": "conjoncture",
+      "grounded": true,
+      "clarification": false,
+      "attendu_absent": false,
+      "refuse": false,
+      "faits_attendus": 1,
+      "faits_trouves": 1,
+      "faits_manquants": [],
+      "page_attendue_citee": true,
+      "pages_citees": [
+        23
+      ],
+      "sources": [
+        "p. PDF 23",
+        "الرسالة الإخبارية يوليو 2026، ص. 8",
+        "p. PDF 5"
+      ],
+      "duree": 2.8,
+      "answer": "بلغ متوسط معدل التضخم في موريتانيا ⁦1,6٪⁩ في عام ⁦2025⁩، وفق التغير السنوي المتوسط للمؤشر الوطني لأسعار الاستهلاك، الذي وصل إلى ⁦126,9⁩ مقابل ⁦124,9⁩ في ⁦2024⁩. ⁦[p. PDF 23]⁩"
+    },
+    {
+      "id": "ar_inflation_02",
+      "question": "بأي وتيرة ارتفعت أسعار الاستهلاك في المتوسط خلال السنة؟",
+      "difficulty": "paraphrase",
+      "category": "conjoncture",
+      "grounded": true,
+      "clarification": false,
+      "attendu_absent": false,
+      "refuse": false,
+      "faits_attendus": 1,
+      "faits_trouves": 1,
+      "faits_manquants": [],
+      "page_attendue_citee": true,
+      "pages_citees": [
+        23
+      ],
+      "sources": [
+        "p. PDF 23",
+        "p. PDF 5"
+      ],
+      "duree": 7.85,
+      "answer": "ارتفعت أسعار الاستهلاك، مقاسة بالمؤشر الوطني لأسعار الاستهلاك، بنسبة ⁦1,6٪⁩ في المتوسط السنوي خلال ⁦2025⁩، مع تباطؤ وتيرة التضخم. ⁦[p. PDF 23]⁩"
+    },
+    {
+      "id": "ar_reserves_01",
+      "question": "ما هو مستوى الاحتياطيات الرسمية الإجمالية في نهاية ديسمبر 2025؟",
+      "difficulty": "direct",
+      "category": "exterieur",
+      "grounded": true,
+      "clarification": false,
+      "attendu_absent": false,
+      "refuse": false,
+      "faits_attendus": 1,
+      "faits_trouves": 1,
+      "faits_manquants": [],
+      "page_attendue_citee": true,
+      "pages_citees": [
+        5
+      ],
+      "sources": [
+        "p. PDF 5",
+        "p. PDF 50",
+        "p. PDF 51"
+      ],
+      "duree": 3.55,
+      "answer": "بلغت الاحتياطيات الرسمية الإجمالية ⁦2,2⁩ مليار دولار أمريكي في نهاية ديسمبر ⁦2025⁩، بما يعادل ⁦5,9⁩ أشهر من الواردات خارج الصناعات الاستخراجية ⁦[p. PDF 5]⁩."
+    },
+    {
+      "id": "ar_money_01",
+      "question": "ما هي نسبة الودائع تحت الطلب من الكتلة النقدية؟",
+      "difficulty": "direct",
+      "category": "monnaie",
+      "grounded": true,
+      "clarification": false,
+      "attendu_absent": false,
+      "refuse": false,
+      "faits_attendus": 1,
+      "faits_trouves": 1,
+      "faits_manquants": [],
+      "page_attendue_citee": false,
+      "pages_citees": [
+        30
+      ],
+      "sources": [
+        "p. PDF 30",
+        "p. PDF 31",
+        "الرسالة الإخبارية يوليو 2026، ص. 12"
+      ],
+      "duree": 3.1,
+      "answer": "بلغت نسبة الودائع تحت الطلب من الكتلة النقدية بالمعنى الواسع نحو **⁦68,2٪⁩** في ديسمبر ⁦2025⁩، محسوبة بقسمة ⁦127,53⁩ على ⁦186,91⁩. ⁦[p. PDF 30]⁩"
+    },
+    {
+      "id": "ar_treasury_01",
+      "question": "ما هو إجمالي رصيد سندات الخزينة في نهاية ديسمبر 2025؟",
+      "difficulty": "direct",
+      "category": "marches",
+      "grounded": true,
+      "clarification": false,
+      "attendu_absent": false,
+      "refuse": false,
+      "faits_attendus": 1,
+      "faits_trouves": 1,
+      "faits_manquants": [],
+      "page_attendue_citee": true,
+      "pages_citees": [
+        27
+      ],
+      "sources": [
+        "p. PDF 27",
+        "p. PDF 7",
+        "p. PDF 117"
+      ],
+      "duree": 7.13,
+      "answer": "بلغ إجمالي رصيد قيم الخزينة ⁦29,76⁩ مليار أوقية موريتانية في نهاية ديسمبر ⁦2025⁩. ⁦[p. PDF 27]⁩"
+    },
+    {
+      "id": "ar_solvency_01",
+      "question": "ما هو متوسط نسبة الملاءة المالية للبنوك في عام 2025؟",
+      "difficulty": "direct",
+      "category": "supervision",
+      "grounded": true,
+      "clarification": false,
+      "attendu_absent": false,
+      "refuse": false,
+      "faits_attendus": 1,
+      "faits_trouves": 1,
+      "faits_manquants": [],
+      "page_attendue_citee": true,
+      "pages_citees": [
+        42
+      ],
+      "sources": [
+        "p. PDF 45",
+        "p. PDF 42",
+        "p. PDF 38"
+      ],
+      "duree": 2.77,
+      "answer": "بلغ متوسط نسبة الملاءة المالية للبنوك ⁦17,7٪⁩ في نهاية عام ⁦2025⁩، مقابل ⁦19,6٪⁩ في ⁦2024⁩ و⁦20,0٪⁩ في ⁦2023⁩؛ أي انخفاض قدره ⁦1,9⁩ نقطة مئوية مقارنة بعام ⁦2024⁩. وهو أعلى من الحد التنظيمي الأدنى البالغ ⁦12,5٪⁩، مع عدم امتثال مصرفين لهذه النسبة عند إقفال السنة ⁦[p. PDF 42]⁩."
+    },
+    {
+      "id": "ar_banks_01",
+      "question": "كم بلغ إجمالي أصول القطاع المصرفي في نهاية 2025؟",
+      "difficulty": "direct",
+      "category": "supervision",
+      "grounded": true,
+      "clarification": false,
+      "attendu_absent": false,
+      "refuse": false,
+      "faits_attendus": 1,
+      "faits_trouves": 1,
+      "faits_manquants": [],
+      "page_attendue_citee": true,
+      "pages_citees": [
+        40
+      ],
+      "sources": [
+        "p. PDF 40",
+        "p. PDF 33",
+        "p. PDF 7"
+      ],
+      "duree": 5.53,
+      "answer": "بلغ إجمالي أصول القطاع المصرفي ⁦218,5⁩ مليار أوقية موريتانية في نهاية ⁦2025⁩، بزيادة قدرها ⁦17,7٪⁩ مقارنة بعام ⁦2024⁩. ⁦[p. PDF 40]⁩"
+    },
+    {
+      "id": "ar_npl_01",
+      "question": "ما هي نسبة القروض المتعثرة في المحفظة المصرفية في عام 2025؟",
+      "difficulty": "direct",
+      "category": "supervision",
+      "grounded": true,
+      "clarification": false,
+      "attendu_absent": false,
+      "refuse": false,
+      "faits_attendus": 1,
+      "faits_trouves": 1,
+      "faits_manquants": [],
+      "page_attendue_citee": true,
+      "pages_citees": [
+        34,
+        43
+      ],
+      "sources": [
+        "p. PDF 39",
+        "p. PDF 43",
+        "p. PDF 44"
+      ],
+      "duree": 2.28,
+      "answer": "بلغت نسبة القروض المتعثرة في المحفظة المصرفية ⁦17,8٪⁩ في نهاية عام ⁦2025⁩. ⁦[p. PDF 34]⁩ وهي تمثل ⁦17,8٪⁩ من إجمالي محفظة التزامات العملاء في النظام المصرفي. ⁦[p. PDF 43]⁩"
+    },
+    {
+      "id": "ar_gas_01",
+      "question": "كم بلغت صادرات الغاز من مشروع السلحفاة الكبرى أحميم في عام 2025؟",
+      "difficulty": "direct",
+      "category": "exterieur",
+      "grounded": true,
+      "clarification": false,
+      "attendu_absent": false,
+      "refuse": false,
+      "faits_attendus": 1,
+      "faits_trouves": 1,
+      "faits_manquants": [],
+      "page_attendue_citee": true,
+      "pages_citees": [
+        55
+      ],
+      "sources": [
+        "p. PDF 55",
+        "p. PDF 5",
+        "p. PDF 54"
+      ],
+      "duree": 8.65,
+      "answer": "بلغت قيمة صادرات الغاز من مشروع السلحفاة الكبرى أحميم (⁦GTA⁩) في عام ⁦2025⁩ نحو ⁦237⁩ مليون دولار أمريكي، أي ⁦9,4⁩ مليارات أوقية موريتانية. ⁦[p. PDF 55]⁩\n\nبدأت صادرات الغاز الطبيعي المسال من المشروع فعلياً في أبريل ⁦2025⁩ بتصدير أول شحنة ضمن المرحلة الأولى، بعد أول نقل للغاز في نهاية عام ⁦2024⁩. ⁦[p. PDF 55]⁩"
+    },
+    {
+      "id": "ar_current_01",
+      "question": "ما هو عجز الحساب الجاري في عام 2025؟",
+      "difficulty": "direct",
+      "category": "exterieur",
+      "grounded": true,
+      "clarification": false,
+      "attendu_absent": false,
+      "refuse": false,
+      "faits_attendus": 2,
+      "faits_trouves": 2,
+      "faits_manquants": [],
+      "page_attendue_citee": true,
+      "pages_citees": [
+        5
+      ],
+      "sources": [
+        "p. PDF 54",
+        "p. PDF 5",
+        "p. PDF 56"
+      ],
+      "duree": 2.54,
+      "answer": "بلغ عجز الحساب الجاري ⁦416⁩ مليون دولار أمريكي في عام ⁦2025⁩، أي ⁦3,4٪⁩ من الناتج المحلي الإجمالي، مقابل ⁦1,04⁩ مليار دولار أمريكي، أي ⁦9,4٪⁩ من الناتج المحلي الإجمالي في عام ⁦2024⁩. ⁦[p. PDF 5]⁩"
+    },
+    {
+      "id": "ar_debt_01",
+      "question": "ما هي النسبة المئوية التي يمثلها الدين من الناتج المحلي الإجمالي؟",
+      "difficulty": "direct",
+      "category": "exterieur",
+      "grounded": true,
+      "clarification": false,
+      "attendu_absent": false,
+      "refuse": false,
+      "faits_attendus": 1,
+      "faits_trouves": 1,
+      "faits_manquants": [],
+      "page_attendue_citee": false,
+      "pages_citees": [
+        60
+      ],
+      "sources": [
+        "p. PDF 60",
+        "p. PDF 56",
+        "p. PDF 5"
+      ],
+      "duree": 2.31,
+      "answer": "يمثل رصيد الدين الخارجي ⁦37٪⁩ من الناتج المحلي الإجمالي في نهاية ⁦2025⁩، مقابل ⁦40٪⁩ في ⁦2024⁩، أي انخفاض قدره ⁦3⁩ نقاط مئوية. ⁦[p. PDF 60]⁩"
+    },
+    {
+      "id": "ar_payment_01",
+      "question": "ما هي الإصلاحات التي يجري طرحها لأنظمة الدفع؟",
+      "difficulty": "liste",
+      "category": "paiements",
+      "grounded": true,
+      "clarification": false,
+      "attendu_absent": false,
+      "refuse": false,
+      "faits_attendus": 1,
+      "faits_trouves": 0,
+      "faits_manquants": [
+        "ISO 20022"
+      ],
+      "page_attendue_citee": true,
+      "pages_citees": [
+        7,
+        64,
+        65,
+        75
+      ],
+      "sources": [
+        "الرسالة الإخبارية يوليو 2026، ص. 3",
+        "الرسالة الإخبارية مايو 2026، ص. 3",
+        "p. PDF 64"
+      ],
+      "duree": 15.32,
+      "answer": "تُطرح إصلاحات لتحديث النظام الوطني للدفع، وتعزيز حوكمته ورقابته وقدرته على الصمود، وتحقيق قابلية التشغيل البيني وأمن المدفوعات. وتشمل كذلك الدفع الفوري، والرقابة المستمرة على المخاطر والحوادث، وتطوير البنية التحتية وفق المعايير الدولية. [الرسالة الإخبارية يوليو ⁦2026⁩، ص. ⁦3⁩]\n\n- **الإطار التنظيمي للرقابة**: وُضع إطار يحدد آليات رقابة البنك المركزي الموريتاني على البنى التحتية للأسواق المالية، بما ينسجم مع المعايير الدولية، ويشمل الأنظمة التي يديرها البنك وتلك التي يديرها أطراف خارجيون، فضلاً عن حلول ووسائل الدفع الصادرة عن مؤسسات الائتمان ومؤسسات النقود الإلكترونية. ⁦[p. PDF 64]⁩\n\n- **المراقبة المستمرة**: اقتنى البنك المركزي الموريتاني في ⁦2025⁩ نظاماً لإعداد التقارير والرقابة يتيح المتابعة المتواصلة لنشاط منظومة المدفوعات الوطنية ومخاطرها وحوادثها. ⁦[p. PDF 64]⁩\n\n- **نظام الدفع الفوري**: يُنفَّذ المشروع عبر إنشاء البنية المعلوماتية وبدء تطوير الحل البرمجي؛ ويستهدف مدفوعات رقمية سريعة، متاحة، آمنة، متواصلة ومنخفضة التكلفة، مع ضرورة دعم التشغيل البيني وانضمام الفاعلين والتواصل والتوعية. ⁦[p. PDF 75]⁩\n\n- **تحديث البنى التحتية والأمن**: تتضمن المشاريع رفع مستوى البنية التحتية للنظام الوطني للدفع (⁦ATS⁩/⁦CSD⁩) لضمان الإتاحة العالية والنسخ الاحتياطي، وإجراء تدقيق للأمن المعلوماتي واختبارات الاختراق، وتنفيذ التوصيات لتعزيز مرونة واستقرار البنية المعلوماتية للبنك المركزي الموريتاني. ⁦[p. PDF 75]⁩\n\n- **قابلية التشغيل البيني والتحول الرقمي**: تكثفت الأعمال المتعلقة بقابلية التشغيل البيني للمدفوعات الرقمية، ورقابة البنى التحتية للأسواق، وأمن المعاملات المالية، دعماً للشمول المالي والتحول الرقمي؛ كما تقدم مشروع مكتب خدمات ⁦SWIFT⁩ وطني لخدمة الفاعلين الماليين في نواكشوط. ⁦[p. PDF 7]⁩\n\n- **إدارة حوادث الدفع**: يُطرح إنشاء مركز لحوادث الدفع لتجميع الحوادث الواقعة في أنظمة ووسائل الدفع ومركزتها ونشرها، بهدف الوقاية منها وإدارتها وبناء قاعدة بيانات بشأنها. ⁦[p. PDF 65]⁩"
+    },
+    {
+      "id": "ar_lettre_01",
+      "question": "ماذا تقول الرسالة الإخبارية لشهر مارس 2026 عن التبرع بالدم؟",
+      "difficulty": "direct",
+      "category": "lettres",
+      "grounded": true,
+      "clarification": false,
+      "attendu_absent": false,
+      "refuse": false,
+      "faits_attendus": 1,
+      "faits_trouves": 1,
+      "faits_manquants": [],
+      "page_attendue_citee": false,
+      "pages_citees": [],
+      "sources": [
+        "الرسالة الإخبارية مارس 2026، ص. 2"
+      ],
+      "duree": 6.99,
+      "answer": "نظّم البنك المركزي الموريتاني، في ⁦17⁩ مارس ⁦2026⁩، عملية تبرع بالدم لصالح بنك الدم في نواكشوط، بمشاركة موظفين متطوعين في إطار التضامن والالتزام. وتندرج هذه المبادرة ضمن نهج المسؤولية المجتمعية الذي يتبناه البنك. [الرسالة الإخبارية مارس ⁦2026⁩، ص. ⁦2⁩]"
+    },
+    {
+      "id": "ar_lettre_02",
+      "question": "ما هو سعر الفائدة الرئيسي للبنك المركزي الموريتاني؟",
+      "difficulty": "direct",
+      "category": "lettres",
+      "grounded": true,
+      "clarification": false,
+      "attendu_absent": false,
+      "refuse": false,
+      "faits_attendus": 1,
+      "faits_trouves": 1,
+      "faits_manquants": [],
+      "page_attendue_citee": false,
+      "pages_citees": [],
+      "sources": [
+        "الرسالة الإخبارية يوليو 2026، ص. 1",
+        "الرسالة الإخبارية يوليو 2026، ص. 8"
+      ],
+      "duree": 6.35,
+      "answer": "سعر الفائدة الرئيسي للبنك المركزي الموريتاني هو ⁦6,75٪⁩، بعد رفعه بمقدار ⁦25⁩ نقطة أساس من ⁦6,50٪⁩ في ⁦14⁩ يوليو ⁦2026⁩. [الرسالة الإخبارية يوليو ⁦2026⁩، ص. ⁦1⁩]"
+    },
+    {
+      "id": "ar_absent_01",
+      "question": "ما هي وصفة السوشي الياباني التقليدية؟",
+      "difficulty": "absent",
+      "category": "hors_corpus",
+      "grounded": false,
+      "clarification": false,
+      "attendu_absent": true,
+      "refuse": true,
+      "faits_attendus": 0,
+      "faits_trouves": 0,
+      "faits_manquants": [],
+      "page_attendue_citee": null,
+      "pages_citees": [],
+      "sources": [],
+      "duree": 2.43,
+      "answer": "لا أجد هذه المعلومة في وثائق البنك المركزي الموريتاني المتاحة (التقرير السنوي والرسائل الإخبارية)."
+    },
+    {
+      "id": "ar_absent_02",
+      "question": "ما هو عدد سكان اليابان في عام 2025؟",
+      "difficulty": "absent",
+      "category": "hors_corpus",
+      "grounded": false,
+      "clarification": false,
+      "attendu_absent": true,
+      "refuse": true,
+      "faits_attendus": 0,
+      "faits_trouves": 0,
+      "faits_manquants": [],
+      "page_attendue_citee": null,
+      "pages_citees": [],
+      "sources": [],
+      "duree": 1.9,
+      "answer": "لا أجد هذه المعلومة في وثائق البنك المركزي الموريتاني المتاحة (التقرير السنوي والرسائل الإخبارية)."
+    }
+  ]
+}

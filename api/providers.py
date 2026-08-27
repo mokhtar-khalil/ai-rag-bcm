@@ -413,15 +413,11 @@ def _finalize_generated_answer(
     invalid_pages = cited_pages - allowed_pages
     if invalid_pages:
         raise ValueError(f"Citation non autorisée produite par le modèle : {sorted(invalid_pages)}")
-    citations = list(dict.fromkeys(_citation(item) for item in results))
-    normalised_answer = _normalise_apostrophes(answer)
-    cited_any = bool(cited_pages) or any(
-        _normalise_apostrophes(citation) in normalised_answer for citation in citations
-    )
-    missing_answer = missing_information_message(selected_language)
-    if answer != missing_answer and not cited_any:
-        label = "المصادر" if selected_language == "ar" else "Sources"
-        answer += f"\n\n{label} : " + ", ".join(citations) + "."
+    # La liste des sources n'est plus recopiée dans le texte. Elle y était
+    # ajoutée dès qu'aucune citation n'apparaissait — y compris lorsque le
+    # modèle rédigeait lui-même un refus, ce qui donnait « cette information est
+    # absente » suivi de six sources. Le champ « sources » de la réponse HTTP,
+    # affiché séparément par le widget, assure déjà la traçabilité.
     # Le rendu bidirectionnel vient en dernier : ses isolats se glissent à
     # l'intérieur des repères et empêcheraient toute comparaison de citation.
     if selected_language == "ar":

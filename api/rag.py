@@ -679,7 +679,11 @@ class RAGIndex:
         expanded = list(results)
         known_ids = {int(item["chunk_id"]) for item in results}
         by_id = {chunk.chunk_id: chunk for chunk in self.chunks}
-        for result in results[:3]:
+        # L'expansion ne portait que sur les trois premiers passages. Un chunk
+        # coupé au milieu d'un raisonnement — le cas que ce mécanisme existe
+        # pour rattraper — restait donc invisible dès que son voisin arrivait en
+        # quatrième position. La borne `max_results` limite déjà le volume.
+        for result in results[:8]:
             current_id = int(result["chunk_id"])
             # Les tableaux larges occupent souvent trois chunks. On privilégie
             # leur continuation, puis leur contexte précédent.
