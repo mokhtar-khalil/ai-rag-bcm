@@ -1,0 +1,25 @@
+# Vercel ne publie que le widget. Tout ce qui appartient à l'API hébergée sur
+# Railway est exclu : cela raccourcit le déploiement et, surtout, empêche la
+# détection automatique d'un projet Python à partir de requirements.txt.
+api
+core
+frontend
+tests
+evaluation
+data
+storage
+logs
+docs
+
+Dockerfile
+docker-compose.yml
+railway.json
+requirements.txt
+requirements-api.txt
+requirements-dev.txt
+wsgi.py
+run.sh
+run_api_prod.sh
+setup.sh
+
+# scripts/ est conservé : build_widget_vercel.sh y vit.

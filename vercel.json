@@ -1,5 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "echo 'Widget statique : aucune dépendance à installer.'",
   "buildCommand": "sh scripts/build_widget_vercel.sh",
   "outputDirectory": "public",
   "cleanUrls": true,

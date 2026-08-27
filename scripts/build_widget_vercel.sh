@@ -10,8 +10,18 @@
 # son comportement local et reste utilisable via « ?api=https://… ».
 set -eu
 
-SOURCE="widget"
-SORTIE="public"
+# Les chemins sont résolus depuis l'emplacement du script, jamais depuis le
+# répertoire courant : la plateforme de déploiement choisit ce dernier, et une
+# racine de projet mal réglée ferait échouer une résolution relative.
+RACINE=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+SOURCE="$RACINE/widget"
+SORTIE="$RACINE/public"
+
+if [ ! -d "$SOURCE" ]; then
+  echo "Dossier introuvable : $SOURCE" >&2
+  echo "Le script doit rester dans scripts/, à la racine du dépôt." >&2
+  exit 1
+fi
 
 rm -rf "$SORTIE"
 mkdir -p "$SORTIE"
