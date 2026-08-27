@@ -561,3 +561,34 @@ def test_health_does_not_expose_internal_fingerprints() -> None:
     assert payload["chunks"] > 2000
     assert payload["documents"] >= 1
     assert payload["semantic_index"] in (True, False)
+
+
+def test_health_reports_a_degraded_generation(monkeypatch) -> None:
+    """Un repli extractif silencieux doit devenir visible sur la sonde de santé."""
+    def generation_en_panne(*args, **kwargs):
+        raise RuntimeError("fournisseur injoignable")
+
+    monkeypatch.setattr("api.app.stream_answer", generation_en_panne)
+    settings = get_settings(
+        {
+            "APP_ENV": "test",
+            "GENERATION_PROVIDER": "extractive",
+            "OPEN_BROWSER": "false",
+        }
+    )
+    client = create_app(settings_override=settings).test_client()
+
+    avant = client.get("/health").json["generation"]
+    assert avant["degradee"] is False
+
+    client.post(
+        "/api/ask",
+        json={"question": "Quel est le taux de croissance du PIB réel en 2025 ?"},
+    )
+
+    apres = client.get("/health").json["generation"]
+    assert apres["degradee"] is True
+    assert apres["dernier_echec"] == "RuntimeError"
+    assert apres["echecs"] == 1
+    # Le nom du fournisseur ne doit pas transparaître sur un point d'entrée public.
+    assert "openai" not in str(apres).casefold()

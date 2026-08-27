@@ -28,15 +28,18 @@ from api.query import build_retrieval_query
 
 
 SYSTEM_INSTRUCTIONS = """Tu es un analyste documentaire strict de la Banque Centrale de Mauritanie.
-Réponds dans la langue de la question et uniquement avec les extraits du Rapport annuel BCM fournis.
+Réponds dans la langue de la question et uniquement avec les extraits fournis, issus des documents
+publiés par la BCM : le Rapport annuel de l'exercice 2025 et les Lettres d'information mensuelles.
 Une question en arabe exige une réponse en arabe standard moderne, même si les sources sont en français.
 
 Règles obligatoires :
 1. Commence par une réponse directe, sans introduction générique.
 2. Reproduis exactement les chiffres, unités, périodes et bases de comparaison des sources.
-3. Cite chaque fait avec le repère exact indiqué en tête de l'extrait, entre crochets, et
-   recopie-le caractère pour caractère. Ce repère est déjà rédigé dans la langue de la réponse :
-   ne le traduis pas, ne le reformule pas et n'en combine jamais deux.
+3. Cite chaque fait en recopiant, entre crochets, la valeur exacte de la ligne « Repère à citer »
+   de l'extrait utilisé — rien d'autre. N'inclus jamais « EXTRAIT n » ni le mot « Repère » dans
+   la citation. Exemples corrects : [p. PDF 23], [Lettre d'information Mars 2026, p. 2].
+   Ce repère est déjà rédigé dans la langue de la réponse : ne le traduis pas, ne le reformule
+   pas et n'en combine jamais deux.
 4. Ne recopie pas mécaniquement un extrait : relie et explique les faits utiles à la question.
 5. Distingue un niveau, une variation, une contribution, une estimation et une projection.
 6. Si deux passages divergent, expose la divergence au lieu de choisir silencieusement.
@@ -133,7 +136,7 @@ def _citation(item: dict[str, Any]) -> str:
 def _context(results: list[dict[str, Any]]) -> str:
     """Formate les passages récupérés avec leur repère pour le générateur."""
     return "\n\n".join(
-        f"[EXTRAIT {i} | {_citation(item)}]\n{item['text']}"
+        f"--- EXTRAIT {i}\nRepère à citer : {_citation(item)}\nTexte :\n{item['text']}"
         for i, item in enumerate(results, start=1)
     )
 
@@ -389,6 +392,10 @@ def _finalize_generated_answer(
     """Applique le rendu arabe, valide les citations et ajoute les sources manquantes."""
     # Avant tout contrôle : le rendu arabe insère des isolats directionnels qui
     # rendraient la réparation et la validation moins fiables.
+    # Certains modèles recopient l'en-tête complet de l'extrait. La citation
+    # reste juste sur le fond : on la nettoie au lieu de perdre la réponse.
+    answer = re.sub(r"\[\s*(?:---\s*)?EXTRAIT\s*\d+\s*\|\s*", "[", answer)
+    answer = re.sub(r"\[\s*Repère à citer\s*:\s*", "[", answer)
     answer = _repair_source_confusion(answer, results)
     if selected_language == "ar":
         answer = normalize_arabic_units(answer)

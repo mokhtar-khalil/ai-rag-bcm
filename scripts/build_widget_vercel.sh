@@ -45,4 +45,9 @@ else
   echo "BCM_API_URL non définie : la démonstration vise l'API locale."
 fi
 
+# Sans page d'accueil, la racine du domaine renvoie une erreur 404 brute. La
+# démonstration y sert de vitrine : c'est la première chose que verra quiconque
+# ouvre l'URL, y compris l'équipe de la BCM.
+cp "$SORTIE/demo.html" "$SORTIE/index.html"
+
 echo "Publié : $(ls "$SORTIE" | tr '\n' ' ')"

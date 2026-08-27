@@ -194,24 +194,29 @@ Les en-têtes servis :
 curl -sI https://ai-bcm.vercel.app/bcm-chat-widget.js | grep -i "content-type\|cache-control\|access-control"
 ```
 
-Puis ouvrir `https://ai-bcm.vercel.app/demo.html` : la page de démonstration
-sert de banc d'essai indépendant du site de la BCM.
+Puis ouvrir la racine `https://ai-bcm.vercel.app/` : la démonstration y sert de
+page d'accueil et de banc d'essai indépendant du site de la BCM. `cleanUrls`
+étant actif, `/demo.html` redirige vers `/demo` — les deux fonctionnent.
 
-> `demo.html` porte une `data-api-url` locale (`http://127.0.0.1:5000`). Avant
-> de publier, pointez-la vers l'URL Railway, sinon la démonstration en ligne
-> reste muette.
+> Sans `BCM_API_URL`, la démonstration vise `127.0.0.1`. Une page servie en
+> HTTPS ne peut pas appeler une adresse locale en HTTP : le navigateur bloque la
+> requête comme contenu mixte. Le widget l'annonce alors franchement — point
+> rouge et « Service indisponible » — au lieu de rester silencieux.
 
 ## 3. Ordre des opérations
 
 1. Déployer l'API sur Railway ; noter son URL.
 2. Renseigner `CORS_ALLOWED_ORIGINS` avec les domaines de la BCM **et** le
    domaine Vercel.
-3. Pointer `data-api-url` de `widget/demo.html` vers l'URL Railway.
-4. Déployer le widget sur Vercel ; noter son URL.
-5. Transmettre à l'équipe BCM `docs/INTEGRATION_EQUIPE_BCM.md`, complété des
+3. Définir `BCM_API_URL` dans Vercel avec l'URL Railway, puis redéployer :
+   la démonstration en ligne vise alors la bonne API.
+4. Transmettre à l'équipe BCM `docs/INTEGRATION_EQUIPE_BCM.md`, complété des
    deux URL.
-6. Leur demander la liste exacte de leurs origines, et l'ajouter à
+5. Leur demander la liste exacte de leurs origines, et l'ajouter à
    `CORS_ALLOWED_ORIGINS`.
+
+L'ordre compte : le domaine Vercel doit figurer dans `CORS_ALLOWED_ORIGINS`
+(étape 2) avant que la démonstration ne puisse interroger l'API.
 
 L'étape 6 est celle qui bloque en pratique : `https://bcm.mr` et
 `https://www.bcm.mr` sont deux origines distinctes pour le navigateur, et une

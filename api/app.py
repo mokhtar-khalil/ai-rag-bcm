@@ -681,6 +681,14 @@ def create_app(
         PROPAGATE_EXCEPTIONS=False,
         TESTING=settings.is_testing,
     )
+    # Une génération qui échoue est rattrapée par le repli extractif : le
+    # service continue de répondre, mais avec des extraits bruts au lieu d'une
+    # réponse rédigée. Sans trace exposée, la panne reste invisible — /health
+    # répond « ok » et le widget affiche un point vert. Cet état la rend
+    # observable sans appeler le fournisseur à chaque sonde.
+    generation_state: dict[str, Any] = {"succes": 0, "echecs": 0, "dernier_echec": None}
+
+    app.extensions["bcm_generation_state"] = generation_state
     app.extensions["bcm_settings"] = settings
     app.extensions["bcm_engine"] = engine
     configure_logging(app, settings)
@@ -775,6 +783,15 @@ def create_app(
                 "chunks": engine.metadata.get("chunks", 0),
                 "semantic_index": engine.metadata.get("semantic_index", False),
                 "index_schema_version": engine.metadata.get("index_schema_version"),
+                # Le nom du fournisseur reste privé ; seul son état est publié.
+                "generation": {
+                    "reponses_redigees": generation_state["succes"],
+                    "echecs": generation_state["echecs"],
+                    "dernier_echec": generation_state["dernier_echec"],
+                    # Vrai dès qu'une génération a échoué sans succès depuis :
+                    # le service répond alors par extraits bruts.
+                    "degradee": generation_state["dernier_echec"] is not None,
+                },
             }
         )
 
@@ -1488,7 +1505,11 @@ def create_app(
                     yield ("delta", valeur)
                 else:
                     answer = valeur
+            generation_state["succes"] += 1
+            generation_state["dernier_echec"] = None
         except Exception as exc:
+            generation_state["echecs"] += 1
+            generation_state["dernier_echec"] = type(exc).__name__
             app.logger.warning(
                 "request_id=%s generation_failed provider=%s error_type=%s",
                 g.request_id,
