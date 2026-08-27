@@ -7,7 +7,7 @@
   "deploy": {
     "startCommand": "./run_api_prod.sh",
     "healthcheckPath": "/health",
-    "healthcheckTimeout": 240,
+    "healthcheckTimeout": 180,
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 3,
     "numReplicas": 1
