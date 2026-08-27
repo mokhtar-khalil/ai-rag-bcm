@@ -68,6 +68,33 @@ chacun aurait son compteur et la limite annoncée serait multipliée d'autant.
 **Si vous devez un jour passer à plusieurs workers ou plusieurs répliques, il
 faudra d'abord brancher Redis sur le limiteur.**
 
+### Temps de réponse : borner le parallélisme de torch
+
+Symptôme observé en production : une question inédite mettait 6 à 9 secondes
+avant même d'atteindre la génération, contre 0,15 s en local. Une question déjà
+posée revenait en 0,01 s — le cache d'embedding — ce qui désignait clairement le
+calcul du vecteur de la question.
+
+Cause : torch dimensionne son parallélisme sur le nombre de cœurs annoncés par
+l'hôte, pas sur le quota alloué au conteneur. Ses threads se disputent alors la
+même fraction de CPU, et l'ordonnancement coûte plus qu'il ne rapporte.
+
+Mesuré sur l'image, quatre questions inédites :
+
+| | 1 vCPU | 2 vCPU |
+|---|---|---|
+| Sans réglage | 1,41 s | 0,36 s |
+| `OMP_NUM_THREADS=1` | **0,15 s** | **0,11 s** |
+| `OMP_NUM_THREADS=2` | — | 0,15 s |
+
+Un seul thread gagne dans les deux cas : vectoriser une question courte ne tire
+aucun profit du parallélisme. Le réglage est inscrit dans le `Dockerfile`, donc
+actif sans configuration. **Ne l'augmentez pas** en pensant accélérer le service.
+
+Ce coût se paie autant de fois qu'il y a de reformulations : lorsque le
+planificateur en produit trois, la recherche enchaîne quatre vectorisations. Sur
+la production non réglée, cette étape atteignait 29 secondes à elle seule.
+
 ### Diffusion des réponses
 
 L'API renvoie la réponse en Server-Sent Events sur `/api/ask/stream`. La

@@ -49,7 +49,14 @@ assert e.metadata['chunks'] > 2000, 'index incomplet'"
 # sur Swift + Apple Vision, disponibles uniquement sur macOS. Cette image Linux
 # ne peut pas l'activer : CHART_ANALYSIS_ENABLED doit rester "false" tant qu'un
 # moteur OCR multiplateforme ne l'a pas remplacé (roadmap, au-delà de la Phase 1).
-ENV APP_ENV=production \
+# torch dimensionne son parallélisme sur le nombre de cœurs annoncés par l'hôte,
+# pas sur le quota du conteneur. Sur une plateforme comme Railway, ses threads se
+# disputent alors la même fraction de CPU. Mesuré sur cette image : une question
+# passe de 1,41 s à 0,15 s à 1 vCPU, et de 0,36 s à 0,11 s à 2 vCPU. La
+# vectorisation d'une question courte ne tire aucun profit du parallélisme.
+ENV OMP_NUM_THREADS=1 \
+    MKL_NUM_THREADS=1 \
+    APP_ENV=production \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     API_HOST=0.0.0.0 \
