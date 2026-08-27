@@ -85,3 +85,79 @@ def test_gemini_key_is_not_required_outside_production() -> None:
     )
     assert settings.generation_provider == "gemini"
     assert settings.gemini_api_key == ""
+
+
+def test_widget_origin_is_built_from_its_host_and_port() -> None:
+    """L'origine annoncée doit être exactement celle qu'enverra le navigateur."""
+    settings = get_settings(
+        {
+            "APP_ENV": "test",
+            "GENERATION_PROVIDER": "extractive",
+            "OPEN_BROWSER": "false",
+            "WIDGET_HOST": "127.0.0.1",
+            "WIDGET_PORT": "8090",
+        }
+    )
+    assert settings.widget_origin == "http://127.0.0.1:8090"
+
+
+def test_widget_cors_check_rejects_a_near_miss_origin() -> None:
+    """localhost et 127.0.0.1 sont deux origines distinctes pour le navigateur."""
+    import sys
+    from pathlib import Path
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+    from check_widget_cors import problem
+
+    base = {
+        "APP_ENV": "test",
+        "GENERATION_PROVIDER": "extractive",
+        "OPEN_BROWSER": "false",
+        "WIDGET_HOST": "127.0.0.1",
+        "WIDGET_PORT": "8090",
+    }
+    assert problem(get_settings({**base, "CORS_ALLOWED_ORIGINS": ""}))
+    assert problem(get_settings({**base, "CORS_ALLOWED_ORIGINS": "http://localhost:8090"}))
+    assert not problem(
+        get_settings({**base, "CORS_ALLOWED_ORIGINS": "http://127.0.0.1:8090,https://bcm.mr"})
+    )
+
+
+def test_gemini_budget_accounts_for_reasoning_tokens() -> None:
+    """Le plafond de sortie doit absorber la réflexion, pas la seule réponse."""
+    settings = get_settings(
+        {"APP_ENV": "test", "GENERATION_PROVIDER": "extractive", "OPEN_BROWSER": "false"}
+    )
+    # Mesuré sur ce corpus : la réflexion seule dépasse parfois 3 500 tokens.
+    assert settings.gemini_max_output_tokens >= 8000
+    assert settings.gemini_thinking_level == "low"
+
+
+def test_invalid_thinking_level_is_refused() -> None:
+    """Une valeur inconnue doit échouer au démarrage, pas à la première question."""
+    import pytest
+
+    from core.config import ConfigurationError
+
+    with pytest.raises(ConfigurationError):
+        get_settings(
+            {
+                "APP_ENV": "test",
+                "GENERATION_PROVIDER": "extractive",
+                "OPEN_BROWSER": "false",
+                "GEMINI_THINKING_LEVEL": "maximum",
+            }
+        )
+
+
+def test_thinking_level_can_be_left_to_the_model() -> None:
+    """Une valeur vide laisse le modèle choisir son effort de raisonnement."""
+    settings = get_settings(
+        {
+            "APP_ENV": "test",
+            "GENERATION_PROVIDER": "extractive",
+            "OPEN_BROWSER": "false",
+            "GEMINI_THINKING_LEVEL": "",
+        }
+    )
+    assert settings.gemini_thinking_level == ""

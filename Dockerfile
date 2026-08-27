@@ -38,7 +38,12 @@ RUN chmod +x run_api_prod.sh && mkdir -p storage logs
 RUN APP_ENV=production GENERATION_PROVIDER=extractive \
         python scripts/index_report.py \
     && APP_ENV=production GENERATION_PROVIDER=extractive \
-        python scripts/index_embeddings.py --if-configured
+        python scripts/index_embeddings.py --if-configured \
+    && APP_ENV=production GENERATION_PROVIDER=extractive \
+        python -c "from api.rag import RAGIndex; from core.config import get_settings; \
+s = get_settings(); e = RAGIndex(s.report_path, s.index_path).load(); \
+print('corpus indexé :', e.metadata['documents'], 'documents,', e.metadata['chunks'], 'passages'); \
+assert e.metadata['chunks'] > 2000, 'index incomplet'"
 
 # L'OCR local des graphiques (api/charts.py, scripts/build_chart_ocr.sh) repose
 # sur Swift + Apple Vision, disponibles uniquement sur macOS. Cette image Linux
@@ -57,7 +62,8 @@ USER bcm
 
 EXPOSE 5000
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
-    CMD curl -fsS http://127.0.0.1:5000/health || exit 1
+# Le port d'écoute est imposé par la plateforme : la sonde doit le suivre.
+HEALTHCHECK --interval=30s --timeout=10s --start-period=90s --retries=3 \
+    CMD curl -fsS "http://127.0.0.1:${PORT:-${API_PORT:-5000}}/health" || exit 1
 
 CMD ["./run_api_prod.sh"]

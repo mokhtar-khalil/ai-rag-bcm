@@ -1,0 +1,2217 @@
+[
+ {
+  "id": "li2601_01",
+  "difficulty": "direct",
+  "question": "Quand s'est tenue la réunion mensuelle de concertation entre la BCM et les banques primaires en janvier 2026 ?",
+  "grounded": true,
+  "answer": "La réunion mensuelle de concertation entre la BCM et les dirigeants des banques primaires s’est tenue le 28 janvier 2026, sous la présidence de M. Mohamed-Lemine DHEHBY, gouverneur de la Banque Centrale de Mauritanie. [EXTRAIT 2 | Lettre d'information Janvier 2026, p. 1]",
+  "cited": [
+   [
+    "lettre-2026-01",
+    1
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-01",
+    1
+   ]
+  ],
+  "seconds": 4.7,
+  "source_ok": true,
+  "found": [
+   "28 janvier 2026"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2601_02",
+  "difficulty": "direct",
+  "question": "Quelle charte a été signée lors de la réunion de janvier 2026 avec les dirigeants des banques primaires ?",
+  "grounded": true,
+  "answer": "La Charte Interbancaire de Conformité a été signée lors de la réunion mensuelle de concertation du 28 janvier 2026 avec les dirigeants des banques primaires. Elle illustre l’engagement collectif du secteur bancaire en faveur du renforcement des dispositifs LBC/FT. [EXTRAIT 1 | Lettre d'information Janvier 2026, p. 1] [EXTRAIT 4 | Lettre d'information Janvier 2026, p. 1]",
+  "cited": [
+   [
+    "lettre-2026-01",
+    1
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-01",
+    1
+   ]
+  ],
+  "seconds": 11.8,
+  "source_ok": true,
+  "found": [
+   "Charte Interbancaire de Conformité"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2601_03",
+  "difficulty": "direct",
+  "question": "À quelle date le Conseil des Systèmes de Paiement, de Compensation et de Règlement des Titres s'est-il réuni en janvier 2026 et où ?",
+  "grounded": true,
+  "answer": "Le Conseil des Systèmes de Paiement, de Compensation et de Règlement des Titres s’est réuni le 29 janvier 2026 à Nouakchott. [EXTRAIT 1 | Lettre d'information Janvier 2026, p. 1]",
+  "cited": [
+   [
+    "lettre-2026-01",
+    1
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-01",
+    1
+   ]
+  ],
+  "seconds": 4.1,
+  "source_ok": true,
+  "found": [
+   "29 janvier 2026",
+   "Nouakchott"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2601_04",
+  "difficulty": "liste",
+  "question": "Quelles infrastructures du Système National de Paiement le CSPCT a-t-il passées en revue ?",
+  "grounded": true,
+  "answer": "Le CSPCT a passé en revue l’évolution des principales infrastructures du Système National de Paiement : le RTGS, la chambre de compensation automatisée (ACH), le dépositaire central des titres (CSD) et les systèmes ATS. [EXTRAIT 1 | Lettre d'information Janvier 2026, p. 1]",
+  "cited": [
+   [
+    "lettre-2026-01",
+    1
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-01",
+    1
+   ]
+  ],
+  "seconds": 15.6,
+  "source_ok": true,
+  "found": [
+   "RTGS",
+   "ACH",
+   "CSD",
+   "ATS"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2601_05",
+  "difficulty": "direct",
+  "question": "Avec quelle agence des Nations Unies la BCM a-t-elle signé un mémorandum d'entente le 27 janvier 2026, et sur quel sujet ?",
+  "grounded": true,
+  "answer": "La BCM a signé le 27 janvier 2026 un Mémorandum d’Entente avec le Haut-Commissariat des Nations Unies pour les Réfugiés (HCR). Il porte sur la promotion de l’inclusion financière des réfugiés en Mauritanie, afin de faciliter leur accès aux services financiers formels et de soutenir leur autonomisation économique, dans le cadre de la SNIF et du PAFIID. [EXTRAIT 1 | Lettre d'information Janvier 2026, p. 1]",
+  "cited": [
+   [
+    "lettre-2026-01",
+    1
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-01",
+    1
+   ]
+  ],
+  "seconds": 8.4,
+  "source_ok": true,
+  "found": [
+   "HCR",
+   "réfugiés"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2601_06",
+  "difficulty": "paraphrase",
+  "question": "Quels publics le partenariat entre la BCM et le Programme Alimentaire Mondial vise-t-il en priorité ?",
+  "grounded": true,
+  "answer": "Le partenariat entre la BCM et le Programme Alimentaire Mondial vise prioritairement l’inclusion financière des femmes, des jeunes et des populations vulnérables, dans le cadre de la SNIF 2023-2028 et du PAFIID. [EXTRAIT 1 | Lettre d'information Janvier 2026, p. 1]",
+  "cited": [
+   [
+    "lettre-2026-01",
+    1
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-01",
+    1
+   ]
+  ],
+  "seconds": 4.4,
+  "source_ok": true,
+  "found": [
+   "femmes",
+   "jeunes",
+   "populations vulnérables"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2601_07",
+  "difficulty": "raisonnement",
+  "question": "Quelle étude de faisabilité en matière de messagerie financière a été évoquée avec les banques primaires en janvier 2026 ?",
+  "grounded": true,
+  "answer": "L’étude évoquée était une étude de faisabilité portant sur la mise en place d’un **Service Bureau SWIFT local**, examinée parmi les projets structurants lors de la réunion de concertation avec les dirigeants des banques primaires du 28 janvier 2026. [Lettre d'information Janvier 2026, p. 1]\n\nCe Service Bureau SWIFT vise à fournir une infrastructure locale de messagerie financière internationale ; le projet national est destiné à desservir l’ensemble des acteurs financiers de la place de Nouakchott. [p. PDF 7]",
+  "cited": [
+   [
+    "lettre-2026-01",
+    1
+   ],
+   [
+    "rapport-annuel-2025",
+    7
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-01",
+    1
+   ]
+  ],
+  "seconds": 10.4,
+  "source_ok": true,
+  "found": [
+   "Service Bureau SWIFT"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2602_01",
+  "difficulty": "direct",
+  "question": "Sur quelle période s'est déroulée la mission FSSR du FMI en février 2026 ?",
+  "grounded": true,
+  "answer": "La mission FSSR du FMI s’est déroulée du 3 au 16 février 2026, soit une période de 14 jours. [EXTRAIT 1 | Lettre d'information Février 2026, p. 1]",
+  "cited": [
+   [
+    "lettre-2026-02",
+    1
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-02",
+    1
+   ]
+  ],
+  "seconds": 8.9,
+  "source_ok": true,
+  "found": [
+   "3 au 16 février 2026"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2602_02",
+  "difficulty": "raisonnement",
+  "question": "Dans la continuité de quels travaux la mission FSSR de février 2026 s'inscrivait-elle ?",
+  "grounded": true,
+  "answer": "La mission principale FSSR de février 2026 s’inscrivait dans la continuité des travaux engagés lors de la mission du FMI de septembre 2025. Cette mission antérieure évaluait la stabilité du secteur financier, suivait la mise en œuvre des recommandations antérieures et définissait les priorités de réforme. [p. PDF 90]\n\n- **Travaux de septembre 2025** : la mission FSSR avait pour objet « d’évaluer la stabilité du secteur financier, suivre la mise en œuvre des recommandations antérieures et définir les priorités de réforme » ; elle préparait explicitement la mission principale de février 2026. [p. PDF 90]\n- **Approfondissement en février 2026** : la mission organisée du 3 au 16 février 2026 visait à approfondir le diagnostic du cadre de stabilité financière et à définir les priorités d’accompagnement technique pour les prochaines années. [Lettre d'information Février 2026, p. 1]",
+  "cited": [
+   [
+    "lettre-2026-02",
+    1
+   ],
+   [
+    "rapport-annuel-2025",
+    90
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-02",
+    1
+   ]
+  ],
+  "seconds": 6.8,
+  "source_ok": true,
+  "found": [
+   "septembre 2025"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2602_03",
+  "difficulty": "direct",
+  "question": "Quelle convention scientifique le CEEM a-t-il signée le 12 février 2026 et sur quel projet porte-t-elle ?",
+  "grounded": true,
+  "answer": "Le CEEM a signé avec la Mission Archéologique Azougui-Teyart (MAAT) une convention scientifique relative au projet « Azougui et la Vallée de Teyart : archéologie, patrimoine, développement ». [EXTRAIT 1 | Lettre d'information Février 2026, p. 1] [EXTRAIT 2 | Lettre d'information Février 2026, p. 1]\n\nCe projet soutient un programme de recherche sur un site majeur de l’histoire saharienne, associé aux dynamiques commerciales transsahariennes ainsi qu’aux premières formes d’organisation économique et monétaire dans la région. [EXTRAIT 2 | Lettre d'information Février 2026, p. 1]",
+  "cited": [
+   [
+    "lettre-2026-02",
+    1
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-02",
+    1
+   ]
+  ],
+  "seconds": 6.4,
+  "source_ok": true,
+  "found": [
+   "Mission Archéologique Azougui-Teyart",
+   "MAAT"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2602_04",
+  "difficulty": "direct",
+  "question": "Quel comité chargé du pilotage stratégique du système d'information a tenu sa première réunion en février 2026 ?",
+  "grounded": true,
+  "answer": "Le Comité de Gouvernance IT (COGIT), instance chargée du pilotage stratégique du système d'information de la Banque Centrale de Mauritanie, a tenu sa première réunion en février 2026 [EXTRAIT 1 | Lettre d'information Février 2026, p. 1].",
+  "cited": [
+   [
+    "lettre-2026-02",
+    1
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-02",
+    1
+   ]
+  ],
+  "seconds": 4.9,
+  "source_ok": true,
+  "found": [
+   "Comité de Gouvernance IT",
+   "COGIT"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2602_05",
+  "difficulty": "paraphrase",
+  "question": "Quel projet la mission conjointe Banque mondiale–SFI préparait-elle et à quelles entreprises est-il destiné ?",
+  "grounded": true,
+  "answer": "La mission conjointe de la Banque mondiale et de la SFI préparait le projet PforR, consacré au soutien des micro, petites et moyennes entreprises (MPME). [EXTRAIT 1 | Lettre d'information Février 2026, p. 1]\n\n- **Objet du projet** : il vise le renforcement du financement des MPME et la promotion de l’inclusion financière, notamment par l’appui au secteur financier, au fonds de garantie et au développement de l’infrastructure de crédit. [EXTRAIT 2 | Lettre d'information Février 2026, p. 1]\n- **Inscription stratégique** : le projet contribue à la mise en œuvre de la Stratégie Nationale d’Inclusion Financière. [EXTRAIT 2 | Lettre d'information Février 2026, p. 1]",
+  "cited": [
+   [
+    "lettre-2026-02",
+    1
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-02",
+    1
+   ]
+  ],
+  "seconds": 6.9,
+  "source_ok": true,
+  "found": [
+   "PforR",
+   "MPME"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2602_06",
+  "difficulty": "direct",
+  "question": "Qui conduisait la délégation de la Commission économique des Nations Unies pour l'Afrique reçue par la BCM ?",
+  "grounded": true,
+  "answer": "La délégation de la Commission économique des Nations Unies pour l’Afrique (CEA) était conduite par Monsieur Claver Gatete, Secrétaire général adjoint des Nations Unies et Secrétaire exécutif de la CEA. [EXTRAIT 1 | Lettre d'information Février 2026, p. 1]",
+  "cited": [
+   [
+    "lettre-2026-02",
+    1
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-02",
+    1
+   ]
+  ],
+  "seconds": 3.6,
+  "source_ok": true,
+  "found": [
+   "Claver Gatete"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2602_07",
+  "difficulty": "direct",
+  "question": "À l'occasion de quel anniversaire national des membres du personnel de la BCM ont-ils été décorés ?",
+  "grounded": true,
+  "answer": "Les membres du personnel de la BCM ont été décorés à l’occasion du **65° anniversaire de l’indépendance nationale**. [EXTRAIT 1 | Lettre d'information Février 2026, p. 1]",
+  "cited": [
+   [
+    "lettre-2026-02",
+    1
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-02",
+    1
+   ]
+  ],
+  "seconds": 6.9,
+  "source_ok": true,
+  "found": [
+   "65"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2603_01",
+  "difficulty": "direct",
+  "question": "Quel montant de financements l'accord-cadre signé avec l'ICD prévoit-il de mobiliser, et sur quelle période ?",
+  "grounded": true,
+  "answer": "L’accord-cadre avec la Société internationale islamique pour le financement du secteur privé (ICD) prévoit de mobiliser 900 millions de dollars de financements conformes à la finance islamique sur la période 2026-2028. [EXTRAIT 2 | Lettre d'information Mars 2026, p. 1] [EXTRAIT 1 | Lettre d'information Mars 2026, p. 1]",
+  "cited": [
+   [
+    "lettre-2026-03",
+    1
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-03",
+    1
+   ]
+  ],
+  "seconds": 4.0,
+  "source_ok": true,
+  "found": [
+   "900 millions de dollars",
+   "2026-2028"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2603_02",
+  "difficulty": "paraphrase",
+  "question": "Où a été signé l'accord entre la Mauritanie et la Société internationale islamique pour le financement du secteur privé ?",
+  "grounded": true,
+  "answer": "L’accord-cadre entre la Mauritanie et la Société internationale islamique pour le financement du secteur privé (ICD) a été signé à Djeddah. [EXTRAIT 1 | Lettre d'information Mars 2026, p. 1]",
+  "cited": [
+   [
+    "lettre-2026-03",
+    1
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-03",
+    1
+   ]
+  ],
+  "seconds": 7.6,
+  "source_ok": true,
+  "found": [
+   "Djeddah"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2603_03",
+  "difficulty": "direct",
+  "question": "Combien de plateformes numériques structurent le dispositif de supervision de la BCM présenté en mars 2026 ?",
+  "grounded": true,
+  "answer": "Six plateformes numériques structurent le dispositif intégré de supervision de la BCM présenté en mars 2026. Elles couvrent les cautions bancaires, la conformité LBC/FT, les déclarations prudentielles, le crédit, le contrôle sur place et le secteur financier non bancaire [EXTRAIT 1 | Lettre d'information Mars 2026, p. 3].\n\nCes six plateformes automatisent les traitements, sécurisent les flux déclaratifs et outillent les missions d’inspection, pour les secteurs bancaire et financier non bancaire [EXTRAIT 2 | Lettre d'information Mars 2026, p. 6].",
+  "cited": [
+   [
+    "lettre-2026-03",
+    3
+   ],
+   [
+    "lettre-2026-03",
+    6
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-03",
+    3
+   ],
+   [
+    "lettre-2026-03",
+    6
+   ]
+  ],
+  "seconds": 12.8,
+  "source_ok": true,
+  "found": [
+   "six",
+   "6"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2603_04",
+  "difficulty": "direct",
+  "question": "Combien de cautions bancaires ont été émises par les banques sur la plateforme d'authentification, et pour quel montant cumulé ?",
+  "grounded": true,
+  "answer": "Les banques ont émis **13 055 cautions** sur la plateforme d’authentification, pour un **montant cumulé de 56,9 Mds MRU**. [EXTRAIT 1 | Lettre d'information Mars 2026, p. 3]\n\nLe Rapport annuel indique toutefois, à fin 2025, **12 000 cautions enregistrées** pour **53,9 milliards de MRU** : il s’agit du nombre de cautions enregistrées, et non explicitement des cautions émises par les banques. [EXTRAIT 2 | p. PDF 36]",
+  "cited": [
+   [
+    "lettre-2026-03",
+    3
+   ],
+   [
+    "rapport-annuel-2025",
+    36
+   ],
+   [
+    "rapport-annuel-2025",
+    33
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-03",
+    3
+   ]
+  ],
+  "seconds": 7.5,
+  "source_ok": true,
+  "found": [
+   "13 055",
+   "56,9"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2603_05",
+  "difficulty": "direct",
+  "question": "Quand la Banking Supervision Application (BSA) a-t-elle été installée ?",
+  "grounded": true,
+  "answer": "La Banking Supervision Application (BSA) a été installée en juin 2024. Elle est le canal officiel de transmission des reportings réglementaires. [EXTRAIT 1 | Lettre d'information Mars 2026, p. 4]",
+  "cited": [
+   [
+    "lettre-2026-03",
+    4
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-03",
+    4
+   ]
+  ],
+  "seconds": 3.1,
+  "source_ok": true,
+  "found": [
+   "juin 2024"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2603_06",
+  "difficulty": "direct",
+  "question": "À quelle date le Système d'Information sur le Crédit est-il entré en vigueur ?",
+  "grounded": true,
+  "answer": "Le Système d’Information sur le Crédit est entré en vigueur le 1 avril 2025. [EXTRAIT 1 | Lettre d'information Mars 2026, p. 5]",
+  "cited": [
+   [
+    "lettre-2026-03",
+    5
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-03",
+    5
+   ]
+  ],
+  "seconds": 6.3,
+  "source_ok": true,
+  "found": [
+   "1 avril 2025"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2603_07",
+  "difficulty": "direct",
+  "question": "Combien d'étudiants de Master 2 la Chaire d'Économie Monétaire a-t-elle soutenus pour une mobilité Erasmus+, et vers quelle université ?",
+  "grounded": true,
+  "answer": "La Chaire d’Économie Monétaire a soutenu dix étudiants de Master 2 pour une mobilité académique Erasmus+ à l’Université de Palerme, en Italie. [Lettre d'information Mars 2026, p. 2]",
+  "cited": [
+   [
+    "lettre-2026-03",
+    2
+   ],
+   [
+    "lettre-2026-05",
+    8
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-03",
+    2
+   ]
+  ],
+  "seconds": 3.5,
+  "source_ok": true,
+  "found": [
+   "dix",
+   "Palerme"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2603_08",
+  "difficulty": "direct",
+  "question": "Sur quelle période s'est déroulée la mission d'assistance technique du FMI consacrée au FPAS ?",
+  "grounded": true,
+  "answer": "La mission d’assistance technique du FMI consacrée au Système de Prévision et d’Analyse de la Politique monétaire (FPAS) s’est déroulée du 23 mars au 3 avril 2026. [EXTRAIT 1 | Lettre d'information Mars 2026, p. 2]",
+  "cited": [
+   [
+    "lettre-2026-03",
+    2
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-03",
+    2
+   ]
+  ],
+  "seconds": 3.9,
+  "source_ok": true,
+  "found": [
+   "23 mars",
+   "3 avril 2026"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2603_09",
+  "difficulty": "paraphrase",
+  "question": "Quel outil assiste les inspecteurs dans l'analyse de la classification des créances lors des contrôles sur place ?",
+  "grounded": true,
+  "answer": "L’outil est la plateforme **TASNIF**, qui assiste les inspecteurs dans l’analyse de la classification des créances et du provisionnement lors des missions de contrôle sur place, au moyen d’un cadre homogène, traçable et sécurisé [EXTRAIT 1 | Lettre d'information Mars 2026, p. 5].\n\n- **Fonctions d’analyse** : TASNIF recalcule automatiquement la classification des engagements, mesure les écarts de provisionnement et priorise les dossiers selon la classe de risque [EXTRAIT 2 | Lettre d'information Mars 2026, p. 5].\n- **Effet opérationnel** : la plateforme vise des contrôles plus homogènes, plus rapides et plus fiables, ainsi qu’une meilleure appréciation de la qualité des portefeuilles de crédit [EXTRAIT 2 | Lettre d'information Mars 2026, p. 5].",
+  "cited": [
+   [
+    "lettre-2026-03",
+    5
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-03",
+    5
+   ]
+  ],
+  "seconds": 4.9,
+  "source_ok": true,
+  "found": [
+   "TASNIF"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2604_01",
+  "difficulty": "direct",
+  "question": "Quel a été le taux de participation à l'élection des délégués du personnel de la BCM en avril 2026 ?",
+  "grounded": true,
+  "answer": "Le taux de participation à l’élection des délégués du personnel de la BCM organisée en avril 2026 a été de **68,28 %**. [Lettre d'information Avril 2026, p. 1]",
+  "cited": [
+   [
+    "lettre-2026-04",
+    1
+   ],
+   [
+    "rapport-annuel-2025",
+    84
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-04",
+    1
+   ]
+  ],
+  "seconds": 3.5,
+  "source_ok": true,
+  "found": [
+   "68,28 %"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2604_02",
+  "difficulty": "direct",
+  "question": "Quand s'est tenue la première réunion du Conseil d'Administration de la Bourse de Nouakchott SA ?",
+  "grounded": true,
+  "answer": "La première réunion du Conseil d’Administration de la société « Bourse de Nouakchott SA » s’est tenue le 6 avril 2026, sous la présidence du Gouverneur de la Banque Centrale de Mauritanie. [EXTRAIT 1 | Lettre d'information Avril 2026, p. 1]",
+  "cited": [
+   [
+    "lettre-2026-04",
+    1
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-04",
+    1
+   ]
+  ],
+  "seconds": 3.4,
+  "source_ok": true,
+  "found": [
+   "6 avril 2026"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2604_03",
+  "difficulty": "direct",
+  "question": "Sur quelle période se sont tenues les Réunions de printemps du FMI et de la Banque mondiale auxquelles le Gouverneur a participé ?",
+  "grounded": true,
+  "answer": "Les Réunions de printemps du FMI et de la Banque mondiale auxquelles le Gouverneur a participé se sont tenues à Washington du 13 au 19 avril 2026. [EXTRAIT 1 | Lettre d'information Avril 2026, p. 4]",
+  "cited": [
+   [
+    "lettre-2026-04",
+    4
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-04",
+    4
+   ]
+  ],
+  "seconds": 4.8,
+  "source_ok": true,
+  "found": [
+   "13 au 19 avril 2026",
+   "Washington"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2604_04",
+  "difficulty": "liste",
+  "question": "Quels guichets du FMI le programme économique 2023-2026 de la Mauritanie mobilise-t-il ?",
+  "grounded": true,
+  "answer": "Le programme économique et financier 2023-2026 de la Mauritanie est appuyé par trois guichets du FMI : la Facilité Élargie de Crédit (FEC), le Mécanisme Élargi de Crédit (MEDC) et la Facilité pour la Résilience et la Durabilité (FRD). [EXTRAIT 1 | Lettre d'information Avril 2026, p. 4]\n\n- **FEC et MEDC** : ces deux guichets font l’objet de revues conjointes ; lors de la 5e revue, le décaissement prévu, après approbation du Conseil d’administration du FMI, s’élève à 6,4 millions de DTS au titre du FEC/MEDC. [EXTRAIT 2 | p. PDF 89]\n- **FRD** : ce guichet a fait l’objet de la 4e revue ; le décaissement prévu correspondant s’élève à 59,44 millions de DTS. [EXTRAIT 2 | p. PDF 89]",
+  "cited": [
+   [
+    "lettre-2026-04",
+    4
+   ],
+   [
+    "rapport-annuel-2025",
+    89
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-04",
+    4
+   ]
+  ],
+  "seconds": 7.9,
+  "source_ok": true,
+  "found": [
+   "FEC",
+   "MEDC",
+   "FRD"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2604_05",
+  "difficulty": "liste",
+  "question": "Autour de quels axes s'articule le nouveau programme en cours de finalisation avec le FMI ?",
+  "grounded": true,
+  "answer": "Le nouveau programme en cours de finalisation avec le FMI vise à consolider les acquis et à accélérer la transformation économique du pays. Il s’articule autour de trois axes : le renforcement de la stabilité macroéconomique, la promotion d’une croissance inclusive, et le renforcement de la gouvernance et de la transparence. [EXTRAIT 1 | Lettre d'information Avril 2026, p. 4]",
+  "cited": [
+   [
+    "lettre-2026-04",
+    4
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-04",
+    4
+   ]
+  ],
+  "seconds": 4.4,
+  "source_ok": true,
+  "found": [
+   "stabilité macroéconomique",
+   "croissance inclusive",
+   "gouvernance"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2604_06",
+  "difficulty": "raisonnement",
+  "question": "Quand est paru le premier numéro des Cahiers d'Études en Économie Monétaire, et quelle est sa particularité dans l'histoire de la BCM ?",
+  "grounded": true,
+  "answer": "Le premier numéro est paru en avril 2026. Sa particularité est d’être la première revue scientifique — et la première revue éditée — dans l’histoire de la Banque Centrale de Mauritanie. [EXTRAIT 2 | Lettre d'information Mai 2026, p. 6]\n\n- **Parution** : le CEEM a publié ce premier numéro en avril 2026 ; la couverture l’identifie également comme « N° 1 - avril 2026 ». [EXTRAIT 1 | Lettre d'information Avril 2026, p. 3] [EXTRAIT 5 | Lettre d'information Avril 2026, p. 3]\n- **Caractère historique** : la publication est qualifiée de première revue éditée dans l’histoire de la Banque Centrale de Mauritanie et de première revue scientifique de l’institution. [EXTRAIT 1 | Lettre d'information Avril 2026, p. 3] [EXTRAIT 2 | Lettre d'information Mai 2026, p. 6]\n- **Divergence sur la date** : le rapport mentionne une « parution officielle » au mois de mai 2026, tandis que les lettres d’information situent la publication du premier numéro en avril 2026 ; cette différence semble distinguer la parution du numéro de son lancement ou de sa parution officielle. [EXTRAIT 3 | p. PDF 83]",
+  "cited": [
+   [
+    "lettre-2026-04",
+    3
+   ],
+   [
+    "lettre-2026-05",
+    6
+   ],
+   [
+    "rapport-annuel-2025",
+    83
+   ],
+   [
+    "lettre-2026-07",
+    7
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-04",
+    3
+   ]
+  ],
+  "seconds": 7.2,
+  "source_ok": true,
+  "found": [
+   "avril 2026",
+   "première revue"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2604_07",
+  "difficulty": "direct",
+  "question": "Qui a animé la conférence du cycle « L'Invité du CEEM » consacrée au risque climatique en avril 2026 ?",
+  "grounded": true,
+  "answer": "La conférence du cycle « L’Invité du CEEM » consacrée au risque climatique a été animée par Dr Yacoub Bahini, économiste spécialisé dans le risque climatique et les enjeux ESG [Lettre d'information Avril 2026, p. 2]. Le récapitulatif du CEEM l’identifie comme étant affilié à Quant Al Lab [Lettre d'information Mai 2026, p. 8].",
+  "cited": [
+   [
+    "lettre-2026-04",
+    2
+   ],
+   [
+    "lettre-2026-05",
+    8
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-04",
+    2
+   ]
+  ],
+  "seconds": 5.1,
+  "source_ok": true,
+  "found": [
+   "Yacoub Bahini"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2604_08",
+  "difficulty": "direct",
+  "question": "Quel réseau dédié aux femmes dans le secteur financier la BCM a-t-elle réuni avec la SFI en avril 2026 ?",
+  "grounded": true,
+  "answer": "La BCM a réuni à Nouakchott, avec la Société Financière Internationale (SFI), le réseau « Women in Finance Mauritanie ». Cette réunion visait à renforcer le rôle des femmes dans le secteur financier, leur accès équitable aux services financiers et leur participation au développement économique et social. [EXTRAIT 1 | Lettre d'information Avril 2026, p. 2] [EXTRAIT 2 | Lettre d'information Avril 2026, p. 2]",
+  "cited": [
+   [
+    "lettre-2026-04",
+    2
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-04",
+    2
+   ]
+  ],
+  "seconds": 5.2,
+  "source_ok": true,
+  "found": [
+   "Women in Finance Mauritanie"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2605_01",
+  "difficulty": "direct",
+  "question": "De combien le Conseil de Politique Monétaire a-t-il relevé le taux directeur le 18 mai 2026, et à quel niveau ?",
+  "grounded": true,
+  "answer": "Le 18 mai 2026, le Conseil de Politique Monétaire a relevé le taux directeur de **50 points de base**, le portant de **6,00 % à 6,50 %**. [EXTRAIT 1 | Lettre d'information Mai 2026, p. 1]",
+  "cited": [
+   [
+    "lettre-2026-05",
+    1
+   ],
+   [
+    "rapport-annuel-2025",
+    7
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-05",
+    1
+   ]
+  ],
+  "seconds": 4.5,
+  "source_ok": true,
+  "found": [
+   "50 points de base",
+   "6,00 %",
+   "6,50 %"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2605_02",
+  "difficulty": "paraphrase",
+  "question": "Quel était le nouveau niveau du taux directeur de la BCM après la réunion de mai 2026 ?",
+  "grounded": true,
+  "answer": "Le taux directeur de la BCM a été porté de 6,00 % à 6,50 % après la réunion de mai 2026, soit un relèvement de 50 points de base. [EXTRAIT 1 | Lettre d'information Mai 2026, p. 1]",
+  "cited": [
+   [
+    "lettre-2026-05",
+    1
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-05",
+    1
+   ]
+  ],
+  "seconds": 11.7,
+  "source_ok": true,
+  "found": [
+   "6,50 %"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2605_03",
+  "difficulty": "direct",
+  "question": "Comment l'inflation a-t-elle évolué entre mars et avril 2026 selon le Conseil de Politique Monétaire ?",
+  "grounded": true,
+  "answer": "L’inflation a fortement accéléré, passant de 4,7 % en mars 2026 à 7,6 % en avril 2026, soit une hausse de 2,9 points de pourcentage. Le Conseil de Politique Monétaire attribue cette évolution à la hausse des prix des produits alimentaires et énergétiques, à la vigueur persistante du crédit à l’économie et à un niveau élevé de liquidité bancaire. [EXTRAIT 1 | Lettre d'information Mai 2026, p. 1]\n\n- **Perspective** : les projections de la Banque Centrale indiquent la poursuite de cette tendance au cours des prochains mois, avec un pic estimé à 10,2 % en septembre 2026. [EXTRAIT 1 | Lettre d'information Mai 2026, p. 1]",
+  "cited": [
+   [
+    "lettre-2026-05",
+    1
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-05",
+    1
+   ]
+  ],
+  "seconds": 7.6,
+  "source_ok": true,
+  "found": [
+   "4,7 %",
+   "7,6 %"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2605_04",
+  "difficulty": "direct",
+  "question": "À quel niveau la BCM estimait-elle le pic d'inflation, et à quelle échéance ?",
+  "grounded": true,
+  "answer": "La BCM estimait que l’inflation atteindrait un pic de **10,2 % en septembre 2026**. Cette projection reposait sur la poursuite attendue des tensions inflationnistes au cours des mois suivants. [EXTRAIT 1 | Lettre d'information Mai 2026, p. 1]",
+  "cited": [
+   [
+    "lettre-2026-05",
+    1
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-05",
+    1
+   ]
+  ],
+  "seconds": 6.1,
+  "source_ok": true,
+  "found": [
+   "10,2 %",
+   "septembre 2026"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2605_05",
+  "difficulty": "liste",
+  "question": "Quel était le niveau des réserves extérieures brutes et de la liquidité bancaire au moment de la décision de mai 2026 ?",
+  "grounded": true,
+  "answer": "Au moment de la décision du 18 mai 2026, les réserves extérieures brutes étaient à un niveau supérieur à 2,4 milliards de dollars américains et la liquidité bancaire avait dépassé 60 milliards MRU à fin avril 2026. [EXTRAIT 1 | Lettre d'information Mai 2026, p. 1]\n\nLa décision concernait le relèvement du taux directeur de 6,00 % à 6,50 % par le Conseil de Politique Monétaire réuni le 18 mai 2026. [EXTRAIT 3 | Lettre d'information Mai 2026, p. 1] [EXTRAIT 4 | Lettre d'information Mai 2026, p. 1]",
+  "cited": [
+   [
+    "lettre-2026-05",
+    1
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-05",
+    1
+   ]
+  ],
+  "seconds": 5.2,
+  "source_ok": true,
+  "found": [
+   "2,4 milliards",
+   "60 milliards MRU"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2605_06",
+  "difficulty": "raisonnement",
+  "question": "Combien d'objectifs guidaient la décision de relèvement du taux directeur de mai 2026 ?",
+  "grounded": true,
+  "answer": "Cinq objectifs guidaient la décision de relèvement du taux directeur de mai 2026. [EXTRAIT 1 | Lettre d'information Mai 2026, p. 1]",
+  "cited": [
+   [
+    "lettre-2026-05",
+    1
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-05",
+    1
+   ]
+  ],
+  "seconds": 5.9,
+  "source_ok": true,
+  "found": [
+   "cinq"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2605_07",
+  "difficulty": "direct",
+  "question": "Quel était le thème de la 28e Conférence des Gouverneurs des banques centrales francophones, et où s'est-elle tenue ?",
+  "grounded": true,
+  "answer": "Le thème était « L'autonomie des banques centrales face aux attentes des États et du public ». La 28e Conférence des Gouverneurs des banques centrales des pays francophones s’est tenue à Phnom Penh, au Cambodge, du 28 au 31 mai 2026. [EXTRAIT 2 | Lettre d'information Mai 2026, p. 4] [EXTRAIT 1 | Lettre d'information Mai 2026, p. 4]",
+  "cited": [
+   [
+    "lettre-2026-05",
+    4
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-05",
+    4
+   ],
+   [
+    "lettre-2026-05",
+    5
+   ]
+  ],
+  "seconds": 4.9,
+  "source_ok": true,
+  "found": [
+   "autonomie des banques centrales",
+   "Phnom Penh"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2605_08",
+  "difficulty": "direct",
+  "question": "Combien de domaines de coopération couvre l'Accord signé avec la Banque de France en mai 2026 ?",
+  "grounded": true,
+  "answer": "L’Accord de Coopération signé avec la Banque de France en mai 2026 couvre **sept domaines de coopération**. [Lettre d'information Mai 2026, p. 5]",
+  "cited": [
+   [
+    "lettre-2026-05",
+    5
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-05",
+    5
+   ]
+  ],
+  "seconds": 14.2,
+  "source_ok": true,
+  "found": [
+   "sept"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2605_09",
+  "difficulty": "direct",
+  "question": "Quel événement international la BCM accueillera-t-elle à Nouakchott, et à quelles dates ?",
+  "grounded": true,
+  "answer": "La BCM accueillera à Nouakchott la **Réunion des Gouverneurs et Directeurs de Formation des banques centrales francophones**, du **21 au 23 septembre 2026**. Il s’agira de la première organisation de cette réunion annuelle de référence par la Mauritanie. [EXTRAIT 1 | Lettre d'information Mai 2026, p. 5] [EXTRAIT 4 | Lettre d'information Mai 2026, p. 5]\n\nCette rencontre réunira les Gouverneurs et responsables de la formation des banques centrales de l’espace francophone pour trois journées d’échanges portant sur les enjeux monétaires, financiers et pédagogiques communs. [EXTRAIT 2 | Lettre d'information Mai 2026, p. 5]",
+  "cited": [
+   [
+    "lettre-2026-05",
+    5
+   ],
+   [
+    "lettre-2026-06",
+    3
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-05",
+    5
+   ]
+  ],
+  "seconds": 8.9,
+  "source_ok": true,
+  "found": [
+   "21 au 23 septembre 2026",
+   "Nouakchott"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2605_10",
+  "difficulty": "raisonnement",
+  "question": "À quel niveau l'inflation avait-elle été ramenée fin 2023, selon l'intervention du Gouverneur à Phnom Penh ?",
+  "grounded": true,
+  "answer": "L’inflation avait été ramenée à son plus bas niveau historique fin 2023, sous les 3 %, après avoir atteint des niveaux à deux chiffres en 2022 [EXTRAIT 1 | Lettre d'information Mai 2026, p. 4].",
+  "cited": [
+   [
+    "lettre-2026-05",
+    4
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-05",
+    4
+   ]
+  ],
+  "seconds": 3.9,
+  "source_ok": true,
+  "found": [
+   "sous les 3 %",
+   "fin 2023"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2606_01",
+  "difficulty": "direct",
+  "question": "Quel montant d'approbations de financement le Groupe de la BID a-t-il enregistré en 2025, et avec quelle progression ?",
+  "grounded": true,
+  "answer": "Le Groupe de la BID a enregistré en 2025 près de 16 milliards de dollars d'approbations de financement, en progression de 20 %. [EXTRAIT 1 | Lettre d'information Juin 2026, p. 1]",
+  "cited": [
+   [
+    "lettre-2026-06",
+    1
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-06",
+    1
+   ]
+  ],
+  "seconds": 8.2,
+  "source_ok": true,
+  "found": [
+   "16 milliards de dollars",
+   "20"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2606_02",
+  "difficulty": "direct",
+  "question": "Quel nouveau cadre stratégique le Président du Groupe de la BID a-t-il présenté à Bakou ?",
+  "grounded": true,
+  "answer": "Le Président du Groupe de la BID a présenté à Bakou le nouveau cadre stratégique 2026-2035 de l’institution. Il a également annoncé l’entrée en vigueur du nouveau Fonds concessionnel de la BID, destiné à appuyer les pays les plus vulnérables et les projets à fort impact social. [EXTRAIT 1 | Lettre d'information Juin 2026, p. 2]",
+  "cited": [
+   [
+    "lettre-2026-06",
+    2
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-06",
+    2
+   ]
+  ],
+  "seconds": 3.8,
+  "source_ok": true,
+  "found": [
+   "2026-2035"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2606_03",
+  "difficulty": "direct",
+  "question": "À quelles dates et où s'est tenue la 96e Assemblée générale annuelle de la Banque des Règlements Internationaux ?",
+  "grounded": true,
+  "answer": "Elle s’est tenue les 27 et 28 juin 2026 à Bâle. [EXTRAIT 1 | Lettre d'information Juin 2026, p. 3]",
+  "cited": [
+   [
+    "lettre-2026-06",
+    3
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-06",
+    3
+   ]
+  ],
+  "seconds": 5.3,
+  "source_ok": true,
+  "found": [
+   "27 et 28 juin 2026",
+   "Bâle"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2606_04",
+  "difficulty": "direct",
+  "question": "Qui a prononcé la Per Jacobsson Lecture lors de l'Assemblée de la BRI, et sur quel sujet ?",
+  "grounded": true,
+  "answer": "Mme Gita Gopinath, professeure à l’Université Harvard et ancienne Première Directrice générale adjointe du FMI, a prononcé la Per Jacobsson Lecture. Elle était consacrée aux stablecoins et à l’anonymat de la monnaie. [EXTRAIT 1 | Lettre d'information Juin 2026, p. 4]",
+  "cited": [
+   [
+    "lettre-2026-06",
+    4
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-06",
+    4
+   ]
+  ],
+  "seconds": 4.2,
+  "source_ok": true,
+  "found": [
+   "Gita Gopinath",
+   "stablecoins"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2606_05",
+  "difficulty": "liste",
+  "question": "Par quel numéro court la plateforme HIMAYA est-elle joignable, et dans quelles langues accueille-t-elle les usagers ?",
+  "grounded": true,
+  "answer": "La plateforme HIMAYA est joignable via le numéro court **1973**. Elle accueille les usagers en arabe, en français et dans les langues nationales : pulaar, soninké, wolof et hassaniya [EXTRAIT 1 | Lettre d'information Juin 2026, p. 5].",
+  "cited": [
+   [
+    "lettre-2026-06",
+    5
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-06",
+    5
+   ]
+  ],
+  "seconds": 4.5,
+  "source_ok": true,
+  "found": [
+   "1973",
+   "pulaar",
+   "soninké",
+   "wolof",
+   "hassaniya"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2606_06",
+  "difficulty": "direct",
+  "question": "Quels résultats HIMAYA affiche-t-elle après trois mois d'activité ?",
+  "grounded": true,
+  "answer": "Après trois mois d’activité depuis son lancement à la fin de mars 2026, HIMAYA a reçu **400 appels**, enregistré **50 réclamations** et affiché un **taux de résolution de 95 %**. [Lettre d'information Juin 2026, p. 5]\n\n- **Rôle du dispositif** : HIMAYA facilite la réception, l’enregistrement, le traitement et le suivi des réclamations des usagers des services financiers, ainsi que leur information et leur orientation. [Lettre d'information Juin 2026, p. 5]\n- **Accessibilité** : le centre est joignable au numéro court **1973** et accueille les usagers en arabe, en français, ainsi qu’en pulaar, soninké, wolof et hassaniya. [Lettre d'information Juin 2026, p. 5]",
+  "cited": [
+   [
+    "lettre-2026-06",
+    5
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-06",
+    5
+   ]
+  ],
+  "seconds": 10.4,
+  "source_ok": true,
+  "found": [
+   "50",
+   "400",
+   "95"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2606_07",
+  "difficulty": "direct",
+  "question": "Quels programmes de la Banque africaine de développement la délégation de la BAD a-t-elle salués en juin 2026 ?",
+  "grounded": true,
+  "answer": "Les extraits ne mentionnent pas plusieurs programmes de la Banque africaine de développement salués par sa délégation. Ils indiquent la préparation du futur « Programme de gouvernance économique et financière » et soulignent les résultats du partenariat pour la modernisation du système financier mauritanien. [EXTRAIT 1 | Lettre d'information Juin 2026, p. 2]\n\nLa mission d’identification du 29 juin 2026 est présentée comme une nouvelle étape d’un partenariat ayant déjà produit des résultats tangibles pour la modernisation du système financier mauritanien. [EXTRAIT 2 | Lettre d'information Juin 2026, p. 2]",
+  "cited": [
+   [
+    "lettre-2026-06",
+    2
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-06",
+    3
+   ]
+  ],
+  "seconds": 11.8,
+  "source_ok": false,
+  "found": [],
+  "missing": [
+   "PAMIF I",
+   "PAMIF II"
+  ],
+  "answer_ok": false
+ },
+ {
+  "id": "li2606_08",
+  "difficulty": "liste",
+  "question": "Quels sont les quatre axes prioritaires retenus pour la coopération entre la BCM et la Banque de France ?",
+  "grounded": true,
+  "answer": "Les quatre axes prioritaires retenus sont la modernisation du circuit fiduciaire, le développement de la monnaie numérique de banque centrale, le renforcement des capacités en matière de stabilité financière et de finance durable, ainsi que l’assistance technique pour les systèmes de paiement. [EXTRAIT 1 | Lettre d'information Juin 2026, p. 7]",
+  "cited": [
+   [
+    "lettre-2026-06",
+    7
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-06",
+    7
+   ]
+  ],
+  "seconds": 5.7,
+  "source_ok": true,
+  "found": [
+   "circuit fiduciaire",
+   "monnaie numérique",
+   "stabilité financière"
+  ],
+  "missing": [
+   "prévision économique"
+  ],
+  "answer_ok": false
+ },
+ {
+  "id": "li2606_09",
+  "difficulty": "liste",
+  "question": "Quels chantiers du secteur financier ont été passés en revue lors de la visite à la banque d'affaires Lazard ?",
+  "grounded": true,
+  "answer": "Cinq chantiers structurants ont été passés en revue : la consolidation du secteur bancaire, la réforme du Taux Effectif Global, la codification du droit monétaire et financier, le renforcement du cadre de résolution bancaire et la création d’un marché secondaire des créances non performantes. Ils visent conjointement à renforcer la solidité et la modernisation du système financier mauritanien. [EXTRAIT 1 | Lettre d'information Juin 2026, p. 8] [EXTRAIT 2 | Lettre d'information Juin 2026, p. 8]\n\n- **Consolidation du secteur bancaire** : l’étude examine les effets attendus sur la stabilité financière, la concurrence et le financement de l’économie. [EXTRAIT 1 | Lettre d'information Juin 2026, p. 8]\n- **Réforme du Taux Effectif Global** : elle préserve intégralement les garanties de transparence et d’information dont bénéficie la clientèle. [EXTRAIT 1 | Lettre d'information Juin 2026, p. 8]\n- **Codification du droit monétaire et financier** : elle vise à réunir dans un document unique l’ensemble des textes applicables, afin d’en renforcer la lisibilité et la sécurité juridique. [EXTRAIT 1 | Lettre d'information Juin 2026, p. 8]\n- **Cadre de résolution bancaire** : son renforcement est conduit conformément aux standards internationaux. [EXTRAIT 1 | Lettre d'information Juin 2026, p. 8]\n- **Marché secondaire des créances non performantes** : il doit permettre aux banques d’assainir leurs bilans et de libérer des marges pour le financement de l’économie. [EXTRAIT 1 | Lettre d'information Juin 2026, p. 8]",
+  "cited": [
+   [
+    "lettre-2026-06",
+    8
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-06",
+    8
+   ]
+  ],
+  "seconds": 9.9,
+  "source_ok": true,
+  "found": [
+   "consolidation du secteur bancaire",
+   "Taux Effectif Global",
+   "résolution bancaire",
+   "créances non performantes"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2606_10",
+  "difficulty": "raisonnement",
+  "question": "Quel geste institutionnel le nouveau Gouverneur de la Banque de France a-t-il eu envers la délégation mauritanienne ?",
+  "grounded": true,
+  "answer": "Il a tenu à recevoir la délégation mauritanienne dès le deuxième jour de sa prise de fonctions, lors de l’une de ses toutes premières audiences comme Gouverneur. Ce geste institutionnel, qualifié de rare et hautement symbolique, témoignait de la considération accordée au partenariat avec la Banque Centrale de Mauritanie. [EXTRAIT 1 | Lettre d'information Juin 2026, p. 6]",
+  "cited": [
+   [
+    "lettre-2026-06",
+    6
+   ],
+   [
+    "lettre-2026-06",
+    1
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-06",
+    1
+   ],
+   [
+    "lettre-2026-06",
+    6
+   ]
+  ],
+  "seconds": 9.6,
+  "source_ok": true,
+  "found": [
+   "deuxième jour"
+  ],
+  "missing": [
+   "Emmanuel Moulin"
+  ],
+  "answer_ok": false
+ },
+ {
+  "id": "li2607_01",
+  "difficulty": "direct",
+  "question": "Quelle décision le Conseil de Politique Monétaire a-t-il prise le 14 juillet 2026 ?",
+  "grounded": true,
+  "answer": "Le Conseil de Politique Monétaire a relevé le taux directeur de 25 points de base, de 6,50 % à 6,75 %, le 14 juillet 2026. Cette décision prolongeait le resserrement engagé en mai afin de contenir les pressions inflationnistes et de préserver la stabilité des prix [EXTRAIT 3 | Lettre d'information Juillet 2026, p. 1].\n\nLe taux de la facilité de prêt a été porté à 7,00 %, tandis que celui de la facilité de dépôt est demeuré inchangé [EXTRAIT 3 | Lettre d'information Juillet 2026, p. 1].",
+  "cited": [
+   [
+    "lettre-2026-07",
+    1
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-07",
+    1
+   ]
+  ],
+  "seconds": 4.7,
+  "source_ok": true,
+  "found": [
+   "25 points de base",
+   "6,50 %",
+   "6,75 %"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2607_02",
+  "difficulty": "direct",
+  "question": "À quel niveau le taux de la facilité de prêt a-t-il été porté en juillet 2026 ?",
+  "grounded": true,
+  "answer": "Le taux de la facilité de prêt a été porté à **7,00 %** en juillet 2026. [EXTRAIT 1 | Lettre d'information Juillet 2026, p. 1]",
+  "cited": [
+   [
+    "lettre-2026-07",
+    1
+   ],
+   [
+    "lettre-2026-07",
+    9
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-07",
+    1
+   ],
+   [
+    "lettre-2026-07",
+    9
+   ]
+  ],
+  "seconds": 10.9,
+  "source_ok": true,
+  "found": [
+   "7,00 %"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2607_03",
+  "difficulty": "direct",
+  "question": "Quel était le niveau des avoirs extérieurs bruts de la BCM à fin juin 2026, et sa progression par rapport à fin 2025 ?",
+  "grounded": true,
+  "answer": "Les avoirs extérieurs bruts de la BCM se sont établis à **2,65 milliards de dollars américains** à fin juin 2026. Ils étaient en progression de **21,8 %** par rapport à leur niveau de fin 2025. [EXTRAIT 1 | Lettre d'information Juillet 2026, p. 2]",
+  "cited": [
+   [
+    "lettre-2026-07",
+    2
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-07",
+    2
+   ]
+  ],
+  "seconds": 4.0,
+  "source_ok": true,
+  "found": [
+   "2,65 milliards",
+   "21,8"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2607_04",
+  "difficulty": "direct",
+  "question": "Quels revenus les placements des réserves ont-ils générés au premier semestre 2026 ?",
+  "grounded": true,
+  "answer": "Les placements des réserves ont généré 40,15 millions de dollars américains de revenus au premier semestre 2026. Ce résultat a dépassé les objectifs et les références de performance retenues, malgré un environnement financier exigeant [EXTRAIT 1 | Lettre d'information Juillet 2026, p. 2].",
+  "cited": [
+   [
+    "lettre-2026-07",
+    2
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-07",
+    2
+   ]
+  ],
+  "seconds": 7.0,
+  "source_ok": true,
+  "found": [
+   "40,15 millions"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2607_05",
+  "difficulty": "direct",
+  "question": "À quel montant la BCM a-t-elle porté les réserves confiées au mandat de gestion de la Banque mondiale, et quand ?",
+  "grounded": true,
+  "answer": "La BCM a porté à **300 millions de dollars américains** le volume des réserves confiées au mandat de gestion de la Banque mondiale, en **juin 2026**. Ce seuil lui ouvre le plein accès aux dispositifs du programme. [EXTRAIT 1 | Lettre d'information Juillet 2026, p. 5]",
+  "cited": [
+   [
+    "lettre-2026-07",
+    5
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-07",
+    5
+   ]
+  ],
+  "seconds": 12.9,
+  "source_ok": true,
+  "found": [
+   "300 millions de dollars",
+   "juin 2026"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2607_06",
+  "difficulty": "direct",
+  "question": "Quand la BCM a-t-elle publié son Rapport annuel au titre de l'exercice 2025 ?",
+  "grounded": true,
+  "answer": "La BCM a publié son Rapport annuel au titre de l’exercice 2025 le **31 juillet 2026**. [EXTRAIT 1 | Lettre d'information Juillet 2026, p. 3]",
+  "cited": [
+   [
+    "lettre-2026-07",
+    3
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-07",
+    3
+   ]
+  ],
+  "seconds": 4.3,
+  "source_ok": true,
+  "found": [
+   "31 juillet 2026"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2607_07",
+  "difficulty": "direct",
+  "question": "Quelle institution de supervision régionale la BCM a-t-elle accueillie en juillet 2026, et pour quel motif ?",
+  "grounded": true,
+  "answer": "La BCM a accueilli, du 27 au 31 juillet 2026, une délégation de la Commission Bancaire de l’Afrique Centrale (COBAC). Cette mission visait à s’imprégner de l’expérience mauritanienne en matière de reporting prudentiel numérisé. [EXTRAIT 1 | Lettre d'information Juillet 2026, p. 4]\n\n- **Objet des échanges** : la délégation a approfondi le fonctionnement, l’architecture et les bonnes pratiques du dispositif numérique de supervision bancaire de la BCM, au moyen de démonstrations et d’ateliers techniques. [EXTRAIT 1 | Lettre d'information Juillet 2026, p. 4]\n- **Coopération envisagée** : les deux institutions ont notamment examiné des échanges d’inspecteurs, le partage de méthodologies de supervision fondée sur les risques et la poursuite du dialogue au sein de la Communauté des Superviseurs Bancaires Africains. [EXTRAIT 1 | Lettre d'information Juillet 2026, p. 4]",
+  "cited": [
+   [
+    "lettre-2026-07",
+    4
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-07",
+    4
+   ]
+  ],
+  "seconds": 10.1,
+  "source_ok": true,
+  "found": [
+   "COBAC",
+   "reporting prudentiel numérisé"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2607_08",
+  "difficulty": "raisonnement",
+  "question": "Comment la largeur du corridor des taux d'intérêt a-t-elle évolué entre 2022 et 2025, et où s'établit-elle après juillet 2026 ?",
+  "grounded": true,
+  "answer": "La largeur du corridor des taux d’intérêt a été divisée par deux entre 2022 et 2025 : elle est passée de 900 à 450 points de base, soit une réduction de 450 points de base. Après l’ajustement de juillet 2026, elle s’établit à 500 points de base, soit 50 points de base de plus qu’en 2025. [EXTRAIT 1 | Lettre d'information Juillet 2026, p. 9] [EXTRAIT 2 | Lettre d'information Juillet 2026, p. 9]\n\n- **Entre 2022 et 2025** : le resserrement du corridor visait à améliorer la transmission des décisions de politique monétaire aux conditions de financement du marché, en rapprochant les taux du marché du signal du taux directeur et en réduisant les fluctuations des taux à court terme. [EXTRAIT 1 | Lettre d'information Juillet 2026, p. 9]\n- **Après juillet 2026** : le corridor de 500 points de base est encadré par un taux de facilité de prêt de 7,00 % et un taux de facilité de dépôt de 2,00 %. [EXTRAIT 2 | Lettre d'information Juillet 2026, p. 9]",
+  "cited": [
+   [
+    "lettre-2026-07",
+    9
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-07",
+    9
+   ]
+  ],
+  "seconds": 8.2,
+  "source_ok": true,
+  "found": [
+   "450 points de base",
+   "500 points de base"
+  ],
+  "missing": [
+   "900 points de base"
+  ],
+  "answer_ok": false
+ },
+ {
+  "id": "li2607_09",
+  "difficulty": "raisonnement",
+  "question": "Comment la liquidité bancaire a-t-elle évolué entre fin 2022 et 2026 ?",
+  "grounded": true,
+  "answer": "La liquidité bancaire est passée d’environ 30 milliards MRU à fin 2022 à plus de 70 milliards MRU en 2026, soit plus qu’un doublement et une hausse supérieure à 40 milliards MRU. Cette abondance a été progressivement absorbée par les instruments de reprise de liquidité de la BCM. [EXTRAIT 1 | Lettre d'information Juillet 2026, p. 10]\n\n- **Fin 2025** : la liquidité bancaire atteignait déjà un niveau historiquement élevé, avoisinant 60 milliards MRU à fin décembre 2025. [EXTRAIT 2 | p. PDF 26]\n- **Avril 2026** : elle a dépassé 60 milliards MRU à fin avril 2026 ; l’encours des opérations de reprise de liquidité de la BCM excédait alors 20 milliards MRU. [EXTRAIT 3 | Lettre d'information Mai 2026, p. 1]\n- **Composition et régulation en 2025** : malgré une liquidité globale élevée, les réserves libres ont reculé de 690 millions MRU, tandis que les bons BCM ont progressé de 2 520 millions MRU et les SENAD de 6 600 millions MRU, traduisant l’absorption active de liquidité par la Banque centrale. [EXTRAIT 9 | p. PDF 26]\n- **Facteurs de la hausse en 2025** : la progression significative a notamment résulté de l’accélération des dépenses publiques et des liquidités générées par le développement des portefeuilles électroniques (wallets). [EXTRAIT 4 | p. PDF 25]",
+  "cited": [
+   [
+    "lettre-2026-07",
+    10
+   ],
+   [
+    "rapport-annuel-2025",
+    26
+   ],
+   [
+    "lettre-2026-05",
+    1
+   ],
+   [
+    "rapport-annuel-2025",
+    25
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-07",
+    10
+   ]
+  ],
+  "seconds": 11.6,
+  "source_ok": true,
+  "found": [
+   "30 milliards",
+   "70 milliards"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2607_10",
+  "difficulty": "liste",
+  "question": "Quels modèles la BCM croise-t-elle pour prévoir l'inflation, et à quels horizons ?",
+  "grounded": true,
+  "answer": "La BCM croise les modèles **ARMA** et **VECM** pour prévoir l’inflation : ARMA fournit un signal à court terme, de **un à trois mois**, tandis que VECM produit des projections de **douze à vingt-quatre mois**. [EXTRAIT 2 | Lettre d'information Juillet 2026, p. 11] [EXTRAIT 1 | Lettre d'information Juillet 2026, p. 11]\n\n- **Modèle ARMA** : il analyse l’historique de l’indice des prix à la consommation afin d’identifier tendances, cycles et effets de mémoire ; son horizon utile est de **un à trois mois**. [EXTRAIT 2 | Lettre d'information Juillet 2026, p. 11]\n- **Modèle VECM** : il relie l’inflation à la masse monétaire, au taux de change, aux prix alimentaires importés et à l’activité ; il permet des projections de **douze à vingt-quatre mois**. [EXTRAIT 1 | Lettre d'information Juillet 2026, p. 11]\n- **Articulation des modèles** : l’architecture analytique présente les prévisions d’inflation comme des « **prévisions croisées** » fondées sur « **ARMA + VECM** », intégrées au cadre prospectif du Modèle de Projection Trimestriel (QPM). [EXTRAIT 3 | Lettre d'information Juillet 2026, p. 11]",
+  "cited": [
+   [
+    "lettre-2026-07",
+    11
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-07",
+    11
+   ]
+  ],
+  "seconds": 11.1,
+  "source_ok": true,
+  "found": [
+   "ARMA",
+   "VECM",
+   "un à trois mois",
+   "douze à vingt-quatre mois"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2607_11",
+  "difficulty": "direct",
+  "question": "Quelle plateforme scientifique diffuse désormais les Cahiers d'Études en Économie Monétaire ?",
+  "grounded": true,
+  "answer": "Les Cahiers d'Études en Économie Monétaire sont désormais diffusés sur Cairn.info, plateforme scientifique francophone de référence. [EXTRAIT 1 | Lettre d'information Juillet 2026, p. 7]",
+  "cited": [
+   [
+    "lettre-2026-07",
+    7
+   ],
+   [
+    "lettre-2026-07",
+    1
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-07",
+    1
+   ],
+   [
+    "lettre-2026-07",
+    7
+   ]
+  ],
+  "seconds": 9.0,
+  "source_ok": true,
+  "found": [
+   "Cairn.info"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2607_12",
+  "difficulty": "raisonnement",
+  "question": "Sur quelle période s'est déroulée la mission d'évaluation des sauvegardes du FMI, et quand la précédente avait-elle eu lieu ?",
+  "grounded": true,
+  "answer": "La mission d’évaluation des sauvegardes du FMI s’est déroulée à Nouakchott du 2 au 12 juillet 2026. La précédente évaluation avait été conduite en 2023. [EXTRAIT 4 | Lettre d'information Juillet 2026, p. 5] [EXTRAIT 1 | Lettre d'information Juillet 2026, p. 5]",
+  "cited": [
+   [
+    "lettre-2026-07",
+    5
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-07",
+    5
+   ]
+  ],
+  "seconds": 8.7,
+  "source_ok": true,
+  "found": [
+   "2 au 12 juillet 2026",
+   "2023"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "li2607_13",
+  "difficulty": "direct",
+  "question": "Quelle règle de politique monétaire figure dans le bloc monétaire du Modèle de Projection Trimestriel ?",
+  "grounded": true,
+  "answer": "Le graphique « 3.1.5 Évolution des taux d'intérêt » est analysé à partir de la page PDF 28 et de ses libellés extraits localement.\n\n**Message principal**\n- Ces actions contribueront au renforcement du mécanisme de transmission de la politique monétaire, à la diversification des sources de financement de l’État et au développement du secteur financier. [p. PDF 28]\n- Ces réformes s’inscrivent dans la stratégie globale de modernisation maturités TMP-BIT (-147 pb), tandis que les maturités 26S enregistrent des baisses plus modérées (-54 pb). [p. PDF 28]\n- Ces réformes s’inscrivent dans la stratégie globale de modernisation La variation annuelle montre une baisse notable, particulièrement sur les maturités BTC 13 semaines (-192 pb) et les [p. PDF 28]\n\n**Lecture visuelle**\n- Repères temporels détectés : 2025 [p. PDF 28].\n- Les observations ci-dessus proviennent du graphique et du commentaire de la même page ; aucun libellé illisible n'a été reconstitué.",
+  "cited": [
+   [
+    "rapport-annuel-2025",
+    28
+   ],
+   [
+    "lettre-2026-07",
+    12
+   ],
+   [
+    "rapport-annuel-2025",
+    25
+   ],
+   [
+    "lettre-2026-05",
+    7
+   ],
+   [
+    "lettre-2026-07",
+    8
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-07",
+    12
+   ]
+  ],
+  "seconds": 0.3,
+  "source_ok": true,
+  "found": [],
+  "missing": [
+   "règle de Taylor"
+  ],
+  "answer_ok": false
+ },
+ {
+  "id": "licross_01",
+  "difficulty": "raisonnement",
+  "question": "Quel a été le cheminement du taux directeur de la BCM entre mai et juillet 2026 ?",
+  "grounded": true,
+  "answer": "Entre mai et juillet 2026, la BCM a poursuivi un resserrement graduel : le taux directeur a d’abord été porté à 6,50 % en mai, par une hausse de 50 points de base, puis relevé de 25 points de base le 14 juillet, de 6,50 % à 6,75 %. [p. PDF 7] [Lettre d'information Juillet 2026, p. 1]\n\n- **Étape de mai** : le relèvement de 50 points de base a porté le taux directeur à 6,50 %. [p. PDF 7]\n- **Étape de juillet** : le Conseil de Politique Monétaire a relevé le taux de 25 points de base, de 6,50 % à 6,75 %, le 14 juillet 2026. [Lettre d'information Juillet 2026, p. 1]\n- **Variation cumulée mai-juillet** : le taux directeur a augmenté de 25 points de base entre le niveau de 6,50 % atteint en mai et celui de 6,75 % en juillet ; ce mouvement prolongeait le resserrement engagé en mai. [Lettre d'information Juillet 2026, p. 1]",
+  "cited": [
+   [
+    "rapport-annuel-2025",
+    7
+   ],
+   [
+    "lettre-2026-07",
+    1
+   ],
+   [
+    "lettre-2026-07",
+    8
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-05",
+    1
+   ],
+   [
+    "lettre-2026-07",
+    1
+   ],
+   [
+    "lettre-2026-07",
+    8
+   ]
+  ],
+  "seconds": 7.1,
+  "source_ok": true,
+  "found": [
+   "6,50 %",
+   "6,75 %"
+  ],
+  "missing": [
+   "6,00 %"
+  ],
+  "answer_ok": false
+ },
+ {
+  "id": "licross_02",
+  "difficulty": "raisonnement",
+  "question": "Combien de fois le Conseil de Politique Monétaire s'est-il réuni en 2026 selon les lettres d'information, et à quelles dates ?",
+  "grounded": true,
+  "answer": "Le Conseil de Politique Monétaire s’est réuni deux fois en 2026 selon les lettres d’information fournies : le 18 mai 2026 et le 14 juillet 2026. La réunion du 14 juillet est explicitement qualifiée de « deuxième réunion ordinaire de l’année ». [EXTRAIT 2 | Lettre d'information Juillet 2026, p. 1]\n\n- **Première réunion mentionnée** : le Conseil de Politique Monétaire s’est réuni le 18 mai 2026. [EXTRAIT 1 | Lettre d'information Mai 2026, p. 1]\n- **Deuxième réunion ordinaire** : le Conseil a tenu sa deuxième réunion ordinaire de l’année le 14 juillet 2026. [EXTRAIT 2 | Lettre d'information Juillet 2026, p. 1]",
+  "cited": [
+   [
+    "lettre-2026-05",
+    1
+   ],
+   [
+    "lettre-2026-07",
+    1
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-05",
+    1
+   ],
+   [
+    "lettre-2026-07",
+    1
+   ],
+   [
+    "lettre-2026-07",
+    4
+   ]
+  ],
+  "seconds": 6.2,
+  "source_ok": true,
+  "found": [
+   "18 mai 2026",
+   "14 juillet 2026"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "licross_03",
+  "difficulty": "raisonnement",
+  "question": "Comment les réserves extérieures de la Mauritanie ont-elles évolué entre la lettre de mai et celle de juillet 2026 ?",
+  "grounded": true,
+  "answer": "Les réserves extérieures ont été décrites comme bien gérées et devant être davantage diversifiées dans la lettre de mai, puis comme étant en renforcement dans celle de juillet. Toutefois, la lettre de mai ne fournit aucun niveau chiffré : l’ampleur exacte de l’évolution entre les deux lettres ne peut donc pas être calculée. [Lettre d'information Mai 2026, p. 2] [Lettre d'information Juillet 2026, p. 2]\n\n- **Niveau à fin juin 2026** : les avoirs extérieurs bruts de la Banque Centrale ont atteint 2,65 milliards de dollars américains, soit une progression annoncée de 21,8 % par rapport à fin 2025. [Lettre d'information Juillet 2026, p. 2]\n- **Situation décrite en mai** : le Conseil a exprimé sa satisfaction quant au rendement et à la qualité de la gestion des avoirs extérieurs durant les quatre premiers mois de 2026, sans indiquer leur montant ni leur variation. [Lettre d'information Mai 2026, p. 2]\n- **Orientation de gestion** : en mai, le Conseil a demandé la poursuite de la diversification des avoirs et une allocation optimale des réserves afin d’en renforcer la résilience ; en juillet, il a relevé la solidité de la position extérieure et la poursuite du renforcement des réserves de change. [Lettre d'information Mai 2026, p. 2] [Lettre d'information Juillet 2026, p. 2]\n- **Divergence documentaire** : la lettre de juillet indique une hausse de 21,8 % par rapport à fin 2025, tandis que le Rapport annuel situe les réserves de change au 31 décembre 2025 à 2 212 millions USD. Les extraits fournis ne permettent pas d’expliquer cette différence de référence ou de périmètre. [Lettre d'information Juillet 2026, p. 2] [p. PDF 50]",
+  "cited": [
+   [
+    "lettre-2026-07",
+    2
+   ],
+   [
+    "lettre-2026-05",
+    2
+   ],
+   [
+    "rapport-annuel-2025",
+    50
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-05",
+    1
+   ],
+   [
+    "lettre-2026-07",
+    2
+   ]
+  ],
+  "seconds": 13.1,
+  "source_ok": true,
+  "found": [
+   "2,65 milliards"
+  ],
+  "missing": [
+   "2,4 milliards"
+  ],
+  "answer_ok": false
+ },
+ {
+  "id": "licross_04",
+  "difficulty": "raisonnement",
+  "question": "Quelles étapes ont jalonné la coopération entre la BCM et la Banque de France en 2026 ?",
+  "grounded": true,
+  "answer": "La coopération a été formalisée par un accord en mai, puis concrétisée dès juin par une visite officielle à Paris et des chantiers techniques, avant de se poursuivre par une mission de travail sur la filière fiduciaire les 30 et 31 juillet 2026.  \n\n- **Formalisation du partenariat** : en marge de la Conférence des Gouverneurs des banques centrales francophones à Phnom Penh, le Gouverneur Mohamed-Lemine DHEHBY a signé avec François Villeroy de Galhau un Accord de Coopération couvrant sept domaines, dont l’analyse économique et monétaire, la supervision bancaire, les réserves de change, le fiduciaire, la lutte contre le faux-monnayage et l’appui au CEEM. [EXTRAIT 1 | Lettre d'information Mai 2026, p. 5]\n\n- **Modalités de mise en œuvre prévues** : la coopération devait notamment prendre la forme de missions d’experts, d’échanges de personnel, de visites d’étude et de participation aux séminaires de l’Institut Bancaire et Financier International (IBFI). [EXTRAIT 7 | Lettre d'information Mai 2026, p. 5]\n\n- **Première concrétisation à Paris en juin** : la visite officielle du Gouverneur DHEHBY à la Banque de France a donné une « traduction concrète et immédiate » à l’accord ; elle a inclus un entretien entre Gouverneurs, une session technique sur le fiduciaire et la monnaie numérique, ainsi qu’une participation à ECONDAT 2026. [EXTRAIT 2 | Lettre d'information Juin 2026, p. 1] [EXTRAIT 3 | Lettre d'information Juin 2026, p. 6]\n\n- **Opérationnalisation et nouveaux chantiers** : les deux Gouverneurs ont convenu de rendre l’accord effectif avec un suivi régulier. La Banque de France a proposé une mission d’expertise pour accompagner le projet pilote de monnaie numérique de banque centrale de la BCM et de partager ses méthodologies de diagnostic climatique ainsi que son expérience d’intégration des critères environnementaux dans la supervision prudentielle. [EXTRAIT 12 | Lettre d'information Juin 2026, p. 6] [EXTRAIT 4 | Lettre d'information Juin 2026, p. 7]\n\n- **Échange sur l’analyse économique par l’intelligence artificielle** : en marge de la visite, la délégation de la BCM a participé le 5 juin 2026 à Paris à ECONDAT Spring Meeting 2026, consacré à l’analyse économique fondée sur des données non conventionnelles, l’intelligence artificielle et l’apprentissage automatique. [EXTRAIT 5 | Lettre d'information Juin 2026, p. 7]\n\n- **Mission fiduciaire en juillet** : les 30 et 31 juillet 2026, le Gouverneur DHEHBY a conduit une visite de travail auprès de la filière fiduciaire de la Banque de France, dans la région de Clermont-Ferrand, notamment au Centre de recherche contre la contrefaçon ; cette visite s’inscrivait dans la mise en œuvre de l’accord signé en mai. [EXTRAIT 6 | Lettre d'information Juillet 2026, p. 6]",
+  "cited": [
+   [
+    "lettre-2026-05",
+    5
+   ],
+   [
+    "lettre-2026-06",
+    1
+   ],
+   [
+    "lettre-2026-06",
+    6
+   ],
+   [
+    "lettre-2026-06",
+    7
+   ],
+   [
+    "lettre-2026-07",
+    6
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-05",
+    5
+   ],
+   [
+    "lettre-2026-06",
+    6
+   ],
+   [
+    "lettre-2026-07",
+    1
+   ],
+   [
+    "lettre-2026-07",
+    6
+   ]
+  ],
+  "seconds": 19.0,
+  "source_ok": true,
+  "found": [
+   "Phnom Penh",
+   "Paris",
+   "Clermont-Ferrand"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "licross_05",
+  "difficulty": "raisonnement",
+  "question": "Quel parcours les Cahiers d'Études en Économie Monétaire ont-ils suivi depuis leur lancement ?",
+  "grounded": true,
+  "answer": "Les Cahiers d’Études en Économie Monétaire ont été lancés en avril 2026, puis leur premier numéro a paru officiellement en mai 2026. Première revue scientifique de l’histoire de la Banque Centrale de Mauritanie, ils ont ensuite rejoint le catalogue de Cairn.info en juillet 2026 afin d’élargir leur diffusion scientifique. [Lettre d'information Mai 2026, p. 6] [p. PDF 83] [Lettre d'information Juillet 2026, p. 7]\n\n- **Lancement et premier numéro** : la Lettre d’information indique un lancement en avril 2026 sous la direction du Centre d’Études en Économie Monétaire (CEEM), tandis que le Rapport annuel situe la parution officielle du premier numéro au mois de mai 2026. Les deux passages décrivent cette publication comme la première revue scientifique dans l’histoire de la Banque Centrale de Mauritanie. [Lettre d'information Mai 2026, p. 6] [p. PDF 83]\n\n- **Contenu initial** : le premier numéro réunit cinq articles de recherche appliquée sur la courbe des taux, l’intermédiation financière, la réforme du régime de change, le taux de change effectif réel et le modèle macroéconomique de la BCM. [Lettre d'information Mai 2026, p. 6]\n\n- **Objectif de diffusion régulière** : disponible sur le site de la Banque Centrale, ce premier numéro annonçait l’ambition d’une publication régulière et d’un rayonnement croissant. Les Cahiers ont vocation à diffuser régulièrement des recherches appliquées, notamment sur la politique monétaire, l’inflation, la liquidité bancaire, la stabilité financière et le secteur extérieur. [Lettre d'information Mai 2026, p. 6] [p. PDF 83]\n\n- **Préparation des contributions** : avant la publication du premier numéro, le CEEM a organisé un atelier d’écriture pour accompagner les cadres dans la structuration, la rédaction et la valorisation de leurs travaux analytiques selon les standards des publications institutionnelles ou académiques. [p. PDF 83]\n\n- **Ouverture internationale** : en juillet 2026, les Cahiers sont entrés au catalogue de Cairn.info. Ce partenariat leur donne accès à un lectorat de chercheurs, universitaires, étudiants, décideurs publics et institutions dans l’espace francophone et au-delà, en renforçant leur visibilité auprès de la communauté scientifique internationale. [Lettre d'information Juillet 2026, p. 7]",
+  "cited": [
+   [
+    "lettre-2026-05",
+    6
+   ],
+   [
+    "rapport-annuel-2025",
+    83
+   ],
+   [
+    "lettre-2026-07",
+    7
+   ],
+   [
+    "lettre-2026-07",
+    1
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-04",
+    3
+   ],
+   [
+    "lettre-2026-05",
+    6
+   ],
+   [
+    "lettre-2026-07",
+    1
+   ],
+   [
+    "lettre-2026-07",
+    7
+   ]
+  ],
+  "seconds": 15.1,
+  "source_ok": true,
+  "found": [
+   "avril 2026",
+   "cinq articles",
+   "Cairn.info"
+  ],
+  "missing": [],
+  "answer_ok": true
+ },
+ {
+  "id": "licross_06",
+  "difficulty": "liste",
+  "question": "Quels engagements la BCM a-t-elle pris en faveur de l'inclusion financière des populations vulnérables en 2026 ?",
+  "grounded": true,
+  "answer": "En 2026, la BCM a pris des engagements ciblés en faveur des réfugiés, des femmes, des jeunes et des populations vulnérables, par des partenariats inscrits dans la SNIF 2023-2028 et le PAFIID. Elle vise notamment l’accès aux services financiers formels, l’autonomisation économique des réfugiés et un accès équitable des femmes aux services financiers. [Lettre d'information Janvier 2026, p. 1]\n\n- **Réfugiés** : le mémorandum d’entente signé avec le HCR le 27 janvier 2026 vise à faciliter l’accès des réfugiés en Mauritanie aux services financiers formels et à soutenir leur autonomisation économique. [Lettre d'information Janvier 2026, p. 1]\n\n- **Femmes, jeunes et populations vulnérables** : la convention de partenariat avec le Programme Alimentaire Mondial (PAM) vise à renforcer la coopération en matière d’inclusion financière au profit de ces publics, dans le cadre de la SNIF 2023-2028 et du PAFIID. [Lettre d'information Janvier 2026, p. 1]\n\n- **Femmes** : à travers le réseau « Women in Finance Mauritanie », organisé avec la Société Financière Internationale (SFI), la BCM vise à renforcer le rôle des femmes dans le secteur financier, favoriser leur accès équitable aux services financiers et promouvoir leur participation active au développement économique et social. [Lettre d'information Avril 2026, p. 2]\n\n- **Microfinance et zones rurales** : la BCM identifie la microfinance comme ayant un rôle potentiel auprès des populations vulnérables, des femmes, des microentrepreneurs et des zones rurales ; les réformes engagées devront améliorer la gouvernance, la gestion des risques, le recouvrement et la viabilité des IMF. [p. PDF 72]\n\n- **Mise en œuvre en 2026** : l’accélération dépendra notamment du renforcement de la gouvernance, de la mobilisation des financements, de l’amélioration des données et de la transformation de l’accès formel aux services financiers en un usage effectif, régulier et bénéfique pour les populations ciblées. [p. PDF 73]",
+  "cited": [
+   [
+    "lettre-2026-01",
+    1
+   ],
+   [
+    "lettre-2026-04",
+    2
+   ],
+   [
+    "rapport-annuel-2025",
+    72
+   ],
+   [
+    "rapport-annuel-2025",
+    73
+   ]
+  ],
+  "want": [
+   [
+    "lettre-2026-01",
+    1
+   ],
+   [
+    "lettre-2026-04",
+    2
+   ],
+   [
+    "lettre-2026-06",
+    5
+   ]
+  ],
+  "seconds": 13.7,
+  "source_ok": true,
+  "found": [
+   "HCR",
+   "PAM",
+   "Women in Finance"
+  ],
+  "missing": [
+   "HIMAYA"
+  ],
+  "answer_ok": false
+ },
+ {
+  "id": "liabs_01",
+  "difficulty": "absent",
+  "question": "Quel taux de croissance du PIB la BCM prévoit-elle pour la Mauritanie en 2027 ?",
+  "grounded": true,
+  "answer": "La BCM indique des perspectives favorables sur 2025-2027, avec une croissance « de l’ordre de 4,2 % en moyenne ». Elle ne fournit pas un taux de croissance du PIB distinct spécifiquement pour 2027. [p. PDF 106]",
+  "cited": [
+   [
+    "rapport-annuel-2025",
+    106
+   ]
+  ],
+  "want": [],
+  "seconds": 7.9,
+  "refused": false
+ },
+ {
+  "id": "liabs_02",
+  "difficulty": "absent",
+  "question": "Quel est le montant des réserves obligatoires imposé aux banques en août 2026 ?",
+  "grounded": false,
+  "answer": "Votre question peut correspondre à plusieurs indicateurs du rapport.\n\nPouvez-vous confirmer l'une de ces formulations ?\n\n1. Que dit le rapport sur l'indicateur « • Réserves Obligatoires • Réserves Libres • Bons du Trésor < » ?\n2. Que dit le rapport sur l'indicateur « Conseil Général - Discipline budgétaire, La Banque Centrale de Mauritanie a tenu, le » ?",
+  "cited": [
+   [
+    "lettre-2026-07",
+    2
+   ],
+   [
+    "lettre-2026-07",
+    3
+   ],
+   [
+    "lettre-2026-05",
+    2
+   ],
+   [
+    "lettre-2026-07",
+    1
+   ],
+   [
+    "rapport-annuel-2025",
+    98
+   ]
+  ],
+  "want": [],
+  "seconds": 2.7,
+  "refused": true
+ },
+ {
+  "id": "liabs_03",
+  "difficulty": "absent",
+  "question": "Quelle décision le Conseil de Politique Monétaire a-t-il prise lors de sa réunion de septembre 2026 ?",
+  "grounded": false,
+  "answer": "Je ne trouve pas cette information dans les documents BCM fournis (Rapport annuel et Lettres d'information).",
+  "cited": [],
+  "want": [],
+  "seconds": 4.4,
+  "refused": true
+ },
+ {
+  "id": "liabs_04",
+  "difficulty": "absent",
+  "question": "Combien de banques sont agréées en Mauritanie fin 2026 ?",
+  "grounded": false,
+  "answer": "Je ne trouve pas cette information dans les documents BCM fournis (Rapport annuel et Lettres d'information).",
+  "cited": [],
+  "want": [],
+  "seconds": 9.0,
+  "refused": true
+ },
+ {
+  "id": "liabs_05",
+  "difficulty": "absent",
+  "question": "Quel est le cours du dollar face à l'ouguiya au 31 juillet 2026 ?",
+  "grounded": false,
+  "answer": "Je ne trouve pas cette information dans les documents BCM fournis (Rapport annuel et Lettres d'information).",
+  "cited": [],
+  "want": [],
+  "seconds": 4.1,
+  "refused": true
+ },
+ {
+  "id": "liabs_06",
+  "difficulty": "absent",
+  "question": "Quelle est la cible d'inflation chiffrée officiellement annoncée par la BCM ?",
+  "grounded": false,
+  "answer": "Je ne trouve pas cette information dans les documents BCM fournis (Rapport annuel et Lettres d'information).",
+  "cited": [],
+  "want": [],
+  "seconds": 5.3,
+  "refused": true
+ }
+]

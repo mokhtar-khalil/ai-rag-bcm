@@ -6,6 +6,7 @@ from api.app import (
     create_app,
 )
 from core.config import get_settings
+from tests.conftest import generation_diffusee
 
 
 def test_health() -> None:
@@ -37,7 +38,7 @@ def test_chart_question_uses_only_local_chart_analysis(monkeypatch) -> None:
         lambda *args, **kwargs: "Explication graphique vérifiée [p. PDF 42].",
     )
     monkeypatch.setattr(
-        "api.app.answer_with_provider",
+        "api.app.stream_answer",
         lambda *args, **kwargs: (_ for _ in ()).throw(
             AssertionError("L'OCR local ne doit pas être envoyé au générateur externe.")
         ),
@@ -153,7 +154,7 @@ def test_scanned_section_followup_injects_document_ocr(monkeypatch) -> None:
         captured["results"] = results
         return "L’auditeur exprime une opinion sans réserve [p. PDF 119]."
 
-    monkeypatch.setattr("api.app.answer_with_provider", fake_answer)
+    monkeypatch.setattr("api.app.stream_answer", generation_diffusee(fake_answer))
     settings = get_settings(
         {
             "APP_ENV": "test",
@@ -426,7 +427,7 @@ def test_monetary_aggregates_do_not_trigger_a_false_clarification(
             "[p. PDF 30]."
         )
 
-    monkeypatch.setattr("api.app.answer_with_provider", fake_answer)
+    monkeypatch.setattr("api.app.stream_answer", generation_diffusee(fake_answer))
     settings = get_settings(
         {
             "APP_ENV": "test",
@@ -510,8 +511,10 @@ def test_confirmed_indicator_does_not_trigger_a_second_clarification(
         lambda question, results, settings: results[:4],
     )
     monkeypatch.setattr(
-        "api.app.answer_with_provider",
-        lambda *args, **kwargs: "Indicateur confirmé et réponse produite [p. PDF 33].",
+        "api.app.stream_answer",
+        generation_diffusee(
+            lambda *args, **kwargs: "Indicateur confirmé et réponse produite [p. PDF 33]."
+        ),
     )
     settings = get_settings(
         {
@@ -532,6 +535,9 @@ def test_confirmed_indicator_does_not_trigger_a_second_clarification(
     assert response.status_code == 200
     assert response.json["clarification_needed"] is False
     assert response.json["suggestions"] == []
+    # Vérifie que la génération simulée a bien été atteinte : sans cette
+    # assertion, un repli silencieux ferait passer le test sans rien prouver.
+    assert "Indicateur confirmé" in response.json["answer"]
 
 
 def test_precise_reserves_answer() -> None:
@@ -543,3 +549,15 @@ def test_precise_reserves_answer() -> None:
     answer = response.json["answer"].replace(" ", "")
     assert "2,2milliardsdedollars" in answer
     assert "5,9mois" in answer
+
+
+def test_health_does_not_expose_internal_fingerprints() -> None:
+    """Les empreintes du corpus n'ont pas à figurer sur un point d'entrée public."""
+    payload = create_app().test_client().get("/health").json
+    assert "corpus_fingerprint" not in payload
+    assert "report_sha256" not in payload
+    assert "manifest" not in payload
+    # Ce qui sert réellement à surveiller le service reste publié.
+    assert payload["chunks"] > 2000
+    assert payload["documents"] >= 1
+    assert payload["semantic_index"] in (True, False)

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections import OrderedDict
 from functools import lru_cache
 from pathlib import Path
 from typing import Iterable
@@ -70,24 +71,49 @@ def embed_documents(
     )
 
 
-@lru_cache(maxsize=256)
-def _cached_query_embedding(
-    text: str, model: str, cache_path: str
-) -> tuple[float, ...]:
-    """Mémorise les vecteurs des questions répétées pour réduire la latence."""
-    vector = _encode_local(
-        [text],
-        model=model,
-        cache_path=Path(cache_path),
-        batch_size=1,
-        prefix="query: ",
-    )[0]
-    return tuple(float(value) for value in vector)
+# Cache mémoire des vecteurs de questions, partagé par les deux entrées. Un
+# dictionnaire explicite permet de savoir ce qui manque avant d'encoder, ce
+# qu'un lru_cache ne sait pas exposer sans déclencher le calcul.
+_QUERY_CACHE: "OrderedDict[tuple[str, str, str], np.ndarray]" = OrderedDict()
+_QUERY_CACHE_MAX = 256
+
+
+def _remember(key: tuple[str, str, str], vector: np.ndarray) -> np.ndarray:
+    """Mémorise un vecteur en écartant la question la plus anciennement utilisée."""
+    _QUERY_CACHE[key] = vector
+    _QUERY_CACHE.move_to_end(key)
+    while len(_QUERY_CACHE) > _QUERY_CACHE_MAX:
+        _QUERY_CACHE.popitem(last=False)
+    return vector
 
 
 def embed_query(text: str, model: str, cache_path: Path) -> np.ndarray:
     """Vectorise une question localement et met le résultat en cache mémoire."""
-    return np.asarray(
-        _cached_query_embedding(text.strip(), model, str(cache_path)),
-        dtype=np.float32,
-    )
+    return embed_queries([text], model, cache_path)[0]
+
+
+def embed_queries(
+    texts: list[str], model: str, cache_path: Path
+) -> list[np.ndarray]:
+    """Vectorise plusieurs reformulations en un seul passage du modèle.
+
+    Chaque appel d'encodage porte un coût fixe. Les reformulations produites par
+    le planificateur étaient vectorisées une par une : les regrouper supprime ce
+    coût autant de fois qu'il y a de variantes.
+    """
+    keys = [(text.strip(), model, str(cache_path)) for text in texts]
+    manquants = [key for key in dict.fromkeys(keys) if key not in _QUERY_CACHE]
+
+    if manquants:
+        matrix = _encode_local(
+            [key[0] for key in manquants],
+            model=model,
+            cache_path=cache_path,
+            batch_size=max(len(manquants), 1),
+            prefix="query: ",
+        )
+        for key, vector in zip(manquants, matrix):
+            _remember(key, np.asarray(vector, dtype=np.float32))
+
+    return [_remember(key, _QUERY_CACHE[key]) for key in keys]
+

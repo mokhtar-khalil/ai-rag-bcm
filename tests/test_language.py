@@ -1,4 +1,5 @@
 """Tests du choix automatique entre le français et l'arabe."""
+from tests.conftest import generation_diffusee
 
 import sys
 from types import SimpleNamespace
@@ -42,7 +43,7 @@ def test_explicit_api_language_overrides_question_detection(monkeypatch) -> None
         assert not is_arabic_text(question)
         return "بلغ معدل النمو الحقيقي 4.0٪ [p. PDF 5]."
 
-    monkeypatch.setattr("api.app.answer_with_provider", fake_answer)
+    monkeypatch.setattr("api.app.stream_answer", generation_diffusee(fake_answer))
     settings = get_settings(
         {
             "APP_ENV": "test",
@@ -148,8 +149,13 @@ def test_openai_generation_keeps_a_valid_arabic_answer_with_payment_standards(
         settings,
     )
     assert len(calls) == 1
+    # L'effort de raisonnement réduit reste le levier de vitesse de la voie arabe.
     assert calls[0]["reasoning"] == {"effort": "low"}
-    assert calls[0]["max_output_tokens"] == 1000
+    # Le plafond de sortie suit désormais la configuration : le figer bas tronquait
+    # les réponses longues sans rien économiser, seuls les tokens produits étant
+    # facturés.
+    assert calls[0]["max_output_tokens"] == settings.openai_max_output_tokens
+    assert calls[0]["max_output_tokens"] >= 3000
     assert "ISO 20022" in answer
     assert "تعذر إنشاء الإجابة" not in answer
 
@@ -178,7 +184,7 @@ def test_arabic_question_uses_french_retrieval_and_arabic_generation(
         assert any("4,0%" in item["text"].replace(" ", "") for item in results)
         return "بلغ معدل نمو الناتج المحلي الإجمالي الحقيقي 4.0٪ [p. PDF 5]."
 
-    monkeypatch.setattr("api.app.answer_with_provider", fake_answer)
+    monkeypatch.setattr("api.app.stream_answer", generation_diffusee(fake_answer))
     settings = get_settings(
         {
             "APP_ENV": "test",
@@ -221,7 +227,7 @@ def test_arabic_payment_reforms_use_the_fast_path_and_both_relevant_pages(
 
     monkeypatch.setattr("api.app.plan_queries_openai", forbidden_call)
     monkeypatch.setattr("api.app.rerank_openai", forbidden_call)
-    monkeypatch.setattr("api.app.answer_with_provider", fake_answer)
+    monkeypatch.setattr("api.app.stream_answer", generation_diffusee(fake_answer))
     settings = get_settings(
         {
             "APP_ENV": "test",
@@ -248,7 +254,7 @@ def test_arabic_followup_reuses_a_page_from_a_french_turn(monkeypatch) -> None:
         assert any(int(item["pdf_page"]) == 25 for item in results)
         return "شهدت السيولة المصرفية تحسناً خلال سنة 2025 [p. PDF 25]."
 
-    monkeypatch.setattr("api.app.answer_with_provider", fake_answer)
+    monkeypatch.setattr("api.app.stream_answer", generation_diffusee(fake_answer))
     settings = get_settings(
         {
             "APP_ENV": "test",

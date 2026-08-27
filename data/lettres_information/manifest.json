@@ -1,0 +1,90 @@
+{
+  "source": "bo.bcm.mr — actualités taguées « lettre_d_information »",
+  "recupere_le": "2026-08-25",
+  "editions": [
+    {
+      "fichier": "BCM-lettre-information-2026-01-janvier.pdf",
+      "titre": "Lettre d'information de la BCM — Janvier 2026",
+      "edition": "2026-01",
+      "pages": 1,
+      "publie_le": "2026-02-04",
+      "nid": 1069,
+      "page_publique": "https://www.bcm.mr/actualite/a8660b7d-6d87-4040-b3e0-533f89c7194f/publication-de-la-lettre-dinformation-janvier-2026",
+      "image_source": "https://bo.bcm.mr/sites/default/files/2026-02/lettre%20d%27info%20n%205%20JAN-2026_page-0001.jpg",
+      "image_dimensions": "1241x1754",
+      "langue": "fr"
+    },
+    {
+      "fichier": "BCM-lettre-information-2026-02-fevrier.pdf",
+      "titre": "Lettre d'information de la BCM — Février 2026",
+      "edition": "2026-02",
+      "pages": 1,
+      "publie_le": "2026-03-05",
+      "nid": 1108,
+      "page_publique": "https://www.bcm.mr/actualite/16360a22-12da-4785-9afc-9aeb153fdb0c/publication-de-la-lettre-dinformation-fevrier-2026",
+      "image_source": "https://bo.bcm.mr/sites/default/files/2026-03/lettre%20d%27info%206%20FEV-2026_pages-to-jpg-0001.jpg",
+      "image_dimensions": "2481x3508",
+      "langue": "fr"
+    },
+    {
+      "fichier": "BCM-lettre-information-2026-03-mars.pdf",
+      "titre": "Lettre d'information de la BCM — Mars 2026",
+      "edition": "2026-03",
+      "pages": 6,
+      "publie_le": "2026-04-09",
+      "nid": 1144,
+      "page_publique": "https://www.bcm.mr/actualite/f3d11b88-9647-4f43-a850-3eeb339e65ef/publication-de-la-lettre-dinformation-mars-2026",
+      "image_source": "https://bo.bcm.mr/sites/default/files/2026-04/lettre-d-information-mars-2026.png",
+      "image_dimensions": "983x8192",
+      "langue": "fr"
+    },
+    {
+      "fichier": "BCM-lettre-information-2026-04-avril.pdf",
+      "titre": "Lettre d'information de la BCM — Avril 2026",
+      "edition": "2026-04",
+      "pages": 6,
+      "publie_le": "2026-05-15",
+      "nid": 1176,
+      "page_publique": "https://www.bcm.mr/actualite/9b38ef1b-a82a-4de3-ba16-e8cd8f3b11da/publication-de-la-lettre-dinformation-avril-2026",
+      "image_source": "https://bo.bcm.mr/sites/default/files/2026-05/LI%20Avril%202026%20FR_Page_1_v2%20%281%29.png",
+      "image_dimensions": "800x6777",
+      "langue": "fr"
+    },
+    {
+      "fichier": "BCM-lettre-information-2026-05-mai.pdf",
+      "titre": "Lettre d'information de la BCM — Mai 2026",
+      "edition": "2026-05",
+      "pages": 8,
+      "publie_le": "2026-06-13",
+      "nid": 1185,
+      "page_publique": "https://www.bcm.mr/actualite/faffe415-0583-429f-b364-2971806bb383/publication-de-la-lettre-dinformation-mai-2026",
+      "image_source": "https://bo.bcm.mr/sites/default/files/2026-06/LI-MAI-2026-Mai-fr-V2%20%281%29.png",
+      "image_dimensions": "719x8036",
+      "langue": "fr"
+    },
+    {
+      "fichier": "BCM-lettre-information-2026-06-juin.pdf",
+      "titre": "Lettre d'information de la BCM — Juin 2026",
+      "edition": "2026-06",
+      "pages": 8,
+      "publie_le": "2026-07-17",
+      "nid": 1257,
+      "page_publique": "https://www.bcm.mr/actualite/be2104ca-a542-4e76-9040-e112363a11cf/publication-de-la-lettre-dinformation-juin-2026",
+      "image_source": "https://bo.bcm.mr/sites/default/files/2026-07/LI_Juin2026.png",
+      "image_dimensions": "865x9668",
+      "langue": "fr"
+    },
+    {
+      "fichier": "BCM-lettre-information-2026-07-juillet.pdf",
+      "titre": "Lettre d'information de la BCM — Juillet 2026",
+      "edition": "2026-07",
+      "pages": 13,
+      "publie_le": "2026-08-19",
+      "nid": 1291,
+      "page_publique": "https://www.bcm.mr/actualite/95295504-39fb-4df4-93a7-e43110f21ab6/publication-de-la-lettre-dinformation-juillet-2026",
+      "image_source": "https://bo.bcm.mr/sites/default/files/2026-08/LM-JUILLET_2026-BCM.png",
+      "image_dimensions": "2481x42096",
+      "langue": "fr"
+    }
+  ]
+}

@@ -29,8 +29,14 @@ def response_language(value: str) -> str:
 def missing_information_message(language: str) -> str:
     """Produit le refus documentaire dans la langue de l'utilisateur."""
     if language == "ar":
-        return "لا أجد هذه المعلومة في تقرير البنك المركزي الموريتاني المقدم."
-    return "Je ne trouve pas cette information dans le rapport BCM fourni."
+        return (
+            "لا أجد هذه المعلومة في وثائق البنك المركزي الموريتاني المتاحة "
+            "(التقرير السنوي والرسائل الإخبارية)."
+        )
+    return (
+        "Je ne trouve pas cette information dans les documents BCM fournis "
+        "(Rapport annuel et Lettres d'information)."
+    )
 
 
 def answer_language_instruction(value: str, language: str | None = None) -> str:

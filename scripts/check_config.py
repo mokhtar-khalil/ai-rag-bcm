@@ -30,7 +30,7 @@ def main() -> int:
     print(f"- environnement : {settings.app_env}")
     print(f"- rapport : {settings.report_path.name}")
     print(f"- API : {settings.api_host}:{settings.api_port}")
-    print(f"- interface : {settings.gradio_host}:{settings.gradio_port}")
+    print(f"- widget : {settings.widget_host}:{settings.widget_port}")
     print(f"- mode de génération : {settings.generation_provider}")
     print(
         "- recherche sémantique locale : "

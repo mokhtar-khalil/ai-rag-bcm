@@ -5,6 +5,20 @@ chatbot RAG BCM : quel fichier fait quoi, et les commandes exactes pour
 chaque scénario (dev local, Docker local, VM de test, futur serveur BCM).
 Objectif : ne plus avoir à redemander « comment on fait déjà » — tout est ici.
 
+## 0. Déploiement hébergé (Railway + Vercel) — voie retenue
+
+Deux documents dédiés ont été écrits pour cette voie et font désormais référence :
+
+- **`docs/DEPLOIEMENT_RAILWAY_VERCEL.md`** — mise en service de l'API sur
+  Railway et du widget sur Vercel : variables, dimensionnement, vérifications,
+  mise à jour du corpus.
+- **`docs/INTEGRATION_EQUIPE_BCM.md`** — à transmettre à l'équipe du site
+  bcm.mr : une balise `<script>`, et la seule information qu'elle doit nous
+  fournir en retour (la liste exacte de ses origines).
+
+Le reste de ce document décrit les scénarios locaux, Docker et VM, qui restent
+valables pour le développement et les essais.
+
 ## 1. Vue d'ensemble
 
 ```

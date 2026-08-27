@@ -32,6 +32,7 @@ exec "$GUNICORN_BIN" \
   --workers "${WEB_CONCURRENCY:-1}" \
   --threads "${GUNICORN_THREADS:-4}" \
   --timeout "${GUNICORN_TIMEOUT:-210}" \
+  --graceful-timeout "${GUNICORN_GRACEFUL_TIMEOUT:-30}" \
   --bind "${API_HOST}:${API_PORT}" \
   --access-logfile - \
   --error-logfile - \

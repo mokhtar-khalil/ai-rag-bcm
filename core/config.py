@@ -92,14 +92,19 @@ class Settings:
     api_url: str
     gradio_host: str
     gradio_port: int
+    widget_host: str
+    widget_port: int
     open_browser: bool
     generation_provider: str
     openai_api_key: str = field(repr=False)
     openai_model: str
     openai_rerank_model: str
     openai_reasoning_effort: str
+    openai_max_output_tokens: int
     gemini_api_key: str = field(repr=False)
     gemini_model: str
+    gemini_max_output_tokens: int
+    gemini_thinking_level: str
     embedding_model: str
     embedding_cache_path: Path
     semantic_retrieval: bool
@@ -124,6 +129,11 @@ class Settings:
     reindex_token: str = field(repr=False)
     cors_allowed_origins: tuple[str, ...]
     rate_limit_ask: str
+
+    @property
+    def widget_origin(self) -> str:
+        """Origine exacte que le navigateur enverra depuis la page du widget."""
+        return f"http://{self.widget_host}:{self.widget_port}"
 
     @property
     def is_production(self) -> bool:
@@ -161,10 +171,22 @@ def get_settings(environ: Mapping[str, str] | None = None) -> Settings:
             "GEMINI_API_KEY est requis en production lorsque GENERATION_PROVIDER vaut gemini."
         )
 
+    thinking_level = _text(env, "GEMINI_THINKING_LEVEL", "low").casefold()
+    if thinking_level not in {"", "low", "medium", "high"}:
+        raise ConfigurationError(
+            "GEMINI_THINKING_LEVEL doit valoir low, medium, high, ou rester vide."
+        )
+
     top_k = _integer(env, "TOP_K", 5, 1, 10)
-    retrieval_candidates = _integer(env, "RETRIEVAL_CANDIDATES", 12, top_k, 50)
+    # Le budget de candidats était calibré sur un corpus d'un seul document. Le
+    # corpus réunit désormais le rapport annuel et les Lettres d'information :
+    # à budget constant, les passages d'une source évincent ceux de l'autre.
+    retrieval_candidates = _integer(env, "RETRIEVAL_CANDIDATES", 18, top_k, 50)
     api_host = _text(env, "API_HOST", "127.0.0.1")
-    api_port = _integer(env, "API_PORT", 5000, 1, 65535)
+    # Les plateformes de type Railway ou Heroku imposent le port d'écoute par la
+    # variable PORT, choisie au démarrage du conteneur. Elle prime donc sur
+    # API_PORT, qui reste la valeur de référence en local et en Docker.
+    api_port = _integer(env, "PORT", _integer(env, "API_PORT", 5000, 1, 65535), 1, 65535)
     return Settings(
         app_env=app_env,
         log_level=_text(env, "LOG_LEVEL", "INFO").upper(),
@@ -178,14 +200,42 @@ def get_settings(environ: Mapping[str, str] | None = None) -> Settings:
         api_url=_text(env, "API_URL", f"http://{api_host}:{api_port}").rstrip("/"),
         gradio_host=_text(env, "GRADIO_HOST", "127.0.0.1"),
         gradio_port=_integer(env, "GRADIO_PORT", 7861, 1, 65535),
+        # Serveur statique local qui sert le widget et sa page de démonstration.
+        # Son origine doit figurer dans CORS_ALLOWED_ORIGINS, sinon le
+        # navigateur bloque tous les appels du widget vers l'API.
+        widget_host=_text(env, "WIDGET_HOST", "127.0.0.1"),
+        widget_port=_integer(env, "WIDGET_PORT", 8090, 1, 65535),
         open_browser=_boolean(env, "OPEN_BROWSER", True),
         generation_provider=provider,
         openai_api_key=openai_api_key,
         openai_model=_text(env, "OPENAI_MODEL", "gpt-5.6-terra"),
         openai_rerank_model=_text(env, "OPENAI_RERANK_MODEL", "gpt-5.6-luna"),
         openai_reasoning_effort=_text(env, "OPENAI_REASONING_EFFORT", "medium"),
+        # Comme chez Gemini, les tokens de raisonnement sont décomptés de ce
+        # budget. Mesuré ici : 184 tokens de raisonnement pour 572 de réponse
+        # sur une question large, et jusqu'à 120 pour un reranking qui n'en
+        # produit que 18. Un plafond serré ne réduit pas le coût — seuls les
+        # tokens réellement produits sont facturés — mais tronque la sortie.
+        openai_max_output_tokens=_integer(
+            env, "OPENAI_MAX_OUTPUT_TOKENS", 3000, 500, 32000
+        ),
         gemini_api_key=gemini_api_key,
-        gemini_model=_text(env, "GEMINI_MODEL", "gemini-2.5-flash"),
+        gemini_model=_text(env, "GEMINI_MODEL", "gemini-3.6-flash"),
+        # Les modèles Gemini récents raisonnent avant de répondre et leurs
+        # tokens de réflexion sont décomptés de ce budget. Un budget calibré sur
+        # la seule longueur de la réponse la fait couper en plein milieu.
+        # Mesuré sur ce corpus : la réflexion consomme de 350 à plus de 3 500
+        # tokens selon la question, de façon peu prévisible. Le plafond n'est
+        # facturé que s'il est consommé : le fixer haut ne coûte rien et évite
+        # de servir une réponse coupée.
+        gemini_max_output_tokens=_integer(
+            env, "GEMINI_MAX_OUTPUT_TOKENS", 8000, 500, 32000
+        ),
+        # « low » divise la latence par cinq sur une question large (36 s -> 7 s)
+        # pour une réponse de longueur et de structure comparables. Une réponse
+        # documentaire est fondée sur les extraits fournis : elle exige peu de
+        # raisonnement autonome. Mettre "" pour laisser le modèle décider.
+        gemini_thinking_level=_text(env, "GEMINI_THINKING_LEVEL", "low").casefold(),
         embedding_model=_text(env, "EMBEDDING_MODEL", "intfloat/multilingual-e5-small"),
         embedding_cache_path=_path(
             env, "EMBEDDING_CACHE_PATH", PROJECT_ROOT / "storage" / "models"

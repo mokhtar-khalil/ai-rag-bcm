@@ -40,7 +40,7 @@ def test_generate_gemini_returns_grounded_answer(monkeypatch) -> None:
         settings,
     )
     assert "[p. PDF 5]" in answer
-    assert models.calls[0]["model"] == "gemini-2.5-flash"
+    assert models.calls[0]["model"] == "gemini-3.6-flash"
 
 
 def test_generate_gemini_rejects_invalid_citation(monkeypatch) -> None:

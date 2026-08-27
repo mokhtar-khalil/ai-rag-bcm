@@ -6,7 +6,6 @@ activé, un vecteur sémantique. L'index reste toujours limité au PDF fourni.
 
 from __future__ import annotations
 
-import hashlib
 import re
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -14,8 +13,18 @@ from typing import Any
 
 import joblib
 import numpy as np
-from pypdf import PdfReader
 from sklearn.feature_extraction.text import TfidfVectorizer
+
+from api.sources import (
+    SOURCE_TYPE_PDF,
+    Document,
+    build_registry,
+    citation_label,
+    clean_pdf_page,
+    corpus_fingerprint,
+    file_checksum,
+    load_corpus,
+)
 
 
 FRENCH_STOP_WORDS = {
@@ -27,17 +36,27 @@ FRENCH_STOP_WORDS = {
     "sont", "sur", "un", "une", "vos", "votre", "vous", "y", "ete", "etre",
 }
 
-INDEX_SCHEMA_VERSION = 9
+INDEX_SCHEMA_VERSION = 10
 
 
 @dataclass(frozen=True)
 class Chunk:
-    """Passage indexé avec sa page PDF, son type et son texte prioritaire."""
+    """Passage indexé, rattaché à son unité citable et à sa source d'origine.
+
+    `pdf_page` reste la clé entière de l'unité citable : le numéro de page pour
+    un rapport PDF, un identifiant réservé (>= WEB_UNIT_OFFSET) pour une page du
+    site bcm.mr. Les champs de source permettent de citer une URL publique
+    plutôt qu'un numéro de page lorsque le passage ne vient pas d'un PDF.
+    """
     chunk_id: int
     pdf_page: int
     text: str
     kind: str = "standard"
     focus_text: str = ""
+    doc_id: str = ""
+    source_type: str = SOURCE_TYPE_PDF
+    url: str = ""
+    title: str = ""
 
 
 class RAGIndex:
@@ -63,6 +82,8 @@ class RAGIndex:
         self.semantic_matrix: np.ndarray | None = None
         self.embedding_model: str | None = None
         self.metadata: dict[str, Any] = {}
+        self.manifest: list[dict[str, Any]] = []
+        self.source_registry: dict[int, dict[str, Any]] = {}
 
     @property
     def has_semantic_index(self) -> bool:
@@ -72,33 +93,17 @@ class RAGIndex:
     @staticmethod
     def _sha256(path: Path) -> str:
         """Calcule l'empreinte du PDF afin de détecter un index devenu obsolète."""
-        digest = hashlib.sha256()
-        with path.open("rb") as stream:
-            for block in iter(lambda: stream.read(1024 * 1024), b""):
-                digest.update(block)
-        return digest.hexdigest()
+        return file_checksum(path)
 
-    @staticmethod
-    def _clean_page(text: str) -> str:
-        """Nettoie le texte PDF sans supprimer les retours utiles aux tableaux."""
-        text = text.replace("\x00", " ").replace("\u00ad", "")
-        text = re.sub(r"(?<=\w)-\s*\n\s*(?=\w)", "", text)
-        lines: list[str] = []
-        for raw_line in text.splitlines():
-            line = re.sub(r"\s+", " ", raw_line).strip()
-            if not line:
-                lines.append("")
-                continue
-            if line.casefold() == "rapport annuel 2025":
-                continue
-            if re.fullmatch(r"(?:\d{1,3}\s*){1,2}", line):
-                continue
-            lines.append(line)
-        cleaned = "\n".join(lines)
-        cleaned = re.sub(r"\n{3,}", "\n\n", cleaned)
-        return cleaned.strip()
+    _clean_page = staticmethod(clean_pdf_page)
 
-    def _chunk_page(self, text: str, pdf_page: int, first_id: int) -> list[Chunk]:
+    def _chunk_page(
+        self,
+        text: str,
+        pdf_page: int,
+        first_id: int,
+        source: dict[str, str] | None = None,
+    ) -> list[Chunk]:
         """Découpe une page en passages chevauchants pour préserver le contexte."""
         if not text:
             return []
@@ -118,7 +123,14 @@ class RAGIndex:
             # (le tableau ou le schéma est une image). Les conserver dès 60
             # caractères permet de retrouver leur page avant le traitement OCR.
             if len(piece) >= 60:
-                chunks.append(Chunk(chunk_id=chunk_id, pdf_page=pdf_page, text=piece))
+                chunks.append(
+                    Chunk(
+                        chunk_id=chunk_id,
+                        pdf_page=pdf_page,
+                        text=piece,
+                        **(source or {}),
+                    )
+                )
                 chunk_id += 1
 
         for paragraph in paragraphs:
@@ -151,7 +163,11 @@ class RAGIndex:
         return chunks
 
     def _table_line_chunks(
-        self, text: str, pdf_page: int, first_id: int
+        self,
+        text: str,
+        pdf_page: int,
+        first_id: int,
+        source: dict[str, str] | None = None,
     ) -> list[Chunk]:
         """Ajoute des passages fins pour éviter de diluer une ligne de tableau."""
         chunks: list[Chunk] = []
@@ -221,26 +237,45 @@ class RAGIndex:
                     text=enriched,
                     kind="table_row",
                     focus_text="\n".join([*focus_context, line]),
+                    **(source or {}),
                 )
             )
             chunk_id += 1
         return chunks
 
-    def build(self) -> dict[str, Any]:
-        """Extrait le PDF, crée les passages et persiste les matrices TF-IDF."""
-        if not self.report_path.exists():
-            raise FileNotFoundError(f"Rapport introuvable : {self.report_path}")
+    def build(self, documents: list[Document] | None = None) -> dict[str, Any]:
+        """Indexe les documents fournis, ou le seul rapport PDF par défaut."""
+        corpus = (
+            list(documents) if documents is not None else load_corpus(self.report_path)
+        )
+        if not corpus:
+            raise RuntimeError("Aucun document à indexer.")
 
-        reader = PdfReader(str(self.report_path))
         chunks: list[Chunk] = []
-        for index, page in enumerate(reader.pages, start=1):
-            cleaned = self._clean_page(page.extract_text() or "")
-            page_chunks = self._chunk_page(cleaned, index, len(chunks))
-            chunks.extend(page_chunks)
-            chunks.extend(self._table_line_chunks(cleaned, index, len(chunks)))
+        for document in corpus:
+            source = {
+                "doc_id": document.doc_id,
+                "source_type": document.source_type,
+                "url": document.url,
+                "title": document.title,
+            }
+            for segment in document.segments:
+                if not segment.text:
+                    continue
+                chunks.extend(
+                    self._chunk_page(segment.text, segment.unit, len(chunks), source)
+                )
+                # Le découpage ligne à ligne vise les tableaux chiffrés des
+                # rapports ; une page éditoriale du site n'en contient pas.
+                if document.source_type == SOURCE_TYPE_PDF:
+                    chunks.extend(
+                        self._table_line_chunks(
+                            segment.text, segment.unit, len(chunks), source
+                        )
+                    )
 
         if not chunks:
-            raise RuntimeError("Aucun texte exploitable n'a été extrait du rapport.")
+            raise RuntimeError("Aucun texte exploitable n'a été extrait des documents.")
 
         texts = [chunk.text for chunk in chunks]
         word_vectorizer = TfidfVectorizer(
@@ -265,17 +300,38 @@ class RAGIndex:
         word_matrix = word_vectorizer.fit_transform(texts)
         char_matrix = char_vectorizer.fit_transform(texts)
 
+        pdf_documents = [
+            document for document in corpus if document.source_type == SOURCE_TYPE_PDF
+        ]
         metadata = {
             "index_schema_version": INDEX_SCHEMA_VERSION,
-            "report_title": "Rapport annuel BCM - exercice 2025",
+            "report_title": pdf_documents[0].title if pdf_documents else corpus[0].title,
             "report_file": self.report_path.name,
-            "report_sha256": self._sha256(self.report_path),
-            "pdf_pages": len(reader.pages),
+            "report_sha256": pdf_documents[0].checksum if pdf_documents else "",
+            "pdf_pages": sum(len(document.segments) for document in pdf_documents),
+            "documents": len(corpus),
+            "pages_par_source": {
+                source_type: sum(
+                    len(document.segments)
+                    for document in corpus
+                    if document.source_type == source_type
+                )
+                for source_type in sorted({item.source_type for item in corpus})
+            },
             "chunks": len(chunks),
             "semantic_index": False,
         }
+        # L'empreinte n'est enregistrée que pour le corpus par défaut : un corpus
+        # injecté (tests, ingestion expérimentale) ne correspond à aucun fichier.
+        metadata["corpus_fingerprint"] = (
+            corpus_fingerprint(self.report_path) if documents is None else {}
+        )
+        self.manifest = [document.manifest() for document in corpus]
+        self.source_registry = build_registry(corpus)
         payload = {
             "metadata": metadata,
+            "manifest": self.manifest,
+            "source_registry": self.source_registry,
             "chunks": [asdict(chunk) for chunk in chunks],
             "word_vectorizer": word_vectorizer,
             "char_vectorizer": char_vectorizer,
@@ -290,6 +346,8 @@ class RAGIndex:
     def _load_payload(self, payload: dict[str, Any]) -> None:
         """Restaure en mémoire les composants sérialisés de l'index."""
         self.metadata = payload["metadata"]
+        self.manifest = payload.get("manifest", [])
+        self.source_registry = payload.get("source_registry", {})
         self.chunks = [Chunk(**item) for item in payload["chunks"]]
         self.word_vectorizer = payload["word_vectorizer"]
         self.char_vectorizer = payload["char_vectorizer"]
@@ -307,6 +365,8 @@ class RAGIndex:
         """Assemble l'état de l'index dans un format enregistrable par joblib."""
         return {
             "metadata": self.metadata,
+            "manifest": self.manifest,
+            "source_registry": self.source_registry,
             "chunks": [asdict(chunk) for chunk in self.chunks],
             "word_vectorizer": self.word_vectorizer,
             "char_vectorizer": self.char_vectorizer,
@@ -334,18 +394,30 @@ class RAGIndex:
         self.metadata["embedding_dimensions"] = int(values.shape[1])
         joblib.dump(self._payload(), self.index_path, compress=3)
 
-    def load(self, rebuild_if_stale: bool = True) -> "RAGIndex":
-        """Charge l'index et le reconstruit si le schéma ou le PDF a changé."""
+    def load(
+        self,
+        rebuild_if_stale: bool = True,
+        documents: list[Document] | None = None,
+    ) -> "RAGIndex":
+        """Charge l'index et le reconstruit si le schéma ou une source a changé."""
         if not self.index_path.exists():
-            self.build()
+            self.build(documents)
             return self
         payload = joblib.load(self.index_path)
-        stale = (
-            payload["metadata"].get("report_sha256") != self._sha256(self.report_path)
-            or payload["metadata"].get("index_schema_version") != INDEX_SCHEMA_VERSION
-        )
+        stale = payload["metadata"].get("index_schema_version") != INDEX_SCHEMA_VERSION
+        if not stale:
+            if documents is None:
+                # Corpus par défaut : comparer les empreintes de fichiers suffit
+                # et évite de réextraire le texte de chaque document.
+                stale = payload["metadata"].get(
+                    "corpus_fingerprint"
+                ) != corpus_fingerprint(self.report_path)
+            else:
+                stale = [document.manifest() for document in documents] != payload.get(
+                    "manifest", []
+                )
         if rebuild_if_stale and stale:
-            self.build()
+            self.build(documents)
         else:
             self._load_payload(payload)
         return self
@@ -639,6 +711,31 @@ class RAGIndex:
                 if len(expanded) >= max_results:
                     return expanded
         return expanded
+
+    def decorate(
+        self, results: list[dict[str, Any]], language: str = "fr"
+    ) -> list[dict[str, Any]]:
+        """Joint à chaque passage le repère cité et l'origine de sa source.
+
+        Les passages circulent ensuite tels quels jusqu'au générateur et jusqu'à
+        la réponse HTTP : ni l'un ni l'autre n'a besoin de connaître le registre.
+        """
+        for item in results:
+            entry = self.source_registry.get(int(item["pdf_page"]))
+            if entry is None:
+                # Index antérieur au registre : conserver l'ancien repère.
+                item.setdefault("citation", f"p. PDF {item['pdf_page']}")
+                item.setdefault("source_type", SOURCE_TYPE_PDF)
+                continue
+            item["citation"] = citation_label(
+                entry["source_type"], entry["title"], entry["pdf_page"], language
+            )
+            item["source_type"] = entry["source_type"]
+            item["source_title"] = entry["title"]
+            item["source_url"] = entry["url"]
+            item["source_page"] = entry["pdf_page"]
+            item["source_date"] = entry.get("published_at", "")
+        return results
 
     @staticmethod
     def is_relevant(

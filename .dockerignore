@@ -22,3 +22,12 @@ evaluation/results
 
 run.sh
 setup.sh
+
+# Images sources des Lettres d'information : retéléchargeables depuis bo.bcm.mr
+# et inutiles à l'exécution, seuls les fichiers OCR servent à l'indexation.
+data/lettres_information/.cache
+
+# Index hérité d'une version antérieure, reconstruit au build.
+data/index
+
+evaluation

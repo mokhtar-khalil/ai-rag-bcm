@@ -28,10 +28,28 @@
   </p>
 </main>
 
-<!-- Intégration du widget : une seule ligne, à placer avant la fermeture de </body>. -->
+<!--
+  Page de démonstration. Elle accepte « ?api=https://… » afin d'être essayée
+  contre l'API déployée sans modifier ce fichier :
+      https://<projet>.vercel.app/demo.html?api=https://<projet>.up.railway.app
+  À défaut, elle vise l'API locale. Sur un vrai site, l'intégration se réduit à
+  la balise <script> ci-dessous, avec data-api-url en dur.
+-->
+<script>
+  (function () {
+    var demande = new URLSearchParams(location.search).get("api") || "";
+    // Seuls https et la boucle locale sont acceptés : une URL arbitraire en
+    // http exposerait les questions posées depuis cette page.
+    var autorisee =
+      /^https:\/\//.test(demande) ||
+      /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(demande);
+    window.BCM_CHAT_CONFIG = {
+      apiUrl: autorisee ? demande.replace(/\/+$/, "") : "http://127.0.0.1:5000",
+    };
+  })();
+</script>
 <script
   src="./bcm-chat-widget.js"
-  data-api-url="http://127.0.0.1:5001"
   data-language="fr"
 ></script>
 </body>

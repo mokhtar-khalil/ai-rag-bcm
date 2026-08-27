@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import re
 import hmac
+import json
 import unicodedata
 from pathlib import Path
 from threading import Lock
@@ -16,13 +17,14 @@ from time import perf_counter
 from typing import Any
 from uuid import uuid4
 
-from flask import Flask, g, jsonify, request
+from flask import Flask, Response, g, jsonify, request, stream_with_context
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from werkzeug.exceptions import BadRequest, HTTPException
 
 from api.providers import (
+    stream_answer,
     answer_with_provider,
     plan_queries_openai,
     rerank_openai,
@@ -41,6 +43,7 @@ from api.charts import (
     select_chart_pages,
 )
 from api.rag import RAGIndex
+from api.sources import SOURCE_TYPE_PDF, citation_label
 from api.query import build_retrieval_query, is_national_question
 from core.config import Settings, get_settings
 from core.language import (
@@ -614,6 +617,54 @@ def _contextualize_followup(
     return f"{question}. Sujet actif : {subject}.{page_hint}"
 
 
+def _report_units(
+    pages: list[int], registry: dict[int, dict[str, Any]]
+) -> list[int]:
+    """Ne garde que les unités qui désignent réellement une page du rapport PDF.
+
+    Le rendu d'image et l'OCR documentaire ouvrent le rapport annuel à un numéro
+    de page. Une unité venant d'une Lettre d'information n'y correspond à rien :
+    la laisser passer déclencherait un rendu voué à l'échec.
+    """
+    if not registry:
+        return pages
+    return [
+        page
+        for page in pages
+        if registry.get(page, {}).get("source_type", SOURCE_TYPE_PDF) == SOURCE_TYPE_PDF
+    ]
+
+
+def _select_results(
+    search_results: list[dict[str, Any]],
+    wanted: int,
+    registry: dict[int, dict[str, Any]],
+    primary_type: str = SOURCE_TYPE_PDF,
+) -> list[dict[str, Any]]:
+    """Sélectionne les passages sans qu'une source en évince silencieusement une autre.
+
+    Le corpus réunit le rapport annuel et les Lettres d'information. À nombre de
+    passages constant, une lettre bien classée prend la place d'une page du
+    rapport, qui n'atteint alors jamais la génération. La sélection est donc
+    élargie jusqu'à ce que la source de référence dispose du quota qu'elle aurait
+    obtenu seule, sans pour autant écarter les passages des autres sources.
+    """
+    if not registry:
+        return search_results[:wanted]
+    selected: list[dict[str, Any]] = []
+    primary = 0
+    for item in search_results:
+        entry = registry.get(int(item["pdf_page"]), {})
+        # Une unité absente du registre provient d'un index antérieur : la
+        # traiter comme la source de référence conserve l'ancien comportement.
+        if entry.get("source_type", primary_type) == primary_type:
+            primary += 1
+        selected.append(item)
+        if primary >= wanted or len(selected) >= wanted * 2:
+            break
+    return selected
+
+
 def create_app(
     settings_override: Settings | None = None,
     engine_override: RAGIndex | None = None,
@@ -642,6 +693,18 @@ def create_app(
                 r"/health": {"origins": list(settings.cors_allowed_origins)},
             },
         )
+
+    # Le modèle d'embedding met environ neuf secondes à se charger. Sans
+    # préchargement, cette attente est payée par la première question de chaque
+    # worker : /health ne réchauffe que celui qui répond à la sonde. Le coût est
+    # déplacé au démarrage, où il est invisible pour l'utilisateur.
+    if settings.semantic_retrieval:
+        try:
+            warm_embedding_model(settings.embedding_model, settings.embedding_cache_path)
+        except Exception as exc:  # le service reste utilisable en recherche lexicale
+            app.logger.warning(
+                "embedding_warmup_failed error_type=%s", type(exc).__name__
+            )
 
     app.config["RATELIMIT_ENABLED"] = not settings.is_testing
     limiter = Limiter(get_remote_address, app=app, default_limits=[], storage_uri="memory://")
@@ -699,26 +762,49 @@ def create_app(
         ensure_loaded()
         if settings.semantic_retrieval and engine.has_semantic_index:
             warm_embedding_model(settings.embedding_model, settings.embedding_cache_path)
+        # Sélection explicite : « **engine.metadata » publiait les empreintes
+        # SHA-256 de chaque document du corpus, sans utilité pour un appelant et
+        # sans raison d'être exposées sur un point d'entrée public.
         return jsonify(
             {
                 "status": "ok",
                 "chart_analysis_enabled": settings.chart_analysis_enabled,
-                **engine.metadata,
+                "documents": engine.metadata.get("documents", 0),
+                "pages_par_source": engine.metadata.get("pages_par_source", {}),
+                "pdf_pages": engine.metadata.get("pdf_pages", 0),
+                "chunks": engine.metadata.get("chunks", 0),
+                "semantic_index": engine.metadata.get("semantic_index", False),
+                "index_schema_version": engine.metadata.get("index_schema_version"),
             }
         )
 
-    @app.post("/api/ask")
-    @limiter.limit(settings.rate_limit_ask)
-    def ask() -> Any:
-        """Répond à une question en exécutant toute la chaîne RAG."""
+    def _evenement_reponse(payload: dict[str, Any]) -> tuple[str, Any]:
+        """Événement final : la réponse complète, prête à être sérialisée."""
+        return ("done", payload)
+
+    def _evenement_erreur(message: str, status: int) -> tuple[str, Any]:
+        """Événement d'erreur, porteur du corps JSON et du code HTTP."""
+        return ("error", (message, status))
+
+    def _ask_events() -> Any:
+        """Exécute toute la chaîne RAG en produisant des événements successifs.
+
+        Le découpage en événements permet à deux points d'entrée de partager
+        exactement la même logique : « /api/ask » attend l'événement final et
+        renvoie un JSON unique, « /api/ask/stream » les retransmet au fil de
+        l'eau. Sans ce partage, la voie diffusée aurait sa propre copie du
+        pipeline et les deux divergeraient à la première correction.
+        """
         ensure_loaded()
         payload = request.get_json(silent=False)
         if not isinstance(payload, dict):
-            return error_payload("Le corps JSON doit être un objet.", 400)
+            yield _evenement_erreur("Le corps JSON doit être un objet.", 400)
+            return
 
         question = payload.get("question")
         if not isinstance(question, str) or not question.strip():
-            return error_payload("Le champ 'question' est obligatoire.", 400)
+            yield _evenement_erreur("Le champ 'question' est obligatoire.", 400)
+            return
         question = question.strip()
         requested_language = payload.get("language")
         if requested_language is None:
@@ -726,14 +812,16 @@ def create_app(
             # lorsque l'interface n'a pas transmis son choix explicite.
             language = response_language(question)
         elif requested_language not in {"fr", "ar"}:
-            return error_payload("Le champ 'language' doit valoir 'fr' ou 'ar'.", 400)
+            yield _evenement_erreur("Le champ 'language' doit valoir 'fr' ou 'ar'.", 400)
+            return
         else:
             language = requested_language
         if len(question) > settings.max_question_chars:
-            return error_payload(
+            yield _evenement_erreur(
                 f"La question dépasse {settings.max_question_chars:,} caractères.".replace(",", " "),
                 400,
             )
+            return
         history = _safe_history(payload.get("history", []), settings.max_history_messages)
         retrieval_question = _contextualize_followup(question, history)
         followup = retrieval_question != question
@@ -765,7 +853,7 @@ def create_app(
                             "excerpt": _source_excerpt(chunk.text, focus_user),
                         }
                     )
-            return jsonify(
+            yield _evenement_reponse(
                 {
                     "answer": focus_answer,
                     "sources": repeated_sources,
@@ -778,6 +866,7 @@ def create_app(
                     "language": language,
                 }
             )
+            return
         previous_users = [item["content"] for item in history[-4:] if item["role"] == "user"]
         if retrieval_question == question and len(question.split()) <= 8 and previous_users:
             retrieval_question = f"{previous_users[-1]} {question}"
@@ -792,8 +881,12 @@ def create_app(
         comparative_question = (
             len(set(re.findall(r"\b(?:19|20)\d{2}\b", question))) >= 2
         )
+        # Le corpus réunit plusieurs sources et le TF-IDF est global : chaque
+        # ajout de documents redistribue légèrement les scores des passages
+        # existants. Une question large réclame donc une tranche de preuves
+        # assez profonde pour absorber ce reclassement sans perdre une page.
         wanted_results = (
-            max(settings.top_k, 8)
+            max(settings.top_k, 10)
             if broad_question or comparative_question
             else settings.top_k
         )
@@ -827,6 +920,7 @@ def create_app(
                 semantic_weight=settings.semantic_weight,
             )
 
+        yield ("stage", "recherche")
         # Étape 1 : enrichir la demande et lancer une première recherche hybride.
         base_retrieval_query = build_retrieval_query(
             enrich_chart_query(retrieval_question)
@@ -864,6 +958,7 @@ def create_app(
             and not followup
             and _needs_query_planning(result_sets[0], retrieval_question)
         ):
+            yield ("stage", "reformulation")
             try:
                 query_plan = plan_queries_openai(retrieval_question, settings)
                 known_queries = {base_retrieval_query.casefold()}
@@ -1003,7 +1098,10 @@ def create_app(
             and bool(query_plan.get("ambiguous"))
             and len(evidence_suggestions) >= 2
         )
-        results = search_results[:wanted_results]
+        results = engine.decorate(
+            _select_results(search_results, wanted_results, engine.source_registry),
+            language,
+        )
         if (
             not chart_requested
             and not clarification_needed
@@ -1015,6 +1113,7 @@ def create_app(
                 settings.min_semantic_score,
             )
         ):
+            yield ("stage", "selection")
             try:
                 results = rerank_openai(retrieval_question, search_results, settings)
             except Exception as exc:
@@ -1023,7 +1122,10 @@ def create_app(
                     g.request_id,
                     type(exc).__name__,
                 )
-                results = search_results[:wanted_results]
+                results = engine.decorate(
+            _select_results(search_results, wanted_results, engine.source_registry),
+            language,
+        )
 
         if clarification_needed:
             results = search_results[: min(8, len(search_results))]
@@ -1035,10 +1137,13 @@ def create_app(
         if chart_requested and settings.chart_analysis_enabled:
             try:
                 chart_analysis_question = enrich_chart_query(question)
-                chart_pages = select_chart_pages(
-                    chart_analysis_question,
-                    search_results,
-                    maximum=settings.chart_max_pages,
+                chart_pages = _report_units(
+                    select_chart_pages(
+                        chart_analysis_question,
+                        search_results,
+                        maximum=settings.chart_max_pages,
+                    ),
+                    engine.source_registry,
                 )
                 if chart_pages:
                     rendered_pages = render_chart_pages(
@@ -1115,7 +1220,9 @@ def create_app(
 
         # Étape 5 : ajouter les passages voisins pour redonner au générateur le
         # contexte parfois coupé par le découpage du PDF.
-        generation_results = engine.expand_with_neighbors(results, max_results=12)
+        generation_results = engine.decorate(
+            engine.expand_with_neighbors(results, max_results=12), language
+        )
 
         # Une page déjà citée peut être entièrement scannée : son index contient
         # alors le titre, mais pas le texte à résumer. Pour un suivi comme
@@ -1140,6 +1247,7 @@ def create_app(
                 native_text = " ".join(sorted(page_texts))
                 if len(native_text) < 1_200:
                     sparse_pages.append(page)
+            sparse_pages = _report_units(sparse_pages, engine.source_registry)
             if sparse_pages:
                 try:
                     rendered_document_pages = render_chart_pages(
@@ -1183,18 +1291,32 @@ def create_app(
             if page in seen_source_pages:
                 continue
             seen_source_pages.add(page)
+            entry = engine.source_registry.get(page, {})
             sources.append(
                 {
                     "pdf_page": page,
                     "score": item["score"],
                     "excerpt": _source_excerpt(item["text"], source_query),
+                    "citation": citation_label(
+                        entry.get("source_type", SOURCE_TYPE_PDF),
+                        entry.get("title", ""),
+                        entry.get("pdf_page", page),
+                        language,
+                    )
+                    if entry
+                    else f"p. PDF {page}",
+                    "source_type": entry.get("source_type", SOURCE_TYPE_PDF),
+                    "source_title": entry.get("title", ""),
+                    "source_url": entry.get("url", ""),
+                    "source_page": entry.get("pdf_page", page),
+                    "source_date": entry.get("published_at", ""),
                 }
             )
             if len(sources) >= 5:
                 break
 
         if clarification_needed:
-            return jsonify(
+            yield _evenement_reponse(
                 {
                     "answer": _clarification_answer(
                         suggestions, language=language
@@ -1208,6 +1330,7 @@ def create_app(
                     "language": language,
                 }
             )
+            return
 
         if chart_contexts:
             chart_context_pages = {
@@ -1241,7 +1364,7 @@ def create_app(
                     and not untranslated_latin_words(chart_answer)
                 )
             ):
-                return jsonify(
+                yield _evenement_reponse(
                     {
                         "answer": chart_answer,
                         "sources": sources,
@@ -1255,11 +1378,12 @@ def create_app(
                         "language": language,
                     }
                 )
+                return
 
         if chart_requested and is_chart_existence_question(question):
             if chart_pages:
                 pages_text = ", ".join(str(page) for page in sorted(set(chart_pages)))
-                return jsonify(
+                yield _evenement_reponse(
                     {
                         "answer": (
                             (
@@ -1283,7 +1407,8 @@ def create_app(
                         "language": language,
                     }
                 )
-            return jsonify(
+                return
+            yield _evenement_reponse(
                 {
                     "answer": (
                         "لا. لا أجد رسماً بيانياً يطابق هذا الطلب في تقرير البنك "
@@ -1291,7 +1416,7 @@ def create_app(
                         if language == "ar"
                         else (
                             "Non. Je ne trouve pas de graphique correspondant à cette demande "
-                            "dans le rapport BCM fourni."
+                            "dans les documents BCM fournis."
                         )
                     ),
                     "sources": sources,
@@ -1303,12 +1428,19 @@ def create_app(
                     "language": language,
                 }
             )
+            return
 
         if not results or not engine.is_relevant(
             search_results, settings.min_relevance_score, settings.min_semantic_score
         ):
+            # Rien de pertinent n'a été trouvé. Seules les pistes tirées des
+            # libellés réellement présents dans le corpus ont un sens ici : les
+            # reformulations produites par le planificateur sont de simples
+            # variantes de la question et laisseraient croire, pour une demande
+            # hors corpus, que l'assistant pourrait y répondre autrement.
+            suggestions = evidence_suggestions
             if suggestions:
-                return jsonify(
+                yield _evenement_reponse(
                     {
                         "answer": _clarification_answer(
                             suggestions, missing=True, language=language
@@ -1322,7 +1454,8 @@ def create_app(
                         "language": language,
                     }
                 )
-            return jsonify(
+                return
+            yield _evenement_reponse(
                 {
                     "answer": missing_information_message(language),
                     "sources": [],
@@ -1334,18 +1467,27 @@ def create_app(
                     "language": language,
                 }
             )
+            return
 
         # Étape 6 : générer une réponse strictement fondée sur les passages. Une
         # réponse extractive locale reste disponible si le fournisseur échoue.
+        yield ("stage", "redaction")
+        answer = ""
         try:
-            answer = answer_with_provider(
+            # Les fragments partent au client au fil de la rédaction ; seul
+            # l'événement « final » a passé les contrôles de citation.
+            for nom_evenement, valeur in stream_answer(
                 provider,
                 retrieval_question if followup else question,
                 generation_results,
                 history,
                 settings,
                 language,
-            )
+            ):
+                if nom_evenement == "delta":
+                    yield ("delta", valeur)
+                else:
+                    answer = valeur
         except Exception as exc:
             app.logger.warning(
                 "request_id=%s generation_failed provider=%s error_type=%s",
@@ -1372,7 +1514,7 @@ def create_app(
                 )
         if language == "ar":
             answer = format_arabic_bidi(answer)
-        return jsonify(
+        yield _evenement_reponse(
             {
                 "answer": answer,
                 "sources": sources,
@@ -1384,6 +1526,73 @@ def create_app(
                 "memory_used": followup,
                 "language": language,
             }
+        )
+        return
+
+    @app.post("/api/ask")
+    @limiter.limit(settings.rate_limit_ask)
+    def ask() -> Any:
+        """Répond en une seule fois : consomme les événements et renvoie le dernier."""
+        for nom, charge in _ask_events():
+            if nom == "error":
+                message, status = charge
+                return error_payload(message, status)
+            if nom == "done":
+                return jsonify(charge)
+        return error_payload("Aucune réponse n'a été produite.", 500)
+
+    @app.post("/api/ask/stream")
+    @limiter.limit(settings.rate_limit_ask)
+    def ask_stream() -> Any:
+        """Diffuse la réponse au fil de sa rédaction, au format Server-Sent Events.
+
+        Le temps total ne change pas : la recherche, la planification et le
+        reranking restent des préalables. C'est l'attente perçue qui change,
+        l'utilisateur voyant les premiers mots au lieu d'un écran figé.
+
+        Le texte diffusé est provisoire : le client doit le remplacer par la
+        valeur de l'événement « done », seule à avoir passé les contrôles de
+        citation et, en arabe, le rendu bidirectionnel.
+        """
+
+        def encoder(nom: str, charge: Any) -> str:
+            """Sérialise un événement au format SSE, sur une seule ligne de données."""
+            return f"event: {nom}\ndata: {json.dumps(charge, ensure_ascii=False)}\n\n"
+
+        def flux() -> Any:
+            try:
+                for nom, charge in _ask_events():
+                    if nom == "delta":
+                        yield encoder("delta", {"text": charge})
+                    elif nom == "stage":
+                        yield encoder("stage", {"stage": charge})
+                    elif nom == "done":
+                        yield encoder("done", charge)
+                    elif nom == "error":
+                        message, status = charge
+                        yield encoder("error", {"error": message, "status": status})
+                        return
+            except Exception as exc:
+                app.logger.exception(
+                    "request_id=%s stream_failed error_type=%s",
+                    g.get("request_id"),
+                    type(exc).__name__,
+                )
+                yield encoder(
+                    "error",
+                    {"error": "Une erreur interne est survenue.", "status": 500},
+                )
+
+        return Response(
+            stream_with_context(flux()),
+            mimetype="text/event-stream",
+            headers={
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+                # Sans cet en-tête, nginx tamponne la réponse et annule tout le
+                # bénéfice de la diffusion.
+                "X-Accel-Buffering": "no",
+            },
         )
 
     @app.post("/api/reindex")
