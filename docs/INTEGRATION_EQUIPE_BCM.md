@@ -9,7 +9,7 @@ Avant la fermeture de `</body>`, sur les pages où l'assistant doit apparaître 
 
 ```html
 <script
-  src="https://assistant-bcm.vercel.app/bcm-chat-widget.js"
+  src="https://ai-bcm.vercel.app/bcm-chat-widget.js"
   data-api-url="https://assistant-bcm.up.railway.app"
   data-logo-url="/imgs/logo_banque_centrale_mauritanie.webp"
 ></script>
@@ -43,7 +43,14 @@ toutes les deux. Il en va de même pour `http://localhost:3000` en développemen
 Sans cette autorisation, le widget s'affiche mais reste muet, et la console du
 navigateur signale une erreur CORS.
 
-## 3. Options disponibles
+## 3. Rien à configurer côté serveur
+
+Le widget est un fichier statique. Il ne lit aucune variable d'environnement et
+n'exige aucune modification de votre configuration serveur, de votre `next.config`
+ou de vos variables de build. Tout se règle par les attributs `data-*` de la
+balise, lisibles dans le HTML.
+
+## 4. Options disponibles
 
 Toutes facultatives, en attributs `data-*` sur la balise `<script>` :
 
@@ -61,7 +68,7 @@ Exemple avec la charte du site :
 
 ```html
 <script
-  src="https://assistant-bcm.vercel.app/bcm-chat-widget.js"
+  src="https://ai-bcm.vercel.app/bcm-chat-widget.js"
   data-api-url="https://assistant-bcm.up.railway.app"
   data-logo-url="/imgs/logo_banque_centrale_mauritanie.webp"
   data-accent-color="#0a3d62"
@@ -69,7 +76,7 @@ Exemple avec la charte du site :
 ></script>
 ```
 
-## 4. Ce que l'assistant sait et ne sait pas
+## 5. Ce que l'assistant sait et ne sait pas
 
 Il répond **uniquement** à partir des documents publiés par la BCM qui sont
 indexés : le Rapport annuel de l'exercice 2025 et les Lettres d'information
@@ -83,7 +90,7 @@ Il ne traite **pas** les demandes individuelles : réclamation d'un client,
 demande d'agrément, question juridique personnelle. Prévoyez un lien de contact
 humain à proximité.
 
-## 5. Vérifier que l'intégration fonctionne
+## 6. Vérifier que l'intégration fonctionne
 
 1. Ouvrir une page du site qui porte la balise.
 2. La bulle apparaît en bas à droite ; cliquer dessus.
@@ -96,7 +103,7 @@ humain à proximité.
 En cas de silence, ouvrir la console du navigateur : une erreur CORS y nomme
 l'origine exacte à nous transmettre.
 
-## 6. Vie privée
+## 7. Vie privée
 
 Le widget conserve la conversation dans le `sessionStorage` du navigateur : elle
 survit à un rechargement, n'est pas partagée entre onglets ni entre visiteurs, et

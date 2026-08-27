@@ -17,7 +17,7 @@ from typing import Any, Iterable
 from PIL import Image
 
 from api.query import build_retrieval_query
-from core.language import is_arabic_text, response_language
+from core.language import response_language
 
 
 CHART_MARKERS = (
@@ -52,9 +52,19 @@ GENERIC_CHART_TERMS = {
     "2025",
 }
 
-BUNDLED_PDFTOPPM = Path(
-    "/Users/ledataspecialist/.cache/codex-runtimes/"
-    "codex-primary-runtime/dependencies/bin/override/pdftoppm"
+# Emplacements usuels de Poppler quand pdftoppm n'est pas dans le PATH :
+# Homebrew sur Apple Silicon, Homebrew sur Intel, puis MacPorts. Sur Linux et
+# dans l'image Docker, le paquet poppler-utils l'installe dans le PATH et cette
+# liste n'est jamais consultée. PDF_RENDERER_PATH reste la dérogation explicite.
+FALLBACK_PDFTOPPM = (
+    Path("/opt/homebrew/bin/pdftoppm"),
+    Path("/usr/local/bin/pdftoppm"),
+    Path("/opt/local/bin/pdftoppm"),
+    # Certains environnements de développement fournissent Poppler dans un cache
+    # d'outillage plutôt que dans le PATH. Le chemin est construit à partir du
+    # répertoire personnel courant : il ne fige plus le nom d'un utilisateur.
+    Path.home()
+    / ".cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override/pdftoppm",
 )
 
 
@@ -347,8 +357,9 @@ def find_pdftoppm(configured_path: str = "") -> Path | None:
     discovered = shutil.which("pdftoppm")
     if discovered:
         return Path(discovered)
-    if BUNDLED_PDFTOPPM.is_file():
-        return BUNDLED_PDFTOPPM
+    for candidat in FALLBACK_PDFTOPPM:
+        if candidat.is_file():
+            return candidat
     return None
 
 

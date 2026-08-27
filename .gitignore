@@ -10,3 +10,6 @@ storage/models/
 storage/chart_pages/
 storage/chart_ocr
 evaluation/results/*.json
+
+# Dossier produit par scripts/build_widget_vercel.sh, reconstruit à chaque déploiement.
+public/

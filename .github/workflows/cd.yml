@@ -50,6 +50,11 @@ jobs:
         with:
           context: .
           push: true
+          # Architecture déclarée explicitement : elle était jusqu'ici celle du
+          # runner. Basculer un jour sur un runner ARM produirait une image
+          # arm64 qui ne démarrerait pas sur Railway, en amd64 — panne d'autant
+          # plus déroutante que rien n'aurait changé dans le code.
+          platforms: linux/amd64
           tags: |
             ${{ env.IMAGE }}:${{ github.sha }}
             ${{ env.IMAGE }}:staging

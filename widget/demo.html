@@ -43,8 +43,14 @@
     var autorisee =
       /^https:\/\//.test(demande) ||
       /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(demande);
+    // Valeur substituée au déploiement par scripts/build_widget_vercel.sh à
+    // partir de BCM_API_URL. Ouverte telle quelle en local, la balise reste
+    // intacte et la page vise l'API locale.
+    var deploiement = "__BCM_API_URL__";
+    var parDefaut =
+      deploiement.indexOf("__") === 0 ? "http://127.0.0.1:5000" : deploiement;
     window.BCM_CHAT_CONFIG = {
-      apiUrl: autorisee ? demande.replace(/\/+$/, "") : "http://127.0.0.1:5000",
+      apiUrl: autorisee ? demande.replace(/\/+$/, "") : parDefaut,
     };
   })();
 </script>

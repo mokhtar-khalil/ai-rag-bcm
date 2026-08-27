@@ -40,7 +40,7 @@ ni accès réseau au premier appel. Mettre à jour le corpus = redéployer.
 | `OPENAI_MODEL` | `gpt-5.6-terra` | |
 | `OPENAI_RERANK_MODEL` | `gpt-5.6-luna` | |
 | `OPENAI_MAX_OUTPUT_TOKENS` | `3000` | |
-| `CORS_ALLOWED_ORIGINS` | `https://www.bcm.mr,https://bcm.mr,https://<projet>.vercel.app` | |
+| `CORS_ALLOWED_ORIGINS` | `https://www.bcm.mr,https://bcm.mr,https://ai-bcm.vercel.app` | |
 | `REINDEX_TOKEN` | … | **secret** |
 | `RATE_LIMIT_ASK` | `20 per minute` | |
 | `CHART_ANALYSIS_ENABLED` | `false` | |
@@ -75,6 +75,42 @@ réponse porte `X-Accel-Buffering: no`, indispensable derrière un proxy qui
 tamponnerait sinon le flux et annulerait tout son bénéfice. Le widget bascule
 seul sur l'appel unique `/api/ask` si le flux échoue.
 
+### Deux façons de fournir l'image — aucune ne demande de la créer à la main
+
+**Voie A — Railway construit depuis le dépôt** (déclarée dans `railway.json`,
+recommandée pour la première mise en service).
+
+Railway lit le `Dockerfile`, construit et déploie à chaque poussée sur la
+branche suivie. Rien à publier, aucun identifiant de registre. La construction
+prend plusieurs minutes : installation de torch, puis vectorisation des 2 595
+passages.
+
+**Voie B — Railway déploie l'image publiée par la CI.**
+
+`.github/workflows/cd.yml` construit et publie déjà l'image sur GitHub
+Container Registry à chaque fusion sur `main` :
+
+```text
+ghcr.io/<organisation>/<dépôt>-api:<sha>
+ghcr.io/<organisation>/<dépôt>-api:staging
+```
+
+et `promote.yml` promeut manuellement un `sha` validé vers le tag `production`.
+Dans Railway, on choisit alors **Deploy from Docker Image** et l'on vise
+`…-api:production`. Le paquet GHCR doit être public, ou les identifiants de
+registre renseignés dans Railway.
+
+|  | Voie A | Voie B |
+|---|---|---|
+| Configuration | aucune | visibilité GHCR ou identifiants |
+| Déploiement | reconstruit (plusieurs minutes) | téléchargement seul |
+| Artefact déployé | reconstruit à part | **exactement celui que la CI a testé** |
+| Déclenchement | poussée sur la branche | promotion explicite d'un `sha` |
+
+Commencez par la voie A. La voie B apporte la traçabilité — on déploie
+l'artefact exact qui a passé les tests — et redevient intéressante dès que les
+redéploiements se multiplient ou qu'un contrôle de mise en production s'impose.
+
 ### Poids et architecture de l'image
 
 Mesuré sur l'image construite :
@@ -86,9 +122,11 @@ Mesuré sur l'image construite :
 | `data/` (rapport PDF et Lettres) | 80 Mo |
 | **Total transféré** | **≈ 1,2 Go** |
 
-Laissez **Railway construire l'image depuis le dépôt**. Une image construite sur
-un Mac Apple Silicon est en `linux/arm64` et ne démarrerait pas sur
-l'infrastructure de Railway, qui est en `amd64`.
+L'infrastructure de Railway est en `amd64`. Une image construite sur un Mac
+Apple Silicon est en `linux/arm64` et n'y démarrerait pas : **ne publiez jamais
+une image bâtie depuis un poste de développement**. La voie A construit sur
+l'infrastructure cible, et la voie B force `platforms: linux/amd64` dans le
+workflow — ce qui protège d'un basculement futur des runners GitHub vers ARM.
 
 La première construction prend plusieurs minutes : l'installation de torch et la
 vectorisation des 2 595 passages en représentent l'essentiel.
@@ -117,8 +155,27 @@ publie volontairement ni empreinte de fichier ni chemin interne.
 
 ## 2. Widget sur Vercel
 
-`vercel.json` publie le dossier `widget/` en statique. Aucune construction,
-aucune fonction serveur.
+`vercel.json` publie le widget en statique. Aucune fonction serveur, donc
+**aucune variable d'environnement n'est lisible à l'exécution** : le widget se
+configure par les attributs `data-*` de la balise `<script>`, côté site.
+
+### La seule variable à définir
+
+| Variable | Valeur | Obligatoire |
+|---|---|---|
+| `BCM_API_URL` | `https://<projet>.up.railway.app` | non |
+
+Elle sert uniquement à la **page de démonstration**. Les variables du projet sont
+disponibles pendant la construction : `scripts/build_widget_vercel.sh` y inscrit
+l'URL de l'API, ce qui évite de figer une adresse d'environnement dans le dépôt.
+
+Sans elle, la démonstration en ligne vise `127.0.0.1:5000` et reste muette — elle
+demeure alors utilisable via `?api=https://…`. Le widget lui-même n'en dépend
+jamais : les sites qui l'intègrent passent leur propre `data-api-url`.
+
+Le script refuse une URL qui ne soit pas en `https` (ou en boucle locale) et
+retire un éventuel slash final, qui casserait les URL construites par
+concaténation.
 
 Les en-têtes servis :
 
@@ -134,10 +191,10 @@ Les en-têtes servis :
 ### Vérifier après déploiement
 
 ```bash
-curl -sI https://<projet>.vercel.app/bcm-chat-widget.js | grep -i "content-type\|cache-control\|access-control"
+curl -sI https://ai-bcm.vercel.app/bcm-chat-widget.js | grep -i "content-type\|cache-control\|access-control"
 ```
 
-Puis ouvrir `https://<projet>.vercel.app/demo.html` : la page de démonstration
+Puis ouvrir `https://ai-bcm.vercel.app/demo.html` : la page de démonstration
 sert de banc d'essai indépendant du site de la BCM.
 
 > `demo.html` porte une `data-api-url` locale (`http://127.0.0.1:5000`). Avant

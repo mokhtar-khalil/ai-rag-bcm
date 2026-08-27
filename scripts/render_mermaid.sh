@@ -2,11 +2,17 @@
 set -euo pipefail
 
 PROJECT_DIR="${0:A:h:h}"
-NODE_DIR="/Users/ledataspecialist/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin"
-PNPM_BIN="/Users/ledataspecialist/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback/pnpm"
 CONFIG="$PROJECT_DIR/docs/diagrammes/puppeteer-config.json"
 
-export PATH="$NODE_DIR:$PATH"
+# Utilitaire de développement : il régénère les diagrammes de l'architecture et
+# ne participe pas au service. pnpm est cherché dans le PATH ; PNPM_BIN permet
+# d'en désigner un autre. Les chemins codés en dur qui figuraient ici visaient
+# un cache local et ne fonctionnaient que sur un poste.
+PNPM_BIN="${PNPM_BIN:-$(command -v pnpm || true)}"
+if [[ -z "$PNPM_BIN" ]]; then
+  echo "pnpm est introuvable. Installez-le (npm i -g pnpm) ou définissez PNPM_BIN."
+  exit 1
+fi
 
 for DIAGRAM in architecture_complete architecture_phase2; do
   SOURCE="$PROJECT_DIR/docs/diagrammes/$DIAGRAM.mmd"
