@@ -61,7 +61,7 @@ Toutes facultatives, en attributs `data-*` sur la balise `<script>` :
 | `data-language` | `fr` | Langue initiale : `fr` ou `ar`. L'utilisateur peut basculer. |
 | `data-position` | `bottom-right` | `bottom-right` ou `bottom-left`. |
 | `data-accent-color` | `#0f766e` | Couleur d'accent, à aligner sur la charte BCM. |
-| `data-title-fr` / `data-title-ar` | « Assistant BCM » | Titre du panneau. |
+| `data-title-fr` / `data-title-ar` | « Assistant des publications de la BCM » | Titre du panneau. |
 | `data-streaming` | `true` | Réponse affichée au fil de sa rédaction. |
 
 Exemple avec la charte du site :

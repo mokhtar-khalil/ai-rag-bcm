@@ -66,13 +66,20 @@ QUERY_EXPANSIONS: tuple[tuple[tuple[str, ...], str], ...] = (
       # vocabulaire de la page qui compare les acteurs du marché.
       "wallet", "wallets", "portefeuille electronique", "porte-monnaie electronique"),
      "wallets bancaires wallet bancaire monnaie électronique mobile banking "
-     "portefeuille électronique transactions volumes montants"),
+     "portefeuille électronique transactions volumes montants répartition par "
+     "opérateur concentration du marché leader position quasi-systémique"),
     # Les marques citées dans le rapport : les nommer doit suffire à retrouver
-    # la page qui les compare.
+    # la page qui les compare. Le passage qui chiffre réellement les parts de
+    # marché (« un leader (Bankily) en position quasi-systémique, avec environ
+    # 73,5% des montants ») est distinct de celui qui nomme les huit wallets :
+    # ses termes propres doivent être présents dans l'expansion, sinon la
+    # recherche s'arrête au premier passage qui se contente de les lister.
     (("bankily", "masrvi", "sedad", "bim-bank", "bimbank", "bci-pay", "bcipay",
-      "amanty", "bamis-digital", "bamis digital"),
+      "amanty", "bamis-digital", "bamis digital", "part de marche", "parts de marche"),
      "wallets bancaires actifs sur le marché parts de marché volumes montants "
-     "transactions monnaie électronique écosystème"),
+     "transactions monnaie électronique écosystème répartition par opérateur "
+     "concentration du marché leader position quasi-systémique asymétrie "
+     "challengers peloton d'acteurs"),
     (("agregats monetaires", "aggregate monetaire"),
      "masse monétaire monnaie au sens large billets en circulation dépôts à vue dépôts à terme actifs extérieurs nets actifs intérieurs nets"),
     (("activite economique", "progresse en volume", "progression en volume"),

@@ -31,7 +31,7 @@ Toutes facultatives, en attributs `data-*` sur la balise `<script>` :
 | `data-language` | `fr` | Langue initiale : `fr` ou `ar`. L'utilisateur peut basculer via le bouton dans l'en-tête. |
 | `data-position` | `bottom-right` | `bottom-right` ou `bottom-left`. |
 | `data-accent-color` | `#0f766e` | Couleur d'accent (bulle, boutons), à adapter à la charte BCM. |
-| `data-title-fr` / `data-title-ar` | "Assistant BCM" / "مساعد البنك المركزي" | Titre affiché dans l'en-tête du panneau. |
+| `data-title-fr` / `data-title-ar` | "Assistant des publications de la BCM" / "مساعد منشورات البنك المركزي" | Titre affiché dans l'en-tête du panneau. |
 | `data-logo-url` | — | Logo officiel affiché dans l'en-tête et sur l'avatar des réponses. À défaut, une marque intégrée est utilisée. |
 | `data-streaming` | `true` | Affichage de la réponse au fil de sa rédaction. `false` force l'appel unique à `/api/ask`. |
 
