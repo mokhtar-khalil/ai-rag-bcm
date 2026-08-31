@@ -129,6 +129,9 @@ class Settings:
     reindex_token: str = field(repr=False)
     cors_allowed_origins: tuple[str, ...]
     rate_limit_ask: str
+    session_max_questions: int
+    session_idle_minutes: int
+    analytics_database_url: str = field(repr=False)
 
     @property
     def widget_origin(self) -> str:
@@ -270,4 +273,15 @@ def get_settings(environ: Mapping[str, str] | None = None) -> Settings:
         reindex_token=_text(env, "REINDEX_TOKEN", ""),
         cors_allowed_origins=_list(env, "CORS_ALLOWED_ORIGINS"),
         rate_limit_ask=_text(env, "RATE_LIMIT_ASK", "20 per minute"),
+        # Anti-abus par session, distinct de RATE_LIMIT_ASK : celui-ci freine un
+        # débit trop rapide, celui-là plafonne le volume total d'une session
+        # avant réinitialisation par inactivité.
+        session_max_questions=_integer(env, "SESSION_MAX_QUESTIONS", 10, 1, 1000),
+        session_idle_minutes=_integer(env, "SESSION_IDLE_MINUTES", 30, 1, 1440),
+        # Journalisation des questions à des fins d'analyse, soumise au
+        # consentement transmis par le client. Une URL Postgres (fournie par
+        # exemple par l'extension Railway) active la persistance ; à défaut,
+        # un fichier SQLite local sert de repli pour le développement — non
+        # durable sur Railway sans volume attaché.
+        analytics_database_url=_text(env, "DATABASE_URL", ""),
     )

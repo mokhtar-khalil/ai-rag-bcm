@@ -209,6 +209,26 @@ Les deux appels JSON — planification et reranking — imposent un schéma de
 sortie. Le modèle produisait sinon un JSON invalide environ une fois sur deux
 (crochet fermant manquant), ce qui perdait l'appel, son délai et son coût.
 
+## Consentement, journalisation et limite de session
+
+Avant sa première question, chaque visiteur voit un popup lui demandant
+l'autorisation de conserver sa question et la réponse à des fins d'analyse. En
+cas de refus, l'assistant reste utilisable, rien n'est journalisé. Le choix
+vaut pour toute la session, pas question par question.
+
+Deux garde-fous, distincts et complémentaires :
+
+```dotenv
+RATE_LIMIT_ASK=20 per minute       # débit : trop de requêtes trop vite
+SESSION_MAX_QUESTIONS=10           # volume : trop de questions au total
+SESSION_IDLE_MINUTES=30            # délai d'inactivité avant réinitialisation
+```
+
+La journalisation exige `DATABASE_URL` (Postgres) pour survivre à un
+redéploiement ; sans elle, un fichier SQLite local sert de repli, pratique en
+développement mais non durable sur Railway. Voir
+`docs/DEPLOIEMENT_RAILWAY_VERCEL.md` pour l'ajout de l'extension Postgres.
+
 ## Déploiement
 
 L'API est hébergée sur Railway, le widget sur Vercel, et le site de la BCM ne

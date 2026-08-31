@@ -43,14 +43,30 @@ toutes les deux. Il en va de même pour `http://localhost:3000` en développemen
 Sans cette autorisation, le widget s'affiche mais reste muet, et la console du
 navigateur signale une erreur CORS.
 
-## 3. Rien à configurer côté serveur
+## 3. Consentement et limite de questions
+
+Avant sa première question, chaque visiteur voit un popup lui demandant
+l'autorisation de conserver sa question et la réponse à des fins d'analyse. En
+cas de refus, l'assistant reste utilisable ; rien n'est alors journalisé. Ce
+comportement est intégré au widget, rien à configurer de votre côté.
+
+Chaque session est limitée à 10 questions, réinitialisées après 30 minutes
+d'inactivité — un anti-abus, pas une restriction destinée aux visiteurs
+normaux. Au-delà, l'assistant l'indique dans la conversation elle-même.
+
+À mentionner dans votre politique de confidentialité si vous en publiez une :
+les questions consenties (texte de la question et de la réponse, langue,
+horodatage — jamais d'adresse IP) sont conservées côté serveur à des fins
+d'amélioration du service.
+
+## 4. Rien à configurer côté serveur
 
 Le widget est un fichier statique. Il ne lit aucune variable d'environnement et
 n'exige aucune modification de votre configuration serveur, de votre `next.config`
 ou de vos variables de build. Tout se règle par les attributs `data-*` de la
 balise, lisibles dans le HTML.
 
-## 4. Options disponibles
+## 5. Options disponibles
 
 Toutes facultatives, en attributs `data-*` sur la balise `<script>` :
 
@@ -76,7 +92,7 @@ Exemple avec la charte du site :
 ></script>
 ```
 
-## 5. Ce que l'assistant sait et ne sait pas
+## 6. Ce que l'assistant sait et ne sait pas
 
 Il répond **uniquement** à partir des documents publiés par la BCM qui sont
 indexés : le Rapport annuel de l'exercice 2025 et les Lettres d'information
@@ -90,7 +106,7 @@ Il ne traite **pas** les demandes individuelles : réclamation d'un client,
 demande d'agrément, question juridique personnelle. Prévoyez un lien de contact
 humain à proximité.
 
-## 6. Vérifier que l'intégration fonctionne
+## 7. Vérifier que l'intégration fonctionne
 
 1. Ouvrir une page du site qui porte la balise.
 2. La bulle apparaît en bas à droite ; cliquer dessus.
@@ -103,7 +119,7 @@ humain à proximité.
 En cas de silence, ouvrir la console du navigateur : une erreur CORS y nomme
 l'origine exacte à nous transmettre.
 
-## 7. Vie privée
+## 8. Vie privée
 
 Le widget conserve la conversation dans le `sessionStorage` du navigateur : elle
 survit à un rechargement, n'est pas partagée entre onglets ni entre visiteurs, et
@@ -111,5 +127,7 @@ disparaît à la fermeture. Aucun cookie n'est déposé. Aucune donnée n'est en
 à un tiers : le widget n'appelle que l'URL indiquée dans `data-api-url`.
 
 Les questions transitent par l'API et, pour la rédaction de la réponse, par le
-fournisseur de génération configuré. À signaler dans votre politique de
-confidentialité si vous en tenez une.
+fournisseur de génération configuré. Avec le consentement de l'utilisateur
+(voir § 3), la question et la réponse sont en outre conservées côté serveur —
+jamais l'adresse IP ni un identifiant permettant de reconnaître la personne. À
+signaler dans votre politique de confidentialité si vous en tenez une.

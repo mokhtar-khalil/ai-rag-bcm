@@ -31,14 +31,19 @@
       language: globalConfig.language || dataset.language || "fr",
       position: globalConfig.position || dataset.position || "bottom-right",
       accentColor: globalConfig.accentColor || dataset.accentColor || "#0f766e",
-      titleFr: globalConfig.titleFr || dataset.titleFr || "Assistant des publications de la BCM",
-      titleAr: globalConfig.titleAr || dataset.titleAr || "مساعد منشورات البنك المركزي",
+      titleFr: globalConfig.titleFr || dataset.titleFr || "BCM Insight AI",
       // URL d'un logo officiel. Vide : la marque intégrée ci-dessous est
       // utilisée. Le fichier doit être servi par le même site que le widget,
       // sinon la politique de sécurité de la page hôte peut le bloquer.
       logoUrl: globalConfig.logoUrl || dataset.logoUrl || "",
       streaming:
         String(globalConfig.streaming || dataset.streaming || "true") !== "false",
+      // Doit rester cohérent avec SESSION_IDLE_MINUTES côté API : ce n'est
+      // qu'un repère client pour redemander le consentement au bon moment,
+      // le serveur restant seul décisionnaire du quota réel.
+      sessionIdleMinutes: Number(
+        globalConfig.sessionIdleMinutes || dataset.sessionIdleMinutes || 30
+      ),
       historyLimit: 16,
       requestTimeoutMs: 190000,
     };
@@ -58,6 +63,11 @@
       title: CONFIG.titleFr,
       scope:
         "Cette application n’utilise que les documents BCM indexés : le Rapport annuel et les Lettres d’information. Si une information n’y figure pas, elle doit le signaler au lieu de compléter avec des connaissances externes.",
+      consentTitle: "Avant de commencer",
+      consentBody:
+        "Avec votre accord, la question posée et la réponse obtenue sont conservées pour analyser et améliorer cet assistant. Aucune adresse IP ni identifiant permettant de vous reconnaître n’est enregistré. Vous pouvez refuser : l’assistant reste utilisable, rien n’est alors conservé.",
+      consentAccept: "J’accepte",
+      consentDecline: "Refuser",
       placeholder: "Posez votre question…",
       send: "Envoyer",
       newConversation: "Nouvelle conversation",
@@ -86,9 +96,14 @@
       ],
     },
     ar: {
-      title: CONFIG.titleAr,
+      title: CONFIG.titleFr,
       scope:
         "يستخدم هذا المساعد وثائق البنك المركزي المفهرسة فقط: التقرير السنوي والرسائل الإخبارية. إذا لم ترد المعلومة فيها، فيجب أن يصرّح بعدم وجودها بدلاً من الاستعانة بمعلومات خارجية.",
+      consentTitle: "قبل البدء",
+      consentBody:
+        "بموافقتك، يُحتفظ بالسؤال المطروح والإجابة المقدمة لتحليل هذا المساعد وتحسينه. لا يُسجَّل أي عنوان IP أو أي معرّف يتيح التعرّف عليك. يمكنك الرفض: يبقى المساعد قابلاً للاستخدام دون حفظ أي شيء.",
+      consentAccept: "أوافق",
+      consentDecline: "رفض",
       placeholder: "اكتب سؤالك…",
       send: "إرسال",
       newConversation: "محادثة جديدة",
@@ -132,7 +147,9 @@
     streaming: "",
     // Étape en cours du traitement, affichée pendant l'attente initiale.
     stage: "",
+    session: null,
   };
+  state.session = loadSession();
 
   function loadHistory() {
     try {
@@ -150,6 +167,75 @@
     } catch (err) {
       /* stockage indisponible (navigation privée, quota) : la conversation reste en mémoire */
     }
+  }
+
+  // ---- Session : identifiant, consentement et fenêtre d'inactivité ----
+  //
+  // Distincte du stockage de l'historique : sessionStorage survit tant que
+  // l'onglet reste ouvert, alors que la session applicative expire après
+  // CONFIG.sessionIdleMinutes d'inactivité, y compris dans un onglet resté
+  // ouvert. C'est cette expiration, pas la fermeture de l'onglet, qui
+  // redemande le consentement et fait repartir le quota de questions.
+
+  var SESSION_KEY = "bcm_chat_widget_session_v1";
+
+  function generateSessionId() {
+    if (window.crypto && typeof window.crypto.randomUUID === "function") {
+      return window.crypto.randomUUID();
+    }
+    // Repli pour les navigateurs anciens : suffisant pour distinguer des
+    // sessions, pas pour un usage cryptographique.
+    return "s-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 10);
+  }
+
+  function freshSession() {
+    return { id: generateSessionId(), consent: null, lastActivity: Date.now() };
+  }
+
+  function loadSession() {
+    try {
+      var raw = window.sessionStorage.getItem(SESSION_KEY);
+      var parsed = raw ? JSON.parse(raw) : null;
+      if (
+        parsed &&
+        typeof parsed.id === "string" &&
+        typeof parsed.lastActivity === "number"
+      ) {
+        return parsed;
+      }
+    } catch (err) {
+      /* JSON invalide : repart sur une session neuve ci-dessous */
+    }
+    return freshSession();
+  }
+
+  function saveSession() {
+    try {
+      window.sessionStorage.setItem(SESSION_KEY, JSON.stringify(state.session));
+    } catch (err) {
+      /* stockage indisponible : le consentement sera redemandé au prochain chargement */
+    }
+  }
+
+  // Appelée à l'ouverture du panneau et avant chaque envoi : si la fenêtre
+  // d'inactivité est dépassée, la session — et avec elle le consentement et
+  // la conversation affichée — repart de zéro, en miroir du compteur
+  // côté serveur qui expire selon la même durée.
+  function ensureFreshSession() {
+    var limiteMs = CONFIG.sessionIdleMinutes * 60 * 1000;
+    if (Date.now() - state.session.lastActivity > limiteMs) {
+      state.session = freshSession();
+      saveSession();
+      state.history = [];
+      saveHistory();
+      return true;
+    }
+    return false;
+  }
+
+  function touchSession() {
+    state.session.lastActivity = Date.now();
+    saveSession();
   }
 
   // ---- Rendu markdown minimal et sûr (gras, listes, citations [p. PDF N]) ----
@@ -314,8 +400,28 @@
     ".bcm-lang button{letter-spacing:.02em;}" +
     // Le titre cède la place au sélecteur plutôt que de le comprimer.
     ".bcm-header-text h1{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}" +
-    ".bcm-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px;background:#f7f8fa;scroll-behavior:smooth;}" +
+    ".bcm-messages{position:relative;flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px;background:#f7f8fa;scroll-behavior:smooth;}" +
     ".bcm-scope{font-size:11.5px;color:#57606f;background:#fff;border-radius:12px;padding:10px 12px;line-height:1.45;border:1px solid #ececf0;}" +
+    ".bcm-hidden{display:none!important;}" +
+    // Le fondu est plus opaque en bas, là où flotte la carte, et plus
+    // transparent vers le haut : le début de la conversation reste lisible
+    // derrière, sans que le popup ne semble occuper tout l'espace.
+    ".bcm-consent-overlay{position:absolute;inset:0;display:flex;align-items:flex-end;padding:14px;background:linear-gradient(to top,rgba(247,248,250,.97) 60%,rgba(247,248,250,.35));z-index:5;}" +
+    ".bcm-consent{width:100%;background:#fff;border:1px solid #ececf0;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;box-shadow:0 10px 28px rgba(15,23,42,.14);}" +
+    ".bcm-consent-title{font-size:13.5px;font-weight:700;color:#111827;}" +
+    ".bcm-consent-body{margin:0;font-size:12px;line-height:1.55;color:#57606f;}" +
+    ".bcm-consent-actions{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:4px;}" +
+    ".bcm-consent-accept{width:100%;background:linear-gradient(135deg," +
+    CONFIG.accentColor +
+    "," +
+    accentDark +
+    ");color:#fff;border:none;border-radius:11px;padding:11px 14px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.14);transition:transform .15s ease,box-shadow .15s ease;}" +
+    ".bcm-consent-accept:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(0,0,0,.18);}" +
+    // Toujours pleinement lisible (contraste AA) et cliquable : plus discret
+    // qu'« Accepter » par la taille et l'absence de fond, jamais par sa
+    // lisibilité.
+    ".bcm-consent-decline{background:none;border:none;color:#6b7280;font-size:11.5px;font-weight:500;cursor:pointer;padding:4px 8px;text-decoration:underline;text-underline-offset:2px;}" +
+    ".bcm-consent-decline:hover{color:#374151;}" +
     ".bcm-examples{display:flex;flex-direction:column;gap:7px;}" +
     ".bcm-example{text-align:start;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:10px 12px;font-size:12.5px;cursor:pointer;color:#1f2937;transition:border-color .15s ease,transform .15s ease;}" +
     ".bcm-example:hover{border-color:" +
@@ -499,7 +605,7 @@
     "</div>" +
     '<div class="bcm-messages" id="bcm-messages" role="log" aria-live="polite" aria-atomic="false"></div>' +
     '<div class="bcm-suggestions" id="bcm-suggestions"></div>' +
-    '<div class="bcm-inputrow">' +
+    '<div class="bcm-inputrow" id="bcm-inputrow">' +
     '<textarea class="bcm-input" id="bcm-input" rows="1"></textarea>' +
     '<button type="button" class="bcm-send" id="bcm-send"></button>' +
     "</div>" +
@@ -517,6 +623,7 @@
     input: shadow.getElementById("bcm-input"),
     send: shadow.getElementById("bcm-send"),
     newConversation: shadow.getElementById("bcm-new"),
+    inputRow: shadow.getElementById("bcm-inputrow"),
   };
 
   function t() {
@@ -555,8 +662,76 @@
         : texts.statusChecking;
   }
 
+  function renderConsentGate() {
+    var texts = t();
+    // Recouvrement, pas remplacement : le début de conversation reste visible
+    // derrière, en dégradé, et la carte elle-même reste une boîte flottante
+    // plutôt que d'occuper tout l'espace des messages.
+    var overlay = document.createElement("div");
+    overlay.className = "bcm-consent-overlay";
+
+    var wrap = document.createElement("div");
+    wrap.className = "bcm-consent";
+
+    var title = document.createElement("div");
+    title.className = "bcm-consent-title";
+    title.textContent = texts.consentTitle;
+    wrap.appendChild(title);
+
+    var body = document.createElement("p");
+    body.className = "bcm-consent-body";
+    body.textContent = texts.consentBody;
+    wrap.appendChild(body);
+
+    var actions = document.createElement("div");
+    actions.className = "bcm-consent-actions";
+
+    var accept = document.createElement("button");
+    accept.type = "button";
+    accept.className = "bcm-consent-accept";
+    accept.textContent = texts.consentAccept;
+    accept.addEventListener("click", function () {
+      decideConsent(true);
+    });
+    actions.appendChild(accept);
+
+    var decline = document.createElement("button");
+    decline.type = "button";
+    decline.className = "bcm-consent-decline";
+    decline.textContent = texts.consentDecline;
+    decline.addEventListener("click", function () {
+      decideConsent(false);
+    });
+    actions.appendChild(decline);
+
+    wrap.appendChild(actions);
+    overlay.appendChild(wrap);
+    return overlay;
+  }
+
+  function decideConsent(accepte) {
+    state.session.consent = accepte;
+    saveSession();
+    renderMessages();
+    renderInputAvailability();
+    els.input.focus();
+  }
+
+  // La saisie et les suggestions n'ont pas de sens tant que l'utilisateur n'a
+  // pas répondu au consentement : les masquer plutôt que les désactiver évite
+  // qu'un clic ou qu'Entrée n'envoie un message dans cet état transitoire.
+  function renderInputAvailability() {
+    var attend = state.session.consent === null;
+    els.inputRow.classList.toggle("bcm-hidden", attend);
+    els.suggestions.classList.toggle("bcm-hidden", attend);
+  }
+
   function renderMessages() {
     els.messages.innerHTML = "";
+    renderInputAvailability();
+    // Le début de conversation (texte de périmètre, exemples) se construit
+    // d'abord, dans tous les cas : le popup de consentement, s'il doit
+    // apparaître, se pose par-dessus au lieu de le remplacer.
     if (state.history.length === 0) {
       var scope = document.createElement("div");
       scope.className = "bcm-scope";
@@ -607,6 +782,13 @@
         row.appendChild(attente);
       }
       els.messages.appendChild(row);
+    }
+    if (state.session.consent === null) {
+      els.messages.appendChild(renderConsentGate());
+      // Le haut du texte de périmètre doit rester visible sous le dégradé,
+      // pas seulement la carte elle-même.
+      els.messages.scrollTop = 0;
+      return;
     }
     els.messages.scrollTop = els.messages.scrollHeight;
   }
@@ -753,6 +935,9 @@
   }
 
   function messageErreur(status, data) {
+    if (data && data.reason === "session_limit" && data.error) {
+      return data.error;
+    }
     return status === 429
       ? t().errorRate
       : (data && data.error) || t().errorGeneric;
@@ -763,6 +948,8 @@
       question: text,
       history: payloadHistory,
       language: state.language,
+      session_id: state.session.id,
+      consent_analytics: state.session.consent === true,
     });
   }
 
@@ -907,6 +1094,18 @@
   function sendMessage(text) {
     text = (text || "").trim();
     if (!text || state.busy) return;
+    // Une inactivité prolongée peut survenir panneau ouvert : revérifier ici,
+    // pas seulement à l'ouverture.
+    if (ensureFreshSession()) {
+      renderMessages();
+    }
+    if (state.session.consent === null) {
+      // Filet de sécurité : la saisie est masquée tant que le choix n'est pas
+      // fait, mais un envoi déclenché autrement (touche Entrée sur un champ
+      // resté focus) ne doit pas contourner le consentement.
+      return;
+    }
+    touchSession();
     state.history.push({ role: "user", content: text });
     state.suggestions = [];
     state.busy = true;
@@ -953,6 +1152,9 @@
     state.everOpened = true;
     launcher.classList.remove("pulse");
     panel.classList.add("open");
+    if (ensureFreshSession()) {
+      renderMessages();
+    }
     checkHealth();
     els.input.focus();
   }

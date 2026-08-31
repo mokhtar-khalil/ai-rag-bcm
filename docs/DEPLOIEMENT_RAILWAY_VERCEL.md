@@ -95,6 +95,45 @@ Ce coût se paie autant de fois qu'il y a de reformulations : lorsque le
 planificateur en produit trois, la recherche enchaîne quatre vectorisations. Sur
 la production non réglée, cette étape atteignait 29 secondes à elle seule.
 
+### Journalisation des questions et limite de session
+
+Trois fonctionnalités liées, toutes soumises au consentement demandé par le
+widget avant la première question d'une session :
+
+- **Consentement** : un popup s'affiche une fois par session ; en cas de
+  refus, l'assistant reste utilisable, rien n'est journalisé.
+- **Limite anti-abus** : `SESSION_MAX_QUESTIONS` (10 par défaut) questions par
+  session, réinitialisée après `SESSION_IDLE_MINUTES` (30 par défaut)
+  d'inactivité. Distincte de `RATE_LIMIT_ASK`, qui freine un débit trop rapide
+  plutôt qu'un volume total.
+- **Journalisation** : question, réponse, langue et horodatage — jamais
+  d'adresse IP ni d'identifiant permettant de reconnaître la personne.
+
+#### Ajouter Postgres sur Railway
+
+La journalisation exige une base **durable** : le disque d'un conteneur
+Railway ne survit pas à un redéploiement sans volume attaché, et l'appli n'en
+attache pas. Sans `DATABASE_URL`, un fichier SQLite local sert de repli —
+correct en développement, mais silencieusement perdu au prochain déploiement
+en production.
+
+1. Dans le projet Railway : **New → Database → Add PostgreSQL**.
+2. Railway injecte automatiquement `DATABASE_URL` dans les variables du
+   service API — aucune valeur à copier à la main.
+3. Au premier démarrage, l'application crée la table `logged_questions` si
+   elle n'existe pas encore (best-effort : une base indisponible ne bloque
+   pas le service, elle désactive silencieusement la journalisation).
+
+Vérifier que la table existe :
+
+```bash
+railway connect postgres
+```
+```sql
+\d logged_questions
+SELECT count(*) FROM logged_questions;
+```
+
 ### Diffusion des réponses
 
 L'API renvoie la réponse en Server-Sent Events sur `/api/ask/stream`. La

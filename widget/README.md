@@ -115,6 +115,32 @@ Basculer en arabe fait passer tout le panneau en lecture droite-à-gauche : c'es
 le signal le plus fort du mode actif, la pastille ne servant qu'au moment de
 choisir.
 
+### Consentement, journalisation et limite de session
+
+Avant la première question d'une session, un popup demande l'accord de
+l'utilisateur pour conserver sa question et la réponse obtenue, à des fins
+d'analyse. Ce choix ne se redemande pas à chaque message : il vaut pour toute
+la session, et seulement pour elle.
+
+- **Accepté** : chaque question de la session est journalisée côté serveur —
+  texte de la question, texte de la réponse, langue, horodatage. Jamais
+  d'adresse IP ni d'identifiant permettant de reconnaître la personne.
+- **Refusé** : l'assistant reste pleinement utilisable, rien n'est conservé.
+
+Une session est limitée à un nombre de questions (`SESSION_MAX_QUESTIONS`
+côté API, 10 par défaut) et se réinitialise — nouveau consentement demandé,
+compteur remis à zéro — après un délai d'inactivité
+(`SESSION_IDLE_MINUTES`, 30 minutes par défaut). Cette réinitialisation
+survient même dans un onglet resté ouvert : elle ne dépend pas de la fermeture
+du navigateur. Le paramètre `data-session-idle-minutes` (ou
+`sessionIdleMinutes` dans `window.BCM_CHAT_CONFIG`) doit rester cohérent avec
+la valeur côté serveur ; il ne sert qu'à redemander le consentement au bon
+moment, le serveur restant seul décisionnaire du quota réel.
+
+Au-delà de la limite, l'assistant répond avec un message explicite dans la
+conversation elle-même (pas une alerte du navigateur), indiquant après combien
+de temps une nouvelle session sera possible.
+
 ### Réponse progressive
 
 Le widget appelle `/api/ask/stream` et affiche la réponse pendant sa rédaction,

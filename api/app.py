@@ -42,6 +42,7 @@ from api.charts import (
     render_chart_pages,
     select_chart_pages,
 )
+from api.analytics import ensure_schema, log_question
 from api.rag import RAGIndex
 from api.sources import SOURCE_TYPE_PDF, citation_label
 from api.query import build_retrieval_query, is_national_question
@@ -737,6 +738,35 @@ def create_app(
 
     app.extensions["bcm_generation_state"] = generation_state
     app.extensions["bcm_settings"] = settings
+
+    # Anti-abus par session : nombre de questions posées depuis la dernière
+    # activité, réinitialisé après SESSION_IDLE_MINUTES d'inactivité. Vit en
+    # mémoire, comme le compteur de RATE_LIMIT_ASK : exact avec un seul worker
+    # (WEB_CONCURRENCY=1, requis pour la même raison — voir DEPLOIEMENT), mais
+    # se dédoublerait avec plusieurs workers.
+    session_lock = Lock()
+    session_state: dict[str, dict[str, float]] = {}
+    SESSION_STATE_MAX = 5000
+
+    def _check_session_limit(session_id: str) -> tuple[bool, int]:
+        """Incrémente le compteur de la session et dit si la limite est dépassée."""
+        now = perf_counter()
+        idle_seconds = settings.session_idle_minutes * 60
+        with session_lock:
+            entree = session_state.get(session_id)
+            if entree is None or (now - entree["vu_a"]) > idle_seconds:
+                entree = {"compte": 0.0, "vu_a": now}
+            entree["compte"] += 1
+            entree["vu_a"] = now
+            session_state[session_id] = entree
+            if len(session_state) > SESSION_STATE_MAX:
+                # Éviction simple des entrées les plus anciennement actives :
+                # borne la mémoire sans dépendre d'un nettoyage périodique.
+                plus_ancienne = min(session_state, key=lambda k: session_state[k]["vu_a"])
+                if plus_ancienne != session_id:
+                    del session_state[plus_ancienne]
+            compte = int(entree["compte"])
+        return compte <= settings.session_max_questions, compte
     app.extensions["bcm_engine"] = engine
     configure_logging(app, settings)
 
@@ -761,6 +791,14 @@ def create_app(
                 "embedding_warmup_failed error_type=%s", type(exc).__name__
             )
 
+    # La table de journalisation est créée au démarrage plutôt qu'à la première
+    # question consentie : une base indisponible se signale une fois dans les
+    # journaux du déploiement, pas en silence à chaque tentative d'écriture.
+    try:
+        ensure_schema(settings)
+    except Exception as exc:  # le service reste utilisable sans journalisation
+        app.logger.warning("analytics_schema_failed error_type=%s", type(exc).__name__)
+
     app.config["RATELIMIT_ENABLED"] = not settings.is_testing
     limiter = Limiter(get_remote_address, app=app, default_limits=[], storage_uri="memory://")
     app.extensions["bcm_limiter"] = limiter
@@ -772,9 +810,14 @@ def create_app(
                 if not engine.chunks:
                     engine.load()
 
-    def error_payload(message: str, status: int) -> tuple[Any, int]:
+    def error_payload(
+        message: str, status: int, reason: str | None = None
+    ) -> tuple[Any, int]:
         """Uniformise les erreurs JSON et y joint l'identifiant de la requête."""
-        return jsonify({"error": message, "request_id": g.get("request_id")}), status
+        corps = {"error": message, "request_id": g.get("request_id")}
+        if reason:
+            corps["reason"] = reason
+        return jsonify(corps), status
 
     @app.before_request
     def start_request() -> None:
@@ -846,9 +889,11 @@ def create_app(
         """Événement final : la réponse complète, prête à être sérialisée."""
         return ("done", payload)
 
-    def _evenement_erreur(message: str, status: int) -> tuple[str, Any]:
-        """Événement d'erreur, porteur du corps JSON et du code HTTP."""
-        return ("error", (message, status))
+    def _evenement_erreur(
+        message: str, status: int, reason: str | None = None
+    ) -> tuple[str, Any]:
+        """Événement d'erreur, porteur du corps JSON, du code HTTP et de sa cause."""
+        return ("error", (message, status, reason))
 
     def _ask_events() -> Any:
         """Exécute toute la chaîne RAG en produisant des événements successifs.
@@ -886,6 +931,29 @@ def create_app(
                 400,
             )
             return
+
+        # Un identifiant de session absent signifie un client antérieur à cette
+        # fonctionnalité : ne pas le pénaliser en lui appliquant une limite
+        # qu'il ne peut pas afficher ni réinitialiser correctement.
+        session_id = payload.get("session_id")
+        if isinstance(session_id, str) and session_id.strip():
+            autorise, compte = _check_session_limit(session_id.strip()[:128])
+            if not autorise:
+                minutes = settings.session_idle_minutes
+                message = (
+                    f"لقد بلغت الحد الأقصى لعدد الأسئلة لهذه الجلسة "
+                    f"({settings.session_max_questions}). ستُتاح جلسة جديدة "
+                    f"تلقائياً بعد {minutes} دقيقة من عدم النشاط."
+                    if language == "ar"
+                    else (
+                        f"Vous avez atteint la limite de {settings.session_max_questions} "
+                        f"questions pour cette session. Une nouvelle session démarre "
+                        f"automatiquement après {minutes} minutes d'inactivité."
+                    )
+                )
+                yield _evenement_erreur(message, 429, reason="session_limit")
+                return
+
         history = _safe_history(payload.get("history", []), settings.max_history_messages)
         retrieval_question = _contextualize_followup(question, history)
         followup = retrieval_question != question
@@ -1609,14 +1677,53 @@ def create_app(
         )
         return
 
+    def _ask_events_logged() -> Any:
+        """Enveloppe `_ask_events` pour journaliser la question et sa réponse.
+
+        Enveloppe plutôt que modifie chaque point de sortie de `_ask_events`
+        (une douzaine) : la journalisation se pose donc une seule fois, sans
+        risquer d'en oublier une lors d'une future correction du pipeline.
+        Best-effort et soumise au consentement transmis par le client — une
+        panne de la base ne doit jamais faire échouer une réponse déjà
+        produite pour l'utilisateur.
+        """
+        payload = request.get_json(silent=True)
+        session_id = ""
+        consent = False
+        question_text = ""
+        if isinstance(payload, dict):
+            brut = payload.get("session_id")
+            session_id = brut.strip()[:128] if isinstance(brut, str) else ""
+            consent = bool(payload.get("consent_analytics"))
+            brut_question = payload.get("question")
+            question_text = brut_question.strip() if isinstance(brut_question, str) else ""
+
+        for nom, charge in _ask_events():
+            if nom == "done" and consent and session_id and question_text:
+                try:
+                    log_question(
+                        settings,
+                        session_id,
+                        str(charge.get("language", "fr")),
+                        question_text,
+                        str(charge.get("answer", "")),
+                    )
+                except Exception as exc:
+                    app.logger.warning(
+                        "request_id=%s analytics_log_failed error_type=%s",
+                        g.get("request_id"),
+                        type(exc).__name__,
+                    )
+            yield nom, charge
+
     @app.post("/api/ask")
     @limiter.limit(settings.rate_limit_ask)
     def ask() -> Any:
         """Répond en une seule fois : consomme les événements et renvoie le dernier."""
-        for nom, charge in _ask_events():
+        for nom, charge in _ask_events_logged():
             if nom == "error":
-                message, status = charge
-                return error_payload(message, status)
+                message, status, reason = charge
+                return error_payload(message, status, reason)
             if nom == "done":
                 return jsonify(charge)
         return error_payload("Aucune réponse n'a été produite.", 500)
@@ -1641,7 +1748,7 @@ def create_app(
 
         def flux() -> Any:
             try:
-                for nom, charge in _ask_events():
+                for nom, charge in _ask_events_logged():
                     if nom == "delta":
                         yield encoder("delta", {"text": charge})
                     elif nom == "stage":
@@ -1649,8 +1756,11 @@ def create_app(
                     elif nom == "done":
                         yield encoder("done", charge)
                     elif nom == "error":
-                        message, status = charge
-                        yield encoder("error", {"error": message, "status": status})
+                        message, status, reason = charge
+                        corps = {"error": message, "status": status}
+                        if reason:
+                            corps["reason"] = reason
+                        yield encoder("error", corps)
                         return
             except Exception as exc:
                 app.logger.exception(
