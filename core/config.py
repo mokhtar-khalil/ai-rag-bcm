@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import os
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Mapping
 
 from dotenv import load_dotenv
 
@@ -132,6 +132,8 @@ class Settings:
     session_max_questions: int
     session_idle_minutes: int
     analytics_database_url: str = field(repr=False)
+    analytics_hash_salt: str = field(repr=False)
+    analytics_admin_token: str = field(repr=False)
 
     @property
     def widget_origin(self) -> str:
@@ -284,4 +286,9 @@ def get_settings(environ: Mapping[str, str] | None = None) -> Settings:
         # un fichier SQLite local sert de repli pour le développement — non
         # durable sur Railway sans volume attaché.
         analytics_database_url=_text(env, "DATABASE_URL", ""),
+        # Secret distinct des clés fournisseur. Il sert uniquement à rendre
+        # l'identifiant aléatoire du navigateur non réversible dans la base.
+        analytics_hash_salt=_text(env, "ANALYTICS_HASH_SALT", ""),
+        # Protège l'endpoint d'agrégats destiné au dashboard central.
+        analytics_admin_token=_text(env, "ANALYTICS_ADMIN_TOKEN", ""),
     )

@@ -67,6 +67,13 @@ def test_cors_allowed_origins_defaults_to_empty() -> None:
     assert settings.cors_allowed_origins == ()
 
 
+def test_analytics_hash_salt_is_loaded_without_being_required_in_tests() -> None:
+    settings = get_settings(
+        {"APP_ENV": "test", "ANALYTICS_HASH_SALT": "secret-analytics"}
+    )
+    assert settings.analytics_hash_salt == "secret-analytics"
+
+
 def test_gemini_key_is_required_in_production_for_the_gemini_provider() -> None:
     with pytest.raises(ConfigurationError):
         get_settings(

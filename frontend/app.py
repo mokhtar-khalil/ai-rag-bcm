@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from typing import Any
+from uuid import uuid4
 
 import gradio as gr
 import requests
@@ -98,6 +99,8 @@ def chat(
     message: str,
     history: list[dict[str, str]],
     language_choice: str,
+    analytics_consent: bool,
+    session_id: str,
 ) -> tuple[str, list[dict[str, str]], dict[str, Any]]:
     """Envoie un message à l'API puis actualise le chat et les suggestions."""
     message = (message or "").strip()
@@ -116,6 +119,8 @@ def chat(
                 "question": message,
                 "history": safe_history,
                 "language": language,
+                "session_id": session_id,
+                "consent_analytics": bool(analytics_consent),
             },
             timeout=190,
         )
@@ -225,6 +230,18 @@ def _language_ui(language_choice: str) -> tuple[Any, ...]:
         ),
         gr.update(value="محادثة جديدة" if arabic else "Nouvelle conversation"),
         gr.update(value="تحديث الحالة" if arabic else "Actualiser l’état"),
+        gr.update(
+            label=(
+                "أوافق على حفظ الأسئلة والأجوبة لتحسين المساعد"
+                if arabic
+                else "J’accepte la conservation des questions et réponses pour améliorer l’assistant"
+            ),
+            info=(
+                "اختياري: يبقى المساعد قابلاً للاستخدام دون تسجيل المحادثة."
+                if arabic
+                else "Facultatif : l’assistant reste utilisable sans journaliser la conversation."
+            ),
+        ),
         gr.update(visible=not arabic),
         gr.update(visible=arabic),
     )
@@ -232,6 +249,7 @@ def _language_ui(language_choice: str) -> tuple[Any, ...]:
 
 # Construction déclarative des composants et de leurs événements Gradio.
 with gr.Blocks(title="Assistant BCM · Rapport annuel") as demo:
+    session_id = gr.State(lambda: uuid4().hex)
     hero = gr.Markdown(HERO["fr"])
     status = gr.Markdown(_status("fr"))
     scope = gr.Markdown(
@@ -242,6 +260,11 @@ with gr.Blocks(title="Assistant BCM · Rapport annuel") as demo:
         choices=["Français", "العربية"],
         value="Français",
         label="Langue de la conversation / لغة المحادثة",
+    )
+    analytics_consent = gr.Checkbox(
+        value=False,
+        label="J’accepte la conservation des questions et réponses pour améliorer l’assistant",
+        info="Facultatif : l’assistant reste utilisable sans journaliser la conversation.",
     )
     chatbot = gr.Chatbot(
         height=560,
@@ -310,6 +333,7 @@ with gr.Blocks(title="Assistant BCM · Rapport annuel") as demo:
             suggestions,
             clear,
             refresh,
+            analytics_consent,
             french_examples,
             arabic_examples,
         ],
@@ -317,12 +341,12 @@ with gr.Blocks(title="Assistant BCM · Rapport annuel") as demo:
 
     send.click(
         chat,
-        [message, chatbot, language_choice],
+        [message, chatbot, language_choice, analytics_consent, session_id],
         [message, chatbot, suggestions],
     )
     message.submit(
         chat,
-        [message, chatbot, language_choice],
+        [message, chatbot, language_choice, analytics_consent, session_id],
         [message, chatbot, suggestions],
     )
     suggestions.change(

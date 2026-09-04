@@ -89,6 +89,19 @@
       errorRate: "Trop de questions en peu de temps. Merci de patienter avant de réessayer.",
       launcherLabel: "Ouvrir l’assistant des publications de la BCM",
       closeLabel: "Fermer",
+      disclaimer: "L’assistant peut se tromper. Vérifiez les informations importantes.",
+      feedbackUp: "Bonne réponse",
+      feedbackDown: "Réponse à améliorer",
+      feedbackThanks: "Merci pour votre retour.",
+      feedbackWhy: "Qu’est-ce qui doit être amélioré ?",
+      feedbackReasons: {
+        incorrect: "Incorrecte",
+        incomplete: "Incomplète",
+        missing_source: "Source manquante",
+        unclear: "Peu claire",
+        too_slow: "Trop lente",
+        other: "Autre",
+      },
       examples: [
         "Quel a été le taux de croissance du PIB réel en 2025 ?",
         "Comment l’inflation a-t-elle évolué en 2025 ?",
@@ -125,6 +138,19 @@
       errorRate: "عدد كبير من الأسئلة خلال وقت قصير. يرجى الانتظار قبل إعادة المحاولة.",
       launcherLabel: "افتح مساعد منشورات البنك المركزي",
       closeLabel: "إغلاق",
+      disclaimer: "قد يخطئ المساعد. تحقق من المعلومات المهمة.",
+      feedbackUp: "إجابة جيدة",
+      feedbackDown: "إجابة تحتاج تحسيناً",
+      feedbackThanks: "شكراً على ملاحظتك.",
+      feedbackWhy: "ما الذي يجب تحسينه؟",
+      feedbackReasons: {
+        incorrect: "غير صحيحة",
+        incomplete: "غير مكتملة",
+        missing_source: "المصدر مفقود",
+        unclear: "غير واضحة",
+        too_slow: "بطيئة جداً",
+        other: "سبب آخر",
+      },
       examples: [
         "ما معدل نمو الناتج المحلي الإجمالي الحقيقي في سنة 2025؟",
         "كيف تطور التضخم خلال سنة 2025؟",
@@ -147,6 +173,10 @@
     streaming: "",
     // Étape en cours du traitement, affichée pendant l'attente initiale.
     stage: "",
+    // Envoyé après la fermeture complète du flux SSE : certains navigateurs
+    // retardent ou abandonnent un fetch lancé depuis le callback du lecteur.
+    pendingResponseEvent: null,
+    analyticsWidgetOpened: false,
     session: null,
   };
   state.session = loadSession();
@@ -516,6 +546,30 @@
     ".bcm-footer button:hover{color:" +
     CONFIG.accentColor +
     ";}" +
+    ".bcm-disclaimer{margin-top:3px;font-size:10px;line-height:1.4;color:#b0b4bb;}" +
+    ".bcm-feedback{display:flex;align-items:center;gap:2px;margin-top:8px;padding-top:8px;border-top:1px solid #f0f1f3;}" +
+    ".bcm-feedback-btn{background:none;border:none;padding:5px;border-radius:7px;cursor:pointer;color:#b0b4bb;display:inline-flex;align-items:center;justify-content:center;}" +
+    ".bcm-feedback-btn svg{width:13px;height:13px;fill:currentColor;}" +
+    ".bcm-feedback-btn:hover{background:#f3f4f6;color:#6b7280;}" +
+    ".bcm-feedback-btn:disabled{cursor:default;}" +
+    ".bcm-feedback-btn:disabled:hover{background:none;}" +
+    ".bcm-feedback-actif{color:" +
+    CONFIG.accentColor +
+    ";background:color-mix(in srgb," +
+    CONFIG.accentColor +
+    " 14%,transparent);}" +
+    ".bcm-feedback-actif:disabled{color:" +
+    CONFIG.accentColor +
+    ";}" +
+    ".bcm-feedback-merci{font-size:10.5px;color:#9ca3af;margin-inline-start:4px;}" +
+    ".bcm-feedback-reasons{display:flex;flex-wrap:wrap;gap:5px;width:100%;margin-top:5px;}" +
+    ".bcm-feedback-question{width:100%;font-size:10.5px;color:#6b7280;}" +
+    ".bcm-feedback-reason{border:1px solid #dfe3e8;background:#fff;color:#4b5563;border-radius:999px;padding:4px 7px;font-size:10px;cursor:pointer;}" +
+    ".bcm-feedback-reason:hover{border-color:" +
+    CONFIG.accentColor +
+    ";color:" +
+    CONFIG.accentColor +
+    ";}" +
     ".bcm-typing{align-self:flex-start;display:flex;gap:4px;padding:12px 14px;background:#fff;border:1px solid #ececf0;border-radius:16px;border-bottom-left-radius:5px;}" +
     ".bcm-typing span{width:6px;height:6px;border-radius:50%;background:#9ca3af;animation:bcm-bounce 1.2s infinite ease-in-out;}" +
     ".bcm-typing .bcm-stage{width:auto;height:auto;border-radius:0;background:none;animation:bcm-fade 1.4s ease-in-out infinite;font-size:12px;color:#6b7280;white-space:nowrap;}" +
@@ -609,7 +663,10 @@
     '<textarea class="bcm-input" id="bcm-input" rows="1"></textarea>' +
     '<button type="button" class="bcm-send" id="bcm-send"></button>' +
     "</div>" +
-    '<div class="bcm-footer"><button type="button" id="bcm-new"></button></div>';
+    '<div class="bcm-footer">' +
+    '<button type="button" id="bcm-new"></button>' +
+    '<div class="bcm-disclaimer" id="bcm-disclaimer"></div>' +
+    "</div>";
   shadow.appendChild(panel);
 
   var els = {
@@ -624,6 +681,7 @@
     send: shadow.getElementById("bcm-send"),
     newConversation: shadow.getElementById("bcm-new"),
     inputRow: shadow.getElementById("bcm-inputrow"),
+    disclaimer: shadow.getElementById("bcm-disclaimer"),
   };
 
   function t() {
@@ -637,6 +695,7 @@
   function renderStatic() {
     var texts = t();
     els.title.textContent = texts.title;
+    els.disclaimer.textContent = texts.disclaimer;
     Array.prototype.forEach.call(els.langButtons, function (bouton) {
       var actif = bouton.getAttribute("data-lang") === state.language;
       bouton.classList.toggle("actif", actif);
@@ -712,6 +771,13 @@
   function decideConsent(accepte) {
     state.session.consent = accepte;
     saveSession();
+    if (accepte) {
+      sendAnalyticsEvent("consent_accepted");
+      if (state.open) {
+        sendAnalyticsEvent("widget_opened");
+        state.analyticsWidgetOpened = true;
+      }
+    }
     renderMessages();
     renderInputAvailability();
     els.input.focus();
@@ -752,8 +818,8 @@
       });
       els.messages.appendChild(examplesWrap);
     }
-    state.history.forEach(function (turn) {
-      els.messages.appendChild(renderMessageRow(turn));
+    state.history.forEach(function (turn, index) {
+      els.messages.appendChild(renderMessageRow(turn, index));
     });
     if (state.busy) {
       var row = document.createElement("div");
@@ -800,7 +866,7 @@
     return avatar;
   }
 
-  function renderMessageRow(turn) {
+  function renderMessageRow(turn, index) {
     var isUser = turn.role === "user";
     var row = document.createElement("div");
     row.className = "bcm-row" + (isUser ? " user" : "");
@@ -813,16 +879,173 @@
     } else {
       bubble.innerHTML = renderMarkdown(turn.content);
       if (turn.sources && turn.sources.length) {
-        bubble.appendChild(renderSources(turn.sources));
+        bubble.appendChild(renderSources(turn.sources, turn.responseId || ""));
+      }
+      // La question associée est le tour précédent : pas d'identifiant de
+      // message à faire correspondre, le texte des deux suffit au retour.
+      var precedent = typeof index === "number" ? state.history[index - 1] : null;
+      if (
+        precedent &&
+        precedent.role === "user" &&
+        turn.responseId &&
+        turn.feedbackToken
+      ) {
+        bubble.appendChild(
+          renderFeedback(
+            precedent.content,
+            turn.content,
+            turn.responseId || "",
+            turn.feedbackToken || ""
+          )
+        );
       }
     }
     row.appendChild(bubble);
     return row;
   }
 
-  function renderSources(sources) {
+  var ICON_THUMB_UP =
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 21h2a1 1 0 0 0 1-1v-9a1 1 0 0 0-1-1H2v11zM22 10.5a2 2 0 0 0-2-2h-5.6l.8-3.9.03-.32c0-.4-.16-.77-.43-1.04L14.17 2 8.6 7.57C8.22 7.95 8 8.46 8 9v9a2 2 0 0 0 2 2h7c.83 0 1.54-.5 1.84-1.22l3-7.03c.1-.23.16-.48.16-.75v-1.5z"/></svg>';
+  var ICON_THUMB_DOWN =
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 3h-2a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h2V3zM2 13.5a2 2 0 0 0 2 2h5.6l-.8 3.9-.03.32c0 .4.16.77.43 1.04L9.83 22l5.57-5.57c.38-.38.6-.89.6-1.43V6a2 2 0 0 0-2-2H8c-.83 0-1.54.5-1.84 1.22l-3 7.03c-.1.23-.16.48-.16.75v1.5z"/></svg>';
+
+  // Envoi discret et non bloquant : le clic reste réactif même si l'API est
+  // lente ou momentanément indisponible, et un échec n'affiche rien — un
+  // retour raté ne doit pas ressembler à une erreur de l'assistant.
+  function sendAnalyticsEvent(eventType, responseId, metadata) {
+    if (state.session.consent !== true) return;
+    try {
+      fetch(CONFIG.apiUrl + "/api/events", {
+        method: "POST",
+        // Évite que le navigateur abandonne un événement envoyé juste après
+        // la fermeture d'un flux SSE ou pendant une navigation de la page hôte.
+        keepalive: true,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          event_type: eventType,
+          session_id: state.session.id,
+          language: state.language,
+          response_id: responseId || "",
+          metadata: metadata || {},
+          consent_analytics: true,
+        }),
+      }).catch(function () {});
+    } catch (err) {
+      /* La télémétrie ne doit jamais perturber l'interface. */
+    }
+  }
+
+  function sendFeedback(
+    question,
+    answer,
+    rating,
+    responseId,
+    feedbackToken,
+    reason,
+    resolved
+  ) {
+    try {
+      fetch(CONFIG.apiUrl + "/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          session_id: state.session.id,
+          language: state.language,
+          question: question,
+          answer: answer,
+          rating: rating,
+          response_id: responseId,
+          feedback_token: feedbackToken,
+          reason: reason,
+          resolved: resolved,
+        }),
+      }).catch(function () {});
+    } catch (err) {
+      /* fetch indisponible : le retour est simplement perdu */
+    }
+  }
+
+  function renderFeedback(question, answer, responseId, feedbackToken) {
+    var texts = t();
+    var wrap = document.createElement("div");
+    wrap.className = "bcm-feedback";
+
+    function terminerFeedback(btn, note, reason, resolved) {
+      if (wrap.classList.contains("bcm-feedback-envoye")) return;
+      wrap.classList.add("bcm-feedback-envoye");
+      btn.classList.add("bcm-feedback-actif");
+      wrap.querySelectorAll("button").forEach(function (autre) {
+        autre.disabled = true;
+      });
+      var merci = document.createElement("span");
+      merci.className = "bcm-feedback-merci";
+      merci.textContent = texts.feedbackThanks;
+      wrap.appendChild(merci);
+      sendFeedback(
+        question,
+        answer,
+        note,
+        responseId,
+        feedbackToken,
+        reason,
+        resolved
+      );
+    }
+
+    function afficherRaisons(btn) {
+      if (wrap.querySelector(".bcm-feedback-reasons")) return;
+      var reasons = document.createElement("div");
+      reasons.className = "bcm-feedback-reasons";
+      var questionLabel = document.createElement("span");
+      questionLabel.className = "bcm-feedback-question";
+      questionLabel.textContent = texts.feedbackWhy;
+      reasons.appendChild(questionLabel);
+      Object.keys(texts.feedbackReasons).forEach(function (reason) {
+        var choice = document.createElement("button");
+        choice.type = "button";
+        choice.className = "bcm-feedback-reason";
+        choice.textContent = texts.feedbackReasons[reason];
+        choice.addEventListener("click", function () {
+          terminerFeedback(btn, "down", reason, false);
+        });
+        reasons.appendChild(choice);
+      });
+      wrap.appendChild(reasons);
+    }
+
+    function bouton(icone, libelle, note) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "bcm-feedback-btn";
+      btn.innerHTML = icone;
+      btn.setAttribute("aria-label", libelle);
+      btn.title = libelle;
+      btn.addEventListener("click", function () {
+        if (wrap.classList.contains("bcm-feedback-envoye")) return;
+        if (note === "up") {
+          terminerFeedback(btn, "up", "helpful", true);
+        } else {
+          afficherRaisons(btn);
+        }
+      });
+      return btn;
+    }
+
+    wrap.appendChild(bouton(ICON_THUMB_UP, texts.feedbackUp, "up"));
+    wrap.appendChild(bouton(ICON_THUMB_DOWN, texts.feedbackDown, "down"));
+    return wrap;
+  }
+
+  function renderSources(sources, responseId) {
     var details = document.createElement("details");
     details.className = "bcm-sources";
+    details.addEventListener("toggle", function () {
+      if (details.open) {
+        sendAnalyticsEvent("sources_opened", responseId, {
+          source_count: sources.length,
+        });
+      }
+    });
     var summary = document.createElement("summary");
     summary.textContent = t().sourcesTitle + " (" + sources.length + ")";
     details.appendChild(summary);
@@ -852,6 +1075,11 @@
         link.target = "_blank";
         link.rel = "noopener noreferrer";
         link.textContent = label;
+        link.addEventListener("click", function () {
+          sendAnalyticsEvent("source_link_clicked", responseId, {
+            source_type: kind,
+          });
+        });
         pageLine.appendChild(link);
       } else {
         pageLine.textContent = label;
@@ -883,6 +1111,7 @@
       chip.className = "bcm-chip";
       chip.textContent = suggestion;
       chip.addEventListener("click", function () {
+        sendAnalyticsEvent("suggestion_clicked");
         state.suggestions = [];
         renderSuggestions();
         sendMessage(suggestion);
@@ -912,6 +1141,12 @@
   // ---- Envoi : diffusion au fil de l'eau, avec repli en un seul appel ----
 
   function terminer() {
+    // Capturer l'événement avant de réinitialiser l'état de la requête. Son
+    // envoi est volontairement différé après le rendu final : certains
+    // navigateurs refusent un nouveau fetch depuis la même micro-tâche que
+    // celle qui vient de fermer le lecteur SSE.
+    var responseEvent = state.pendingResponseEvent;
+    state.pendingResponseEvent = null;
     state.busy = false;
     state.stage = "";
     state.streaming = "";
@@ -920,6 +1155,15 @@
     renderStatic();
     renderMessages();
     renderSuggestions();
+    if (responseEvent) {
+      setTimeout(function () {
+        sendAnalyticsEvent(
+          "response_received",
+          responseEvent.responseId,
+          responseEvent.metadata
+        );
+      }, 0);
+    }
   }
 
   function appliquerReponse(data) {
@@ -930,12 +1174,23 @@
       role: "assistant",
       content: data.answer,
       sources: data.sources || [],
+      responseId: data.response_id || "",
+      feedbackToken: data.feedback_token || "",
     });
     state.suggestions = data.suggestions || [];
+    state.pendingResponseEvent = {
+      responseId: data.response_id || "",
+      metadata: {
+        grounded: Boolean(data.grounded),
+        clarification_needed: Boolean(data.clarification_needed),
+        source_count: (data.sources || []).length,
+      },
+    };
   }
 
   function messageErreur(status, data) {
     if (data && data.reason === "session_limit" && data.error) {
+      sendAnalyticsEvent("session_limit_reached");
       return data.error;
     }
     return status === 429
@@ -1107,10 +1362,12 @@
     }
     touchSession();
     state.history.push({ role: "user", content: text });
+    sendAnalyticsEvent("question_submitted");
     state.suggestions = [];
     state.busy = true;
     state.streaming = "";
     state.stage = "";
+    state.pendingResponseEvent = null;
     els.input.value = "";
     renderMessages();
     renderSuggestions();
@@ -1153,7 +1410,12 @@
     launcher.classList.remove("pulse");
     panel.classList.add("open");
     if (ensureFreshSession()) {
+      state.analyticsWidgetOpened = false;
       renderMessages();
+    }
+    if (state.session.consent === true && !state.analyticsWidgetOpened) {
+      sendAnalyticsEvent("widget_opened");
+      state.analyticsWidgetOpened = true;
     }
     checkHealth();
     els.input.focus();

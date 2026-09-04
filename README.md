@@ -10,6 +10,7 @@ Documentation complémentaire :
 - `PHASE_2_QUALITE_RETRIEVAL.md` détaille le benchmark, la recherche hybride et les gains mesurés ;
 - `PHASE_3_ANALYSE_GRAPHIQUES.md` détaille le rendu PDF, l’OCR local et la lecture des séries ;
 - `ETAPES_CONSTRUCTION.md` explique la construction du chatbot en 16 étapes ;
+- `docs/ANALYTICS_PILOTE.md` décrit la mesure d'usage, les tokens et le bilan client ;
 - `ARCHITECTURE_MERMAID.md` contient les diagrammes Mermaid détaillés ;
 - `docs/diagrammes/architecture_complete.mmd` est le diagramme source autonome ;
 - `docs/diagrammes/architecture_phase2.mmd` détaille les reformulations et la clarification ;
@@ -209,7 +210,7 @@ Les deux appels JSON — planification et reranking — imposent un schéma de
 sortie. Le modèle produisait sinon un JSON invalide environ une fois sur deux
 (crochet fermant manquant), ce qui perdait l'appel, son délai et son coût.
 
-## Consentement, journalisation et limite de session
+## Analytics du pilote, consentement et limite de session
 
 Avant sa première question, chaque visiteur voit un popup lui demandant
 l'autorisation de conserver sa question et la réponse à des fins d'analyse. En
@@ -224,10 +225,30 @@ SESSION_MAX_QUESTIONS=10           # volume : trop de questions au total
 SESSION_IDLE_MINUTES=30            # délai d'inactivité avant réinitialisation
 ```
 
-La journalisation exige `DATABASE_URL` (Postgres) pour survivre à un
-redéploiement ; sans elle, un fichier SQLite local sert de repli, pratique en
-développement mais non durable sur Railway. Voir
-`docs/DEPLOIEMENT_RAILWAY_VERCEL.md` pour l'ajout de l'extension Postgres.
+La collecte enregistre les statuts du RAG, les sources, la latence, les appels
+de modèles et leurs tokens. Elle exige `DATABASE_URL` (PostgreSQL) pour
+survivre à un redéploiement ; sans elle, `storage/analytics.db` sert de repli
+SQLite local. Les identifiants de session sont pseudonymisés avec
+`ANALYTICS_HASH_SALT`.
+
+## Avertissement et retour utilisateur
+
+Chaque réponse porte un pouce haut / pouce bas. Un pouce négatif demande un
+motif ; le retour indique aussi si le besoin est résolu. Un identifiant de
+réponse signé relie le vote à l'interaction et empêche les votes forgés ou
+répétés. Cliquer sur l'icône vaut accord ponctuel pour cette seule réponse.
+
+Produire le bilan agrégé localement :
+
+```bash
+.venv/bin/python scripts/analytics_report.py --days 30 \
+  --output storage/bilan_pilote.md
+```
+
+Le guide complet, les KPI, la procédure Railway et l'intégration à un
+dashboard central sont décrits dans `docs/ANALYTICS_PILOTE.md`. L'endpoint
+`GET /api/admin/analytics` ne retourne que des agrégats et exige
+`ANALYTICS_ADMIN_TOKEN`.
 
 ## Déploiement
 

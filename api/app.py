@@ -7,9 +7,9 @@ Il expose également les routes de santé et de réindexation du rapport.
 
 from __future__ import annotations
 
-import re
 import hmac
 import json
+import re
 import unicodedata
 from pathlib import Path
 from threading import Lock
@@ -42,7 +42,20 @@ from api.charts import (
     render_chart_pages,
     select_chart_pages,
 )
-from api.analytics import ensure_schema, log_question
+from api.analytics import (
+    analytics_snapshot,
+    ensure_schema,
+    log_feedback,
+    log_interaction,
+    log_ui_event,
+)
+from api.usage import (
+    begin_usage_collection,
+    model_call_started,
+    record_model_error,
+    reset_usage_collection,
+    usage_snapshot,
+)
 from api.rag import RAGIndex
 from api.sources import SOURCE_TYPE_PDF, citation_label
 from api.query import build_retrieval_query, is_national_question
@@ -799,6 +812,15 @@ def create_app(
     except Exception as exc:  # le service reste utilisable sans journalisation
         app.logger.warning("analytics_schema_failed error_type=%s", type(exc).__name__)
 
+    def _feedback_token(response_id: str, session_id: str) -> str:
+        """Signe le couple réponse/session pour empêcher les retours forgés."""
+        secret = settings.analytics_hash_salt or "bcm-analytics-local"
+        return hmac.new(
+            secret.encode("utf-8"),
+            f"{response_id}:{session_id}".encode("utf-8"),
+            "sha256",
+        ).hexdigest()
+
     app.config["RATELIMIT_ENABLED"] = not settings.is_testing
     limiter = Limiter(get_remote_address, app=app, default_limits=[], storage_uri="memory://")
     app.extensions["bcm_limiter"] = limiter
@@ -850,7 +872,14 @@ def create_app(
                 "service": "BCM RAG API",
                 "status": "ok",
                 "environment": settings.app_env,
-                "endpoints": ["GET /health", "POST /api/ask", "POST /api/reindex"],
+                "endpoints": [
+                    "GET /health",
+                    "POST /api/ask",
+                    "POST /api/feedback",
+                    "POST /api/events",
+                    "GET /api/admin/analytics",
+                    "POST /api/reindex",
+                ],
             }
         )
 
@@ -1630,6 +1659,14 @@ def create_app(
             generation_state["succes"] += 1
             generation_state["dernier_echec"] = None
         except Exception as exc:
+            model_name = {
+                "openai": settings.openai_model,
+                "gemini": settings.gemini_model,
+                "ollama": settings.ollama_model,
+            }.get(provider, "none")
+            record_model_error(
+                "generation", provider, model_name, exc, model_call_started()
+            )
             generation_state["echecs"] += 1
             generation_state["dernier_echec"] = type(exc).__name__
             app.logger.warning(
@@ -1678,7 +1715,7 @@ def create_app(
         return
 
     def _ask_events_logged() -> Any:
-        """Enveloppe `_ask_events` pour journaliser la question et sa réponse.
+        """Ajoute identifiant, métriques RAG et consommation à la réponse.
 
         Enveloppe plutôt que modifie chaque point de sortie de `_ask_events`
         (une douzaine) : la journalisation se pose donc une seule fois, sans
@@ -1691,30 +1728,111 @@ def create_app(
         session_id = ""
         consent = False
         question_text = ""
+        requested_language = "fr"
         if isinstance(payload, dict):
             brut = payload.get("session_id")
             session_id = brut.strip()[:128] if isinstance(brut, str) else ""
             consent = bool(payload.get("consent_analytics"))
             brut_question = payload.get("question")
             question_text = brut_question.strip() if isinstance(brut_question, str) else ""
+            language_value = payload.get("language")
+            requested_language = (
+                language_value
+                if language_value in {"fr", "ar"}
+                else response_language(question_text)
+            )
 
-        for nom, charge in _ask_events():
-            if nom == "done" and consent and session_id and question_text:
-                try:
-                    log_question(
-                        settings,
-                        session_id,
-                        str(charge.get("language", "fr")),
-                        question_text,
-                        str(charge.get("answer", "")),
+        response_id = uuid4().hex
+        usage_token = begin_usage_collection()
+        try:
+            for nom, charge in _ask_events():
+                if nom == "done":
+                    # Le navigateur utilise cet identifiant opaque pour relier
+                    # le feedback à la bonne réponse sans faire confiance au
+                    # texte renvoyé par le client.
+                    charge["response_id"] = response_id
+                    charge["feedback_token"] = (
+                        _feedback_token(response_id, session_id) if session_id else ""
                     )
-                except Exception as exc:
-                    app.logger.warning(
-                        "request_id=%s analytics_log_failed error_type=%s",
-                        g.get("request_id"),
-                        type(exc).__name__,
-                    )
-            yield nom, charge
+                    if consent and session_id and question_text:
+                        try:
+                            calls = usage_snapshot()
+                            generation_failed = any(
+                                call.get("operation") == "generation"
+                                and not call.get("success", True)
+                                for call in calls
+                            )
+                            if generation_failed and not charge.get("grounded"):
+                                status = "generation_error"
+                            elif generation_failed:
+                                status = "answered_degraded"
+                            elif charge.get("clarification_needed"):
+                                status = "clarification"
+                            elif charge.get("grounded"):
+                                status = "answered"
+                            else:
+                                status = "refused"
+                            log_interaction(
+                                settings,
+                                response_id=response_id,
+                                request_id=str(g.get("request_id", "")),
+                                session_id=session_id,
+                                language=str(charge.get("language", requested_language)),
+                                question=question_text,
+                                answer=str(charge.get("answer", "")),
+                                status=status,
+                                grounded=bool(charge.get("grounded")),
+                                clarification_needed=bool(
+                                    charge.get("clarification_needed")
+                                ),
+                                memory_used=bool(charge.get("memory_used")),
+                                chart_analysis=bool(charge.get("chart_analysis")),
+                                sources=list(charge.get("sources") or []),
+                                latency_ms=(
+                                    perf_counter()
+                                    - g.get("started_at", perf_counter())
+                                )
+                                * 1000,
+                                model_calls=calls,
+                            )
+                        except Exception as exc:
+                            app.logger.warning(
+                                "request_id=%s analytics_log_failed error_type=%s",
+                                g.get("request_id"),
+                                type(exc).__name__,
+                            )
+                elif nom == "error" and consent and session_id and question_text:
+                    message, _http_status, reason = charge
+                    try:
+                        log_interaction(
+                            settings,
+                            response_id=response_id,
+                            request_id=str(g.get("request_id", "")),
+                            session_id=session_id,
+                            language=requested_language,
+                            question=question_text,
+                            answer=str(message),
+                            status=str(reason or "request_error"),
+                            grounded=False,
+                            clarification_needed=False,
+                            memory_used=False,
+                            chart_analysis=False,
+                            sources=[],
+                            latency_ms=(
+                                perf_counter() - g.get("started_at", perf_counter())
+                            )
+                            * 1000,
+                            model_calls=usage_snapshot(),
+                        )
+                    except Exception as exc:
+                        app.logger.warning(
+                            "request_id=%s analytics_log_failed error_type=%s",
+                            g.get("request_id"),
+                            type(exc).__name__,
+                        )
+                yield nom, charge
+        finally:
+            reset_usage_collection(usage_token)
 
     @app.post("/api/ask")
     @limiter.limit(settings.rate_limit_ask)
@@ -1784,6 +1902,147 @@ def create_app(
                 "X-Accel-Buffering": "no",
             },
         )
+
+    @app.post("/api/feedback")
+    @limiter.limit(settings.rate_limit_ask)
+    def feedback() -> Any:
+        """Enregistre un pouce haut/bas sur une réponse déjà affichée.
+
+        Indépendant du consentement de journalisation continue (§ widget) :
+        cliquer sur ce bouton est en lui-même l'accord explicite de
+        l'utilisateur pour cette seule réponse. Best-effort — une panne de la
+        base ne doit jamais transformer un simple clic en erreur visible.
+        """
+        payload = request.get_json(silent=True)
+        if not isinstance(payload, dict):
+            return error_payload("Le corps JSON doit être un objet.", 400)
+
+        rating = payload.get("rating")
+        if rating not in {"up", "down"}:
+            return error_payload("Le champ 'rating' doit valoir 'up' ou 'down'.", 400)
+
+        question = payload.get("question")
+        answer = payload.get("answer")
+        if not isinstance(question, str) or not question.strip():
+            return error_payload("Le champ 'question' est obligatoire.", 400)
+        if not isinstance(answer, str) or not answer.strip():
+            return error_payload("Le champ 'answer' est obligatoire.", 400)
+
+        language = payload.get("language")
+        language = language if language in {"fr", "ar"} else "fr"
+        session_id = payload.get("session_id")
+        session_id = session_id.strip()[:128] if isinstance(session_id, str) else ""
+        response_id = payload.get("response_id")
+        response_id = response_id.strip() if isinstance(response_id, str) else ""
+        feedback_token = payload.get("feedback_token")
+        feedback_token = (
+            feedback_token.strip() if isinstance(feedback_token, str) else ""
+        )
+        if not response_id or not re.fullmatch(r"[a-f0-9]{32}", response_id):
+            return error_payload("Identifiant de réponse invalide.", 400)
+        if not session_id or not hmac.compare_digest(
+            feedback_token, _feedback_token(response_id, session_id)
+        ):
+            return error_payload("Jeton de retour invalide.", 403)
+
+        reason = payload.get("reason")
+        reason = reason.strip()[:40] if isinstance(reason, str) else ""
+        resolved = payload.get("resolved")
+        if resolved is not None and not isinstance(resolved, bool):
+            return error_payload("Le champ 'resolved' doit être booléen.", 400)
+        comment = payload.get("comment")
+        comment = comment.strip()[:500] if isinstance(comment, str) else ""
+
+        inserted = False
+        try:
+            inserted = log_feedback(
+                settings,
+                session_id,
+                language,
+                question.strip()[: settings.max_question_chars],
+                answer.strip()[:8000],
+                rating,
+                response_id=response_id,
+                reason=reason,
+                resolved=resolved,
+                comment=comment,
+            )
+        except Exception as exc:
+            app.logger.warning(
+                "request_id=%s feedback_log_failed error_type=%s",
+                g.get("request_id"),
+                type(exc).__name__,
+            )
+        return jsonify({"status": "ok", "recorded": inserted})
+
+    @app.post("/api/events")
+    @limiter.limit(settings.rate_limit_ask)
+    def analytics_event() -> Any:
+        """Reçoit un événement UI uniquement après consentement explicite."""
+        payload = request.get_json(silent=True)
+        if not isinstance(payload, dict):
+            return error_payload("Le corps JSON doit être un objet.", 400)
+        if payload.get("consent_analytics") is not True:
+            return jsonify({"status": "ignored"})
+        event_type = payload.get("event_type")
+        session_id = payload.get("session_id")
+        if not isinstance(event_type, str) or not event_type.strip():
+            return error_payload("Le champ 'event_type' est obligatoire.", 400)
+        if not isinstance(session_id, str) or not session_id.strip():
+            return error_payload("Le champ 'session_id' est obligatoire.", 400)
+        language = payload.get("language")
+        language = language if language in {"fr", "ar"} else "fr"
+        response_id = payload.get("response_id")
+        response_id = response_id.strip() if isinstance(response_id, str) else ""
+        metadata = payload.get("metadata")
+        metadata = metadata if isinstance(metadata, dict) else {}
+        try:
+            log_ui_event(
+                settings,
+                event_type=event_type.strip(),
+                session_id=session_id.strip()[:128],
+                language=language,
+                response_id=response_id,
+                metadata=metadata,
+            )
+        except ValueError as exc:
+            return error_payload(str(exc), 400)
+        except Exception as exc:
+            app.logger.warning(
+                "request_id=%s analytics_event_failed error_type=%s",
+                g.get("request_id"),
+                type(exc).__name__,
+            )
+        return jsonify({"status": "ok"})
+
+    @app.get("/api/admin/analytics")
+    @limiter.limit("30 per minute")
+    def analytics_dashboard() -> Any:
+        """Expose uniquement des agrégats au dashboard central authentifié."""
+        expected = (
+            f"Bearer {settings.analytics_admin_token}"
+            if settings.analytics_admin_token
+            else ""
+        )
+        supplied = request.headers.get("Authorization", "")
+        if not expected or not hmac.compare_digest(supplied, expected):
+            return error_payload("Accès non autorisé.", 401)
+        raw_days = request.args.get("days", "30")
+        try:
+            days = int(raw_days)
+        except ValueError:
+            return error_payload("Le paramètre 'days' doit être un entier.", 400)
+        if not 1 <= days <= 3660:
+            return error_payload("Le paramètre 'days' doit être compris entre 1 et 3660.", 400)
+        try:
+            return jsonify(analytics_snapshot(settings, days=days))
+        except Exception as exc:
+            app.logger.warning(
+                "request_id=%s analytics_snapshot_failed error_type=%s",
+                g.get("request_id"),
+                type(exc).__name__,
+            )
+            return error_payload("Les analytics sont temporairement indisponibles.", 503)
 
     @app.post("/api/reindex")
     def reindex() -> Any:

@@ -122,9 +122,10 @@ l'utilisateur pour conserver sa question et la réponse obtenue, à des fins
 d'analyse. Ce choix ne se redemande pas à chaque message : il vaut pour toute
 la session, et seulement pour elle.
 
-- **Accepté** : chaque question de la session est journalisée côté serveur —
-  texte de la question, texte de la réponse, langue, horodatage. Jamais
-  d'adresse IP ni d'identifiant permettant de reconnaître la personne.
+- **Accepté** : chaque question, réponse, statut RAG, source, latence et
+  métrique de tokens est journalisé côté serveur. Le parcours (ouverture,
+  suggestions et sources) est également mesuré. Jamais d'adresse IP ;
+  l'identifiant aléatoire de session est pseudonymisé.
 - **Refusé** : l'assistant reste pleinement utilisable, rien n'est conservé.
 
 Une session est limitée à un nombre de questions (`SESSION_MAX_QUESTIONS`
@@ -140,6 +141,19 @@ moment, le serveur restant seul décisionnaire du quota réel.
 Au-delà de la limite, l'assistant répond avec un message explicite dans la
 conversation elle-même (pas une alerte du navigateur), indiquant après combien
 de temps une nouvelle session sera possible.
+
+### Avertissement et retour sur les réponses
+
+Le pied du panneau porte un rappel permanent, comme sur les principaux
+assistants du marché : « L'assistant peut se tromper. Vérifiez les
+informations importantes. »
+
+Chaque réponse porte un pouce haut et un pouce bas. Le pouce haut indique que
+le besoin est résolu ; après un pouce bas, l'utilisateur choisit un motif
+(incorrect, incomplet, source manquante, peu clair, trop lent ou autre). Le
+retour ponctuel reste possible sans consentement continu. Un identifiant signé
+par l'API relie le vote à la bonne réponse et la base refuse un second vote de
+la même session.
 
 ### Réponse progressive
 

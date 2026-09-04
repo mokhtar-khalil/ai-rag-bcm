@@ -24,6 +24,24 @@ def main() -> int:
         print(f"Rapport introuvable : {settings.report_path}", file=sys.stderr)
         return 3
 
+    if settings.is_production and not settings.analytics_database_url:
+        print(
+            "Avertissement : DATABASE_URL est vide ; SQLite ne conservera pas "
+            "les analytics après un redéploiement Railway.",
+            file=sys.stderr,
+        )
+    if (
+        settings.is_production
+        and settings.analytics_database_url
+        and not settings.analytics_hash_salt
+    ):
+        print(
+            "Configuration invalide : ANALYTICS_HASH_SALT est obligatoire "
+            "avec PostgreSQL en production.",
+            file=sys.stderr,
+        )
+        return 5
+
     settings.index_path.parent.mkdir(parents=True, exist_ok=True)
     settings.log_dir.mkdir(parents=True, exist_ok=True)
     print("Configuration valide")
@@ -35,6 +53,14 @@ def main() -> int:
     print(
         "- recherche sémantique locale : "
         f"{'active' if settings.semantic_retrieval else 'désactivée'}"
+    )
+    print(
+        "- analytics : "
+        + (
+            "PostgreSQL durable"
+            if settings.analytics_database_url
+            else "SQLite local"
+        )
     )
     return 0
 

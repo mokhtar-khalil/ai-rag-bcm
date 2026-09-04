@@ -9,12 +9,14 @@ from __future__ import annotations
 import json
 import re
 import unicodedata
-from decimal import Decimal, InvalidOperation
 from collections.abc import Iterator
+from decimal import Decimal, InvalidOperation
 from typing import Any
 
 import requests
 
+from api.query import build_retrieval_query
+from api.usage import model_call_started, record_model_error, record_model_response
 from core.config import Settings, get_settings
 from core.language import (
     answer_language_instruction,
@@ -24,7 +26,6 @@ from core.language import (
     response_language,
     untranslated_latin_words,
 )
-from api.query import build_retrieval_query
 
 
 SYSTEM_INSTRUCTIONS = """Tu es un analyste documentaire strict de la Banque Centrale de Mauritanie.
@@ -230,14 +231,24 @@ def plan_queries_openai(
     from openai import OpenAI
 
     settings = settings or get_settings()
-    response = OpenAI().responses.create(
-        model=settings.openai_rerank_model,
-        instructions=QUERY_PLANNER_INSTRUCTIONS,
-        input=f"QUESTION UTILISATEUR :\n{question}",
-        reasoning={"effort": "low"},
-        # Le plan tient en quelques dizaines de tokens ; la marge sert au raisonnement.
-        max_output_tokens=1500,
-        text={"format": PLANNER_SCHEMA},
+    started = model_call_started()
+    try:
+        response = OpenAI().responses.create(
+            model=settings.openai_rerank_model,
+            instructions=QUERY_PLANNER_INSTRUCTIONS,
+            input=f"QUESTION UTILISATEUR :\n{question}",
+            reasoning={"effort": "low"},
+            # Le plan tient en quelques dizaines de tokens ; la marge sert au raisonnement.
+            max_output_tokens=1500,
+            text={"format": PLANNER_SCHEMA},
+        )
+    except Exception as exc:
+        record_model_error(
+            "query_planning", "openai", settings.openai_rerank_model, exc, started
+        )
+        raise
+    record_model_response(
+        "query_planning", "openai", settings.openai_rerank_model, response, started
     )
     payload = _json_object(response.output_text)
     generated = _unique_questions(payload.get("queries"), 4)
@@ -265,15 +276,23 @@ def rerank_openai(
         for item in results
     )
     settings = settings or get_settings()
-    response = OpenAI().responses.create(
-        model=settings.openai_rerank_model,
-        instructions=RERANK_INSTRUCTIONS,
-        input=f"QUESTION :\n{question}\n\nPASSAGES CANDIDATS :\n{candidates}",
-        reasoning={"effort": "low"},
-        # La sélection tient en 18 tokens, mais le raisonnement en consomme
-        # jusqu'à 120 : à 160, la sortie était parfois vide et l'appel perdu.
-        max_output_tokens=1500,
-        text={"format": RERANK_SCHEMA},
+    started = model_call_started()
+    try:
+        response = OpenAI().responses.create(
+            model=settings.openai_rerank_model,
+            instructions=RERANK_INSTRUCTIONS,
+            input=f"QUESTION :\n{question}\n\nPASSAGES CANDIDATS :\n{candidates}",
+            reasoning={"effort": "low"},
+            # La sélection tient en 18 tokens, mais le raisonnement en consomme
+            # jusqu'à 120 : à 160, la sortie était parfois vide et l'appel perdu.
+            max_output_tokens=1500,
+            text={"format": RERANK_SCHEMA},
+        )
+    except Exception as exc:
+        record_model_error("reranking", "openai", settings.openai_rerank_model, exc, started)
+        raise
+    record_model_response(
+        "reranking", "openai", settings.openai_rerank_model, response, started
     )
     match = re.search(r"\{.*\}", response.output_text.strip(), flags=re.DOTALL)
     if not match:
@@ -324,20 +343,26 @@ def generate_openai(
         f"Historique utile (peut être vide) :\n{_history_text(history)}\n\n"
         f"Question : {question}\n\nSources autorisées :\n{_context(results)}"
     )
-    response = client.responses.create(
-        model=settings.openai_model,
-        instructions=(
-            f"{SYSTEM_INSTRUCTIONS}\n\n"
-            f"{answer_language_instruction(question, selected_language)}"
-        ),
-        input=prompt,
-        reasoning={
-            "effort": (
-                "low" if selected_language == "ar" else settings.openai_reasoning_effort
-            )
-        },
-        max_output_tokens=settings.openai_max_output_tokens,
-    )
+    started = model_call_started()
+    try:
+        response = client.responses.create(
+            model=settings.openai_model,
+            instructions=(
+                f"{SYSTEM_INSTRUCTIONS}\n\n"
+                f"{answer_language_instruction(question, selected_language)}"
+            ),
+            input=prompt,
+            reasoning={
+                "effort": (
+                    "low" if selected_language == "ar" else settings.openai_reasoning_effort
+                )
+            },
+            max_output_tokens=settings.openai_max_output_tokens,
+        )
+    except Exception as exc:
+        record_model_error("generation", "openai", settings.openai_model, exc, started)
+        raise
+    record_model_response("generation", "openai", settings.openai_model, response, started)
     # Une réponse coupée reste plausible mais perd sa fin et parfois sa citation.
     # Le signaler déclenche le repli au lieu de la servir amputée.
     if getattr(response, "status", "completed") == "incomplete":
@@ -456,19 +481,25 @@ def generate_gemini(
         thinking["thinking_config"] = types.ThinkingConfig(
             thinking_level=settings.gemini_thinking_level
         )
-    response = client.models.generate_content(
-        model=settings.gemini_model,
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            system_instruction=(
-                f"{SYSTEM_INSTRUCTIONS}\n\n"
-                f"{answer_language_instruction(question, selected_language)}"
+    started = model_call_started()
+    try:
+        response = client.models.generate_content(
+            model=settings.gemini_model,
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                system_instruction=(
+                    f"{SYSTEM_INSTRUCTIONS}\n\n"
+                    f"{answer_language_instruction(question, selected_language)}"
+                ),
+                max_output_tokens=settings.gemini_max_output_tokens,
+                temperature=0.1,
+                **thinking,
             ),
-            max_output_tokens=settings.gemini_max_output_tokens,
-            temperature=0.1,
-            **thinking,
-        ),
-    )
+        )
+    except Exception as exc:
+        record_model_error("generation", "gemini", settings.gemini_model, exc, started)
+        raise
+    record_model_response("generation", "gemini", settings.gemini_model, response, started)
     # Une réponse coupée reste plausible mais perd sa fin et parfois sa citation :
     # mieux vaut la signaler que la servir telle quelle.
     candidates = getattr(response, "candidates", None) or []
@@ -498,25 +529,34 @@ def generate_ollama(
         f"Historique utile (peut être vide) :\n{_history_text(history)}\n\n"
         f"Question : {question}\n\nSources autorisées :\n{_context(results)}"
     )
-    response = requests.post(
-        f"{settings.ollama_base_url}/api/chat",
-        json={
-            "model": settings.ollama_model,
-            "stream": False,
-            "messages": [
-                {"role": "system", "content": SYSTEM_INSTRUCTIONS},
-                {
-                    "role": "system",
-                    "content": answer_language_instruction(question, selected_language),
-                },
-                {"role": "user", "content": prompt},
-            ],
-            "options": {"temperature": 0.1},
-        },
-        timeout=180,
+    started = model_call_started()
+    try:
+        response = requests.post(
+            f"{settings.ollama_base_url}/api/chat",
+            json={
+                "model": settings.ollama_model,
+                "stream": False,
+                "messages": [
+                    {"role": "system", "content": SYSTEM_INSTRUCTIONS},
+                    {
+                        "role": "system",
+                        "content": answer_language_instruction(question, selected_language),
+                    },
+                    {"role": "user", "content": prompt},
+                ],
+                "options": {"temperature": 0.1},
+            },
+            timeout=180,
+        )
+        response.raise_for_status()
+        response_data = response.json()
+    except Exception as exc:
+        record_model_error("generation", "ollama", settings.ollama_model, exc, started)
+        raise
+    record_model_response(
+        "generation", "ollama", settings.ollama_model, response_data, started
     )
-    response.raise_for_status()
-    answer = response.json()["message"]["content"].strip()
+    answer = response_data["message"]["content"].strip()
     if selected_language == "ar":
         answer = normalize_arabic_units(answer)
         if untranslated_latin_words(answer):
@@ -906,32 +946,39 @@ def stream_answer(
     )
     fragments: list[str] = []
     incomplet = False
-    with OpenAI().responses.stream(
-        model=settings.openai_model,
-        instructions=(
-            f"{SYSTEM_INSTRUCTIONS}\n\n"
-            f"{answer_language_instruction(question, selected_language)}"
-        ),
-        input=prompt,
-        reasoning={
-            "effort": (
-                "low" if selected_language == "ar" else settings.openai_reasoning_effort
-            )
-        },
-        max_output_tokens=settings.openai_max_output_tokens,
-    ) as flux:
-        for evenement in flux:
-            if evenement.type == "response.output_text.delta" and evenement.delta:
-                fragments.append(evenement.delta)
-                yield ("delta", evenement.delta)
-        finale = flux.get_final_response()
-        incomplet = getattr(finale, "status", "completed") == "incomplete"
-
+    started = model_call_started()
+    try:
+        with OpenAI().responses.stream(
+            model=settings.openai_model,
+            instructions=(
+                f"{SYSTEM_INSTRUCTIONS}\n\n"
+                f"{answer_language_instruction(question, selected_language)}"
+            ),
+            input=prompt,
+            reasoning={
+                "effort": (
+                    "low" if selected_language == "ar" else settings.openai_reasoning_effort
+                )
+            },
+            max_output_tokens=settings.openai_max_output_tokens,
+        ) as flux:
+            for evenement in flux:
+                if evenement.type == "response.output_text.delta" and evenement.delta:
+                    fragments.append(evenement.delta)
+                    yield ("delta", evenement.delta)
+            finale = flux.get_final_response()
+            incomplet = getattr(finale, "status", "completed") == "incomplete"
+    except Exception as exc:
+        record_model_error("generation", "openai", settings.openai_model, exc, started)
+        raise
     if incomplet:
-        raise ValueError(
+        error = ValueError(
             "Réponse OpenAI tronquée : augmentez OPENAI_MAX_OUTPUT_TOKENS "
             f"(valeur actuelle : {settings.openai_max_output_tokens})."
         )
+        record_model_error("generation", "openai", settings.openai_model, error, started)
+        raise error
+    record_model_response("generation", "openai", settings.openai_model, finale, started)
     yield (
         "final",
         _finalize_generated_answer("".join(fragments).strip(), selected_language, results),

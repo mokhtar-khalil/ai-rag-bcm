@@ -95,7 +95,7 @@ Ce coût se paie autant de fois qu'il y a de reformulations : lorsque le
 planificateur en produit trois, la recherche enchaîne quatre vectorisations. Sur
 la production non réglée, cette étape atteignait 29 secondes à elle seule.
 
-### Journalisation des questions et limite de session
+### Analytics du pilote et limite de session
 
 Trois fonctionnalités liées, toutes soumises au consentement demandé par le
 widget avant la première question d'une session :
@@ -106,8 +106,14 @@ widget avant la première question d'une session :
   session, réinitialisée après `SESSION_IDLE_MINUTES` (30 par défaut)
   d'inactivité. Distincte de `RATE_LIMIT_ASK`, qui freine un débit trop rapide
   plutôt qu'un volume total.
-- **Journalisation** : question, réponse, langue et horodatage — jamais
-  d'adresse IP ni d'identifiant permettant de reconnaître la personne.
+- **Interactions** : réponse, statut RAG, sujet, sources, latence, fournisseur,
+  modèle et tokens dans `logged_questions` et `model_calls`.
+- **Parcours** : ouvertures, suggestions et consultation des sources dans
+  `ui_events`, uniquement après consentement.
+- **Retours** : satisfaction, résolution et motif dans `answer_feedback`. Le
+  `response_id` et son jeton signé empêchent un vote forgé ou répété.
+- **Vie privée** : aucune adresse IP ; la session aléatoire est pseudonymisée
+  avec `ANALYTICS_HASH_SALT`.
 
 #### Ajouter Postgres sur Railway
 
@@ -118,11 +124,14 @@ correct en développement, mais silencieusement perdu au prochain déploiement
 en production.
 
 1. Dans le projet Railway : **New → Database → Add PostgreSQL**.
-2. Railway injecte automatiquement `DATABASE_URL` dans les variables du
-   service API — aucune valeur à copier à la main.
-3. Au premier démarrage, l'application crée la table `logged_questions` si
-   elle n'existe pas encore (best-effort : une base indisponible ne bloque
-   pas le service, elle désactive silencieusement la journalisation).
+2. Railway injecte `DATABASE_URL` dans les variables du service API. Selon la
+   façon dont les services sont liés, utilisez la référence de variable
+   Railway affichée dans le projet plutôt que de recopier une URL en clair.
+3. Ajoutez deux secrets longs et distincts : `ANALYTICS_HASH_SALT` et
+   `ANALYTICS_ADMIN_TOKEN`.
+4. Au démarrage, l'application crée ou migre `logged_questions`,
+   `model_calls`, `answer_feedback` et `ui_events`. Une base indisponible ne
+   bloque pas les réponses, mais produit un avertissement dans les logs.
 
 Vérifier que la table existe :
 
@@ -131,8 +140,14 @@ railway connect postgres
 ```
 ```sql
 \d logged_questions
+\d model_calls
+\d answer_feedback
+\d ui_events
 SELECT count(*) FROM logged_questions;
 ```
+
+Le mode opératoire complet et le modèle de bilan figurent dans
+`docs/ANALYTICS_PILOTE.md`.
 
 ### Diffusion des réponses
 
