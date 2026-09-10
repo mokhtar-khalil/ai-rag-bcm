@@ -1,16 +1,22 @@
-# Déploiement — API sur Railway, widget sur Vercel
+# Déploiement — tout sur Railway
 
-Deux services, deux rôles :
+Un seul service héberge l'API, la page interne d'évaluation et le fichier du
+widget :
 
 ```
-Site bcm.mr  ──<script src=…>──►  Vercel   (fichier statique, widget)
-     │
-     └──────── appels XHR ───────►  Railway  (API Flask + index RAG)
+Railway (un seul service)
+  ├─ GET  /                     page interne, protégeable par mot de passe
+  ├─ GET  /bcm-chat-widget.js   le widget, servi depuis la même origine
+  └─ POST /api/*                l'API Flask + l'index RAG
 ```
 
-Le site de la BCM n'héberge rien : il ajoute une balise `<script>`. Nous
-hébergeons les deux services, ce qui nous laisse la main sur les mises à jour du
-corpus et du modèle sans jamais toucher au site.
+Même origine pour la page, le script et l'API : aucun en-tête CORS n'est
+nécessaire pour que l'assistant fonctionne à cette adresse. `CORS_ALLOWED_ORIGINS`
+redevient utile le jour où le widget s'intègre sur un domaine bcm.mr distinct
+(voir `docs/INTEGRATION_EQUIPE_BCM.md`) ; en attendant, il peut rester vide.
+
+Une plateforme séparée (Vercel ou autre) pour le widget n'est plus utilisée :
+le fichier ne change pas, seule son adresse de service change.
 
 ## 1. API sur Railway
 
@@ -40,7 +46,9 @@ ni accès réseau au premier appel. Mettre à jour le corpus = redéployer.
 | `OPENAI_MODEL` | `gpt-5.6-terra` | |
 | `OPENAI_RERANK_MODEL` | `gpt-5.6-luna` | |
 | `OPENAI_MAX_OUTPUT_TOKENS` | `3000` | |
-| `CORS_ALLOWED_ORIGINS` | `https://www.bcm.mr,https://bcm.mr,https://ai-bcm.vercel.app` | |
+| `CORS_ALLOWED_ORIGINS` | vide pour l'instant | requis lors de l'intégration publique |
+| `INTERNAL_ACCESS_USERNAME` | `bcm` | protège `/` — voir `docs/ACCES_INTERNE_BCM.md` |
+| `INTERNAL_ACCESS_PASSWORD` | secret long | idem, laisser vide = page ouverte à qui a le lien |
 | `REINDEX_TOKEN` | … | **secret** |
 | `RATE_LIMIT_ASK` | `20 per minute` | |
 | `CHART_ANALYSIS_ENABLED` | `false` | |
@@ -234,74 +242,60 @@ Attendu :
 Un nombre de passages inférieur signale un index incomplet. Ce point d'entrée ne
 publie volontairement ni empreinte de fichier ni chemin interne.
 
-## 2. Widget sur Vercel
+## 2. Page interne et widget
 
-`vercel.json` publie le widget en statique. Aucune fonction serveur, donc
-**aucune variable d'environnement n'est lisible à l'exécution** : le widget se
-configure par les attributs `data-*` de la balise `<script>`, côté site.
+`/` sert une page d'évaluation avec le widget déjà configuré ; `/bcm-chat-widget.js`
+sert le script depuis le même service. L'URL de l'API est déduite de la requête
+elle-même (`request.url_root`), jamais figée dans le dépôt : la page fonctionne
+identiquement sur le domaine Railway par défaut ou sur un domaine personnalisé,
+sans variable à définir pour ça.
 
-### La seule variable à définir
+### Protéger l'accès
 
-| Variable | Valeur | Obligatoire |
-|---|---|---|
-| `BCM_API_URL` | `https://<projet>.up.railway.app` | non |
+Tant que l'assistant n'est pas intégré publiquement sur bcm.mr, `/` peut être
+protégée par un simple mot de passe HTTP (authentification Basic, gérée par le
+navigateur — aucune page de connexion à construire) :
 
-Elle sert uniquement à la **page de démonstration**. Les variables du projet sont
-disponibles pendant la construction : `scripts/build_widget_vercel.sh` y inscrit
-l'URL de l'API, ce qui évite de figer une adresse d'environnement dans le dépôt.
+```dotenv
+INTERNAL_ACCESS_USERNAME=bcm
+INTERNAL_ACCESS_PASSWORD=<secret long>
+```
 
-Sans elle, la démonstration en ligne vise `127.0.0.1:5000` et reste muette — elle
-demeure alors utilisable via `?api=https://…`. Le widget lui-même n'en dépend
-jamais : les sites qui l'intègrent passent leur propre `data-api-url`.
+Générer un secret :
 
-Le script refuse une URL qui ne soit pas en `https` (ou en boucle locale) et
-retire un éventuel slash final, qui casserait les URL construites par
-concaténation.
+```bash
+python3 -c "import secrets; print(secrets.token_urlsafe(18))"
+```
 
-Les en-têtes servis :
-
-- `Access-Control-Allow-Origin: *` sur le fichier du widget. C'est le
-  **script** qui devient chargeable depuis n'importe quel domaine, ce qui est
-  nécessaire et sans risque : le contrôle d'accès réel se joue côté API, par
-  `CORS_ALLOWED_ORIGINS`.
-- `Cache-Control: public, max-age=300, stale-while-revalidate=86400`. Cinq
-  minutes de cache : assez pour épargner le réseau, assez court pour qu'un
-  correctif se propage sans intervention. Un cache long imposerait de renommer
-  le fichier à chaque correction.
+Les deux variables vides (défaut) laissent la page accessible à qui a le lien —
+suffisant pour une démonstration courte et fermée. `/bcm-chat-widget.js` n'est
+jamais protégé : le script n'est pas un secret, comme le code de n'importe quelle
+page web une fois chargée.
 
 ### Vérifier après déploiement
 
 ```bash
-curl -sI https://ai-bcm.vercel.app/bcm-chat-widget.js | grep -i "content-type\|cache-control\|access-control"
+curl -sI https://<projet>.up.railway.app/bcm-chat-widget.js | grep -i "content-type\|cache-control"
+curl -s -o /dev/null -w "%{http_code}\n" https://<projet>.up.railway.app/
 ```
 
-Puis ouvrir la racine `https://ai-bcm.vercel.app/` : la démonstration y sert de
-page d'accueil et de banc d'essai indépendant du site de la BCM. `cleanUrls`
-étant actif, `/demo.html` redirige vers `/demo` — les deux fonctionnent.
-
-> Sans `BCM_API_URL`, la démonstration vise `127.0.0.1`. Une page servie en
-> HTTPS ne peut pas appeler une adresse locale en HTTP : le navigateur bloque la
-> requête comme contenu mixte. Le widget l'annonce alors franchement — point
-> rouge et « Service indisponible » — au lieu de rester silencieux.
+Le second appel renvoie `401` si des identifiants sont configurés, `200` sinon.
+Avec identifiants, ouvrir l'URL dans un navigateur déclenche l'invite native de
+mot de passe — rien à développer côté page.
 
 ## 3. Ordre des opérations
 
-1. Déployer l'API sur Railway ; noter son URL.
-2. Renseigner `CORS_ALLOWED_ORIGINS` avec les domaines de la BCM **et** le
-   domaine Vercel.
-3. Définir `BCM_API_URL` dans Vercel avec l'URL Railway, puis redéployer :
-   la démonstration en ligne vise alors la bonne API.
-4. Transmettre à l'équipe BCM `docs/INTEGRATION_EQUIPE_BCM.md`, complété des
-   deux URL.
-5. Leur demander la liste exacte de leurs origines, et l'ajouter à
-   `CORS_ALLOWED_ORIGINS`.
+1. Déployer sur Railway ; noter l'URL.
+2. Générer et définir `INTERNAL_ACCESS_USERNAME` / `INTERNAL_ACCESS_PASSWORD`
+   si l'accès doit rester fermé au-delà d'une démonstration ponctuelle.
+3. Transmettre l'URL (et les identifiants, séparément) à l'équipe BCM.
+4. Le jour de l'intégration publique sur bcm.mr : suivre
+   `docs/INTEGRATION_EQUIPE_BCM.md`, renseigner `CORS_ALLOWED_ORIGINS` avec
+   leurs domaines exacts, et retirer les identifiants d'accès interne.
 
-L'ordre compte : le domaine Vercel doit figurer dans `CORS_ALLOWED_ORIGINS`
-(étape 2) avant que la démonstration ne puisse interroger l'API.
-
-L'étape 6 est celle qui bloque en pratique : `https://bcm.mr` et
-`https://www.bcm.mr` sont deux origines distinctes pour le navigateur, et une
-seule autorisée sur les deux laisse la moitié des visiteurs sans réponse.
+`https://bcm.mr` et `https://www.bcm.mr` sont deux origines distinctes pour le
+navigateur : à l'étape 4, les deux devront figurer dans `CORS_ALLOWED_ORIGINS`
+si le site répond sur les deux.
 
 ## 4. Mettre à jour le corpus
 
@@ -314,8 +308,7 @@ git add data/lettres_information && git commit && git push
 ```
 
 Railway reconstruit et redéploie. L'OCR reste une étape locale sur macOS ; ses
-fichiers texte sont versionnés, et ni Railway ni Vercel n'ont besoin du moteur
-OCR.
+fichiers texte sont versionnés, et Railway n'a jamais besoin du moteur OCR.
 
 `POST /api/reindex` existe mais reconstruit dans un conteneur éphémère : son
 effet disparaît au prochain redémarrage. Il dépanne, il ne remplace pas un

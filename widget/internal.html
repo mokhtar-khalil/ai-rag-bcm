@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Assistant des publications de la BCM</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Open Sans", "Segoe UI", Roboto, Arial, sans-serif;
+    margin: 0;
+    color: #111827;
+    background: #f7f8fa;
+  }
+  header {
+    background: #0f2f4f;
+    color: #fff;
+    padding: 22px 32px;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 19px;
+  }
+  header p {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.75);
+  }
+  main {
+    max-width: 720px;
+    margin: 40px auto;
+    padding: 0 24px 60px;
+    line-height: 1.6;
+  }
+  .note {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 16px 18px;
+    font-size: 14px;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Assistant des publications de la BCM</h1>
+  <p>Accès interne — évaluation avant intégration sur bcm.mr</p>
+</header>
+<main>
+  <div class="note">
+    <p>
+      Cet accès est réservé à l'équipe de la Banque Centrale de Mauritanie, le
+      temps d'évaluer l'assistant avant son intégration sur le site public.
+      Cliquez sur la bulle en bas à droite pour poser une question sur le
+      Rapport annuel ou les Lettres d'information.
+    </p>
+    <p>
+      Une fois validé, ce même widget s'intègre sur bcm.mr par une seule
+      balise <code>&lt;script&gt;</code>, sans rien changer à son
+      fonctionnement.
+    </p>
+  </div>
+</main>
+
+<script
+  src="__WIDGET_SCRIPT_URL__"
+  data-api-url="__API_BASE_URL__"
+  data-language="fr"
+></script>
+</body>
+</html>

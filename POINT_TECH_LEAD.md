@@ -10,7 +10,7 @@ Rapport annuel 2025 (PDF) + Lettres d'information mensuelles 2026 (images OCRis�
 Un pipeline RAG (Retrieval-Augmented Generation) hybride lexical + sémantique, avec reformulation et reranking par LLM, garde-fous de pertinence, extraction visuelle locale des graphiques, mémoire conversationnelle, et support bilingue FR/AR — exposé via une API Flask, consommé par un widget web embarquable.
 
 ```
-Site bcm.mr ──<script>── Vercel (widget statique) ──XHR──▶ Railway (API Flask + index RAG)
+Site bcm.mr ──<script>── Railway (widget + API Flask + index RAG, un seul service)
 ```
 
 ---
@@ -162,11 +162,10 @@ Optimisations notables :
 ## 11. Déploiement
 
 ```
-bcm.mr (balise <script>) → Vercel (widget statique) → Railway (API Flask + index)
+bcm.mr (balise <script>) → Railway (widget JS + API Flask + index, un seul service)
 ```
 
-- Railway héberge l'API + l'index RAG.
-- Vercel héberge le widget JS statique.
+- Railway héberge l'API, la page interne et le widget JS.
 - L'équipe BCM n'a qu'une balise `<script>` à intégrer sur le site (`docs/INTEGRATION_EQUIPE_BCM.md`).
 - CI/CD GitHub Actions : tests + lint + audit sécurité + build Docker sur chaque push (`ci.yml`), publication d'image sur merge `main` (`cd.yml`), promotion manuelle vers `:production` (`promote.yml`).
 - Scénarios locaux/Docker/VM de test documentés dans `DEPLOYMENT.md`.

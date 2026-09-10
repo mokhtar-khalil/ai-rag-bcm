@@ -29,11 +29,12 @@
 </main>
 
 <!--
-  Page de démonstration. Elle accepte « ?api=https://… » afin d'être essayée
-  contre l'API déployée sans modifier ce fichier :
-      https://<projet>.vercel.app/demo.html?api=https://<projet>.up.railway.app
-  À défaut, elle vise l'API locale. Sur un vrai site, l'intégration se réduit à
-  la balise <script> ci-dessous, avec data-api-url en dur.
+  Page de démonstration locale (voir run.sh). Elle accepte « ?api=https://… »
+  afin d'être essayée contre une API distante sans modifier ce fichier :
+      http://127.0.0.1:8090/demo.html?api=https://<projet>.up.railway.app
+  À défaut, elle vise l'API locale. Sur un vrai site, l'intégration se réduit
+  à la balise <script> de docs/INTEGRATION_EQUIPE_BCM.md, avec data-api-url
+  en dur.
 -->
 <script>
   (function () {
@@ -43,14 +44,8 @@
     var autorisee =
       /^https:\/\//.test(demande) ||
       /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(demande);
-    // Valeur substituée au déploiement par scripts/build_widget_vercel.sh à
-    // partir de BCM_API_URL. Ouverte telle quelle en local, la balise reste
-    // intacte et la page vise l'API locale.
-    var deploiement = "__BCM_API_URL__";
-    var parDefaut =
-      deploiement.indexOf("__") === 0 ? "http://127.0.0.1:5000" : deploiement;
     window.BCM_CHAT_CONFIG = {
-      apiUrl: autorisee ? demande.replace(/\/+$/, "") : parDefaut,
+      apiUrl: autorisee ? demande.replace(/\/+$/, "") : "http://127.0.0.1:5000",
     };
   })();
 </script>

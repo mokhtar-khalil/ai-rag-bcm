@@ -63,8 +63,13 @@ def test_chart_question_uses_only_local_chart_analysis(monkeypatch) -> None:
 
 
 def test_public_metadata_does_not_expose_generation_vendor() -> None:
-    response = create_app().test_client().get("/")
-    assert "openai" not in response.get_data(as_text=True).casefold()
+    client = create_app().test_client()
+    # « /api » est le descriptif JSON du service ; « / » est la page interne
+    # (le widget) — consolidés sur Railway, aucun des deux ne doit nommer le
+    # fournisseur de génération.
+    for chemin in ("/api", "/"):
+        response = client.get(chemin)
+        assert "openai" not in response.get_data(as_text=True).casefold()
 
 
 def test_section_followup_resolves_the_title_and_priority_page() -> None:

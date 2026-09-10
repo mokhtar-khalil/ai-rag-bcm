@@ -7,6 +7,7 @@ Il expose également les routes de santé et de réindexation du rapport.
 
 from __future__ import annotations
 
+import base64
 import hmac
 import json
 import re
@@ -864,7 +865,7 @@ def create_app(
         )
         return response
 
-    @app.get("/")
+    @app.get("/api")
     def root() -> Any:
         """Décrit brièvement le service et ses principaux points d'entrée."""
         return jsonify(
@@ -881,6 +882,74 @@ def create_app(
                     "POST /api/reindex",
                 ],
             }
+        )
+
+    def _internal_access_authorized() -> bool:
+        """Vérifie l'authentification HTTP Basic de la page interne.
+
+        Sans identifiants configurés, l'accès reste ouvert à qui a le lien —
+        un choix volontaire pour une évaluation courte, à muscler dès que
+        l'accès doit durer (voir docs/ACCES_INTERNE_BCM.md).
+        """
+        if not settings.internal_access_username or not settings.internal_access_password:
+            return True
+        header = request.headers.get("Authorization", "")
+        if not header.startswith("Basic "):
+            return False
+        try:
+            decoded = base64.b64decode(header[6:]).decode("utf-8")
+            supplied_user, _, supplied_password = decoded.partition(":")
+        except (ValueError, UnicodeDecodeError):
+            return False
+        return hmac.compare_digest(
+            supplied_user, settings.internal_access_username
+        ) and hmac.compare_digest(supplied_password, settings.internal_access_password)
+
+    def _require_internal_access() -> Any:
+        """Renvoie une réponse 401 si l'authentification échoue, sinon None."""
+        if _internal_access_authorized():
+            return None
+        return Response(
+            "Authentification requise.",
+            401,
+            {"WWW-Authenticate": 'Basic realm="Assistant BCM"'},
+        )
+
+    @app.get("/")
+    def internal_page() -> Any:
+        """Sert la page interne d'évaluation, avec le widget déjà configuré.
+
+        Consolidé sur Railway plutôt que sur un hébergeur statique séparé :
+        même origine que l'API, donc aucun en-tête CORS n'est nécessaire pour
+        que le widget fonctionne ici. CORS_ALLOWED_ORIGINS reste utile plus
+        tard, pour l'intégration publique sur un domaine bcm.mr distinct.
+        """
+        refus = _require_internal_access()
+        if refus is not None:
+            return refus
+        page = (
+            Path(__file__).resolve().parent.parent / "widget" / "internal.html"
+        ).read_text(encoding="utf-8")
+        base_url = request.url_root.rstrip("/")
+        page = page.replace("__API_BASE_URL__", base_url)
+        page = page.replace("__WIDGET_SCRIPT_URL__", f"{base_url}/bcm-chat-widget.js")
+        return Response(page, mimetype="text/html; charset=utf-8")
+
+    @app.get("/bcm-chat-widget.js")
+    def widget_script() -> Any:
+        """Sert le widget depuis le service qui héberge déjà l'API.
+
+        Un cache court (5 minutes) épargne le réseau sans retarder longtemps
+        la propagation d'un correctif, à l'identique de ce qui était réglé
+        côté hébergeur statique avant cette consolidation.
+        """
+        script = (
+            Path(__file__).resolve().parent.parent / "widget" / "bcm-chat-widget.js"
+        ).read_text(encoding="utf-8")
+        return Response(
+            script,
+            mimetype="application/javascript; charset=utf-8",
+            headers={"Cache-Control": "public, max-age=300, stale-while-revalidate=86400"},
         )
 
     @app.get("/health")

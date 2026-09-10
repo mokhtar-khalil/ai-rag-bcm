@@ -9,14 +9,15 @@ Avant la fermeture de `</body>`, sur les pages où l'assistant doit apparaître 
 
 ```html
 <script
-  src="https://ai-bcm.vercel.app/bcm-chat-widget.js"
-  data-api-url="https://assistant-bcm.up.railway.app"
+  src="https://<votre-domaine>.up.railway.app/bcm-chat-widget.js"
+  data-api-url="https://<votre-domaine>.up.railway.app"
   data-logo-url="/imgs/logo_banque_centrale_mauritanie.webp"
 ></script>
 ```
 
-Remplacez les deux premières URL par celles que l'équipe qui héberge le service
-vous communiquera : elles sont fixées au déploiement.
+Le script et l'API sont servis par le même service Railway : remplacez
+`<votre-domaine>` par le domaine exact que l'équipe qui héberge le service vous
+communiquera — il est fixé au déploiement.
 
 Le widget crée lui-même sa bulle flottante et son panneau. Il est isolé du CSS
 du site par un Shadow DOM : **il ne peut ni lire ni modifier le contenu de la
@@ -84,8 +85,8 @@ Exemple avec la charte du site :
 
 ```html
 <script
-  src="https://ai-bcm.vercel.app/bcm-chat-widget.js"
-  data-api-url="https://assistant-bcm.up.railway.app"
+  src="https://<votre-domaine>.up.railway.app/bcm-chat-widget.js"
+  data-api-url="https://<votre-domaine>.up.railway.app"
   data-logo-url="/imgs/logo_banque_centrale_mauritanie.webp"
   data-accent-color="#0a3d62"
   data-language="fr"

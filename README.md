@@ -252,19 +252,21 @@ dashboard central sont décrits dans `docs/ANALYTICS_PILOTE.md`. L'endpoint
 
 ## Déploiement
 
-L'API est hébergée sur Railway, le widget sur Vercel, et le site de la BCM ne
-porte qu'une balise `<script>` :
+L'API, la page interne et le widget sont hébergés sur un seul service Railway.
+Le site de la BCM, lui, ne portera qu'une balise `<script>` lors de
+l'intégration publique :
 
 ```
-Site bcm.mr  ──<script src=…>──►  Vercel   (widget statique)
-     │
-     └──────── appels XHR ───────►  Railway  (API Flask + index RAG)
+Page interne « / »  ──sert──►  bcm-chat-widget.js  ──appels XHR──►  /api/*
+     (même origine Railway pour les trois, aucun CORS en phase interne)
+
+Site bcm.mr (Phase 3)  ──<script src=…>──►  Railway  (widget + API)
 ```
 
-- `docs/DEPLOIEMENT_RAILWAY_VERCEL.md` — mise en service et exploitation ;
+- `docs/DEPLOIEMENT_RAILWAY.md` — mise en service et exploitation ;
 - `docs/INTEGRATION_EQUIPE_BCM.md` — intégration côté site, à transmettre à
   l'équipe de développement de la BCM ;
-- `railway.json`, `vercel.json`, `.env.railway.example` — configuration.
+- `railway.json`, `.env.railway.example` — configuration.
 
 L'index est construit **pendant la construction de l'image** et vérifié : le
 conteneur démarre avec son corpus, sans volume persistant. Mettre à jour le
