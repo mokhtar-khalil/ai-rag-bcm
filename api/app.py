@@ -23,6 +23,7 @@ from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from werkzeug.exceptions import BadRequest, HTTPException
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from api.providers import (
     stream_answer,
@@ -737,6 +738,12 @@ def create_app(
     engine_lock = Lock()
 
     app = Flask(__name__)
+    # Railway (comme tout PaaS derrière un edge) termine le TLS chez lui et
+    # transmet au conteneur en HTTP simple : sans ceci, request.url_root et
+    # request.remote_addr reflètent la connexion interne (http://, IP du
+    # proxy) plutôt que la requête réelle du client. Un seul saut de confiance
+    # (l'edge Railway), donc x_for/x_proto/x_host=1.
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
     app.json.ensure_ascii = False
     app.config.update(
         MAX_CONTENT_LENGTH=settings.max_request_bytes,
