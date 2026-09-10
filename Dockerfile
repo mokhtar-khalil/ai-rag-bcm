@@ -27,6 +27,7 @@ COPY core ./core
 COPY scripts ./scripts
 COPY data ./data
 COPY tests ./tests
+COPY widget ./widget
 COPY wsgi.py run_api_prod.sh ./
 
 RUN chmod +x run_api_prod.sh && mkdir -p storage logs
