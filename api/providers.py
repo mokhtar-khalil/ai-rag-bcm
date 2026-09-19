@@ -261,6 +261,47 @@ def plan_queries_openai(
     }
 
 
+def plan_queries_gemini(
+    question: str,
+    settings: Settings | None = None,
+) -> dict[str, Any]:
+    """Équivalent Gemini de plan_queries_openai, même contrat de retour."""
+    from google import genai
+    from google.genai import types
+
+    settings = settings or get_settings()
+    client = genai.Client(api_key=settings.gemini_api_key)
+    started = model_call_started()
+    try:
+        response = client.models.generate_content(
+            model=settings.gemini_model,
+            contents=f"QUESTION UTILISATEUR :\n{question}",
+            config=types.GenerateContentConfig(
+                system_instruction=QUERY_PLANNER_INSTRUCTIONS,
+                max_output_tokens=1500,
+                temperature=0.1,
+                response_mime_type="application/json",
+            ),
+        )
+    except Exception as exc:
+        record_model_error(
+            "query_planning", "gemini", settings.gemini_model, exc, started
+        )
+        raise
+    record_model_response(
+        "query_planning", "gemini", settings.gemini_model, response, started
+    )
+    payload = _json_object(response.text or "")
+    generated = _unique_questions(payload.get("queries"), 4)
+    queries = _unique_questions([question, *generated], 4)
+    suggestions = _unique_questions(payload.get("suggestions"), 3)
+    return {
+        "queries": queries or [question],
+        "ambiguous": bool(payload.get("ambiguous")) and len(suggestions) >= 2,
+        "suggestions": suggestions,
+    }
+
+
 def rerank_openai(
     question: str,
     results: list[dict[str, Any]],

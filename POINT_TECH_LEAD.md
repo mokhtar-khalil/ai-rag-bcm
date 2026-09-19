@@ -206,3 +206,187 @@ Comparaison à la baseline lexicale pure (avant embeddings) : Hit@5 passé de 70
 - **« Pourquoi RRF plutôt que fusion pondérée directe des scores ? »** → Échelles TF-IDF et cosinus non comparables ; les rangs le sont.
 - **« Comment est garanti que le modèle ne répond pas hors corpus ? »** → Double garde-fou : seuil de pertinence avant génération + contrôle post-génération (réponse sans citation `[...]` = traitée comme refus, sources non publiées).
 - **« Coût par question ? »** → Dominé par 1 à 3 appels LLM (recherche/planification optionnelle, reranking optionnel, génération) ; les tokens de raisonnement comptent dans le plafond de sortie mais ne sont facturés que s'ils sont réellement produits.
+- **« Pourquoi avoir abandonné Vercel ? »** → Une seule origine (Railway) sert la page, le widget et l'API : plus de CORS à négocier entre deux plateformes, une plateforme de moins à exploiter et à facturer pendant le pilote. Voir section 16.
+- **« Comment la vie privée est-elle protégée dans l'analytics ? »** → Rien n'est conservé sans consentement explicite, les identifiants de session sont pseudonymisés par HMAC, aucune IP/nom/email n'est collecté, et l'export par défaut est agrégé. Voir section 15.
+- **« Pourquoi un seul worker Gunicorn en production ? »** → Le modèle d'embedding pèse 811 Mo par processus ; chaque worker en charge sa propre copie. Le temps de réponse est de toute façon dominé par l'attente des appels LLM distants, pas par le calcul local — un worker + plusieurs threads couvre la concurrence sans dupliquer le modèle. Voir section 16.
+
+---
+
+## 15. Analytics du pilote — collecte, confidentialité, dashboard
+
+### Objectif
+
+Le pilote doit permettre de répondre, à la fin de la période d'essai, à cinq
+questions : combien de sessions et de questions, quels sujets/publications
+intéressent le plus, quelles réponses sont utiles ou refusées, quelles sont la
+latence/les erreurs/la consommation de tokens, et quoi prioriser avant une
+généralisation. Le module analytics (`api/analytics.py`, `api/usage.py`,
+`docs/ANALYTICS_PILOTE.md`) a été construit spécifiquement pour ça — ce n'est
+pas de la télémétrie générique, mais un outil de décision pour BCM.
+
+### Ce qui a changé — d'un ajout minimal à un système complet
+
+Deux commits successifs : `83b01d5` posait la base (table unique, popup de
+consentement, PostgreSQL en option) ; `8a4f3ed` (« Renforcement des
+analytics ») l'a étendue à un schéma à 4 tables, un collecteur de tokens dédié,
+le retour utilisateur (pouce haut/bas + motif), un endpoint agrégé protégé et
+un générateur de bilan — environ 2 500 lignes ajoutées au total sur les deux
+commits, dont un guide complet (`docs/ANALYTICS_PILOTE.md`, 263 lignes).
+
+### Schéma de données (4 tables)
+
+| Table | Contenu | Condition |
+|---|---|---|
+| `logged_questions` | Une ligne par réponse : langue, question, réponse, thème, statut du pipeline, sources, score, latence, tokens agrégés, fournisseur/modèle | Consentement requis |
+| `model_calls` | Une ligne par appel distant (`query_planning`, `reranking`, `generation`) : fournisseur, modèle, latence, succès, tokens entrée/entrée-cache/sortie/raisonnement/total | Toujours (pas de texte) |
+| `answer_feedback` | Pouce haut/bas, `resolved`, motif (`incorrect`, `incomplete`, `missing_source`, `unclear`, `too_slow`, `other`), lié au `response_id` par jeton HMAC signé | Un seul vote par session et par réponse |
+| `ui_events` | Parcours : ouverture, question posée, suggestion cliquée, réponse reçue, sources ouvertes, feedback, limite de session atteinte | Consentement requis, jamais de texte de question |
+
+### Nouvelles routes API
+
+- `POST /api/feedback` — enregistre un vote, protégé par le jeton signé du `response_id` (empêche un vote forgé ou répété).
+- `POST /api/events` — enregistre un événement de parcours consenti.
+- `GET /api/admin/analytics?days=N` — agrégats JSON uniquement (aucune question/réponse brute), protégé par `Authorization: Bearer <ANALYTICS_ADMIN_TOKEN>`. C'est la voie recommandée pour brancher un dashboard central sans lui donner accès à la base brute.
+
+### Collecteur de tokens (`api/usage.py`)
+
+Isolation par requête via `contextvars` (deux requêtes concurrentes ne
+mélangent jamais leurs compteurs). Normalise trois formats de SDK différents
+(OpenAI `usage.input_tokens_details.cached_tokens`, Gemini
+`usage_metadata.thoughts_token_count`, Ollama `prompt_eval_count`/`eval_count`)
+vers un schéma commun : entrée, entrée cachée, sortie, raisonnement, total. Un
+compteur à zéro signifie que le fournisseur ne l'a pas renvoyé — à ne pas lire
+comme une consommation réellement nulle.
+
+### Confidentialité — règles appliquées
+
+- Le texte (question/réponse) n'est conservé qu'après acceptation explicite du popup ; un refus n'empêche pas d'utiliser l'assistant.
+- Cliquer sur le feedback vaut accord ponctuel pour cette seule réponse.
+- `session_id` pseudonymisé par HMAC (`ANALYTICS_HASH_SALT`, à ne jamais committer, à ne jamais changer pendant le pilote sous peine de fragmenter les statistiques).
+- Aucune IP, aucun nom, aucun email collecté.
+- L'export standard (`scripts/analytics_report.py`) est agrégé ; `--include-content` (questions/réponses brutes) est réservé aux analystes habilités.
+- Durée de conservation et personnes habilitées : à fixer avec le responsable métier BCM, pas encore tranché dans le code.
+
+### Dev vs production
+
+SQLite (`storage/analytics.db`) en développement — pratique mais son fichier
+disparaît à chaque redéploiement Railway sans volume persistant. En
+production, `DATABASE_URL` (PostgreSQL, ajouté comme extension Railway) est
+requis pour la durabilité ; `scripts/check_config.py` refuse même le démarrage
+en production sans `ANALYTICS_HASH_SALT` défini. Une panne du module
+analytics est journalisée mais **ne bloque jamais** une réponse à
+l'utilisateur — c'est un système d'observation, pas un chemin critique.
+
+### KPI définis (`docs/ANALYTICS_PILOTE.md`)
+
+```text
+Satisfaction = votes positifs / votes exprimés
+Couverture du feedback = réponses évaluées / interactions consenties
+Résolution = retours resolved=true / retours ayant répondu à la question
+Réponses sourcées = grounded=true / interactions
+Refus = status=refused / interactions
+Questions par session = interactions / sessions consenties
+Tokens par interaction = total_tokens / interactions
+```
+
+Règle imposée dans le guide : toujours afficher le numérateur et le
+dénominateur — un taux de 100 % sur 2 votes n'est pas une conclusion.
+
+### Premier résultat réel (`storage/bilan_pilote.md`, généré le 3 sept. 2026)
+
+| Indicateur | Valeur |
+|---|---:|
+| Sessions consenties / Interactions | 6 / 7 |
+| Satisfaction | 71,4 % |
+| Besoins résolus | 66,7 % |
+| Réponses sourcées | 100 % |
+| Latence p50 / p95 | 10,0 s / 21,2 s |
+| Tokens totaux (7 interactions) | 47 239 |
+
+Le rapport se signale lui-même comme **non concluant** : échantillon trop
+petit (le guide recommande 30 interactions minimum avant toute lecture
+métier). Utile surtout comme preuve que toute la chaîne fonctionne de bout en
+bout (consentement → journalisation → feedback → bilan) avant la montée en
+charge du pilote.
+
+---
+
+## 16. Centralisation du widget sur Railway (suppression de Vercel)
+
+### Avant / après
+
+**Avant** (`ce989b7`^) : l'API tournait sur Railway et le widget statique sur
+Vercel — deux plateformes, deux domaines, un en-tête CORS à négocier entre les
+deux, une URL d'API injectée au build par `scripts/build_widget_vercel.sh`.
+
+**Après** : un seul service Railway sert les trois choses :
+
+```
+Railway (un seul service)
+  ├─ GET  /                     page interne d'évaluation, HTTP Basic optionnel
+  ├─ GET  /bcm-chat-widget.js   le widget, servi depuis la même origine
+  └─ POST /api/*                l'API Flask + l'index RAG
+```
+
+`GET /` servait auparavant la description JSON du service ; elle est
+déplacée sur `GET /api`. `vercel.json` et
+`scripts/build_widget_vercel.sh` sont supprimés ; `DEPLOIEMENT_RAILWAY_VERCEL.md`
+est renommé `docs/DEPLOIEMENT_RAILWAY.md`.
+
+### Pourquoi
+
+Même origine pour la page, le script et l'API → **aucun en-tête CORS
+nécessaire** pendant la phase d'évaluation interne. `CORS_ALLOWED_ORIGINS`
+redevient utile seulement le jour où le widget s'intègre sur un domaine bcm.mr
+distinct — et reste vide en attendant. Une plateforme de moins à exploiter,
+facturer et garder synchronisée avec l'API pendant le pilote.
+
+### Contrôle d'accès de la page interne
+
+`INTERNAL_ACCESS_USERNAME` / `INTERNAL_ACCESS_PASSWORD` protègent `/` par
+authentification HTTP Basic (gérée nativement par le navigateur, aucune page
+de connexion à développer) — comparaison en temps constant (`hmac.compare_digest`).
+Les deux vides par défaut : la page reste ouverte à qui a le lien, un choix
+assumé pour une démonstration courte. `/bcm-chat-widget.js`, lui, **n'est
+jamais protégé** : un script JS n'est pas un secret, comme le code de
+n'importe quelle page web une fois chargée.
+
+### URL de l'API injectée dynamiquement
+
+La page interne (`widget/internal.html`) reçoit l'URL de l'API par
+substitution de `__API_BASE_URL__` / `__WIDGET_SCRIPT_URL__` à partir de
+`request.url_root` **au moment de la requête** — jamais figée dans le dépôt ou
+au build. Conséquence pratique : la page fonctionne identiquement sur le
+sous-domaine Railway par défaut ou sur un domaine personnalisé, sans variable
+à changer. Testé explicitement (`tests/test_internal_access.py`).
+
+### Deux bugs découverts pendant la bascule
+
+- **`Dockerfile` incomplet** (`a5a0fcc`) : `COPY widget ./widget` manquait — l'image se construisait sans erreur, mais `/` et `/bcm-chat-widget.js` renvoyaient 404 en production faute de fichiers présents dans le conteneur. Corrigé par un ajout d'une ligne, mais un bon exemple de pourquoi un `curl` de vérification post-déploiement (section « Vérifier après déploiement » de `DEPLOIEMENT_RAILWAY.md`) est nécessaire même pour un changement qui « build » sans erreur.
+- **Schéma HTTP incorrect derrière le proxy Railway** (`58e4072`) : Railway termine le TLS à son edge et transmet en HTTP simple au conteneur. Sans `ProxyFix` (Werkzeug), `request.url_root` renvoyait `http://…` au lieu de `https://…`, ce qui aurait cassé l'URL de l'API injectée dans la page interne servie en HTTPS. Corrigé avec `ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)` — un seul saut de confiance (l'edge Railway).
+
+### Découvertes de performance en production (pendant cette période)
+
+Deux réglages mesurés et documentés dans `docs/DEPLOIEMENT_RAILWAY.md`,
+directement pertinents pour discuter du dimensionnement avec le lead :
+
+| Sujet | Mesure | Réglage retenu |
+|---|---|---|
+| Mémoire par worker Gunicorn | Le modèle d'embedding pèse **811 Mo** par processus ; chaque worker en charge sa propre copie (2 workers ≈ 1,6 Go, 4 workers > 3 Go) | `WEB_CONCURRENCY=1` + `GUNICORN_THREADS=4` — la latence est dominée par l'attente des appels LLM distants, pas par le calcul local, donc les threads suffisent à couvrir la concurrence sans dupliquer le modèle |
+| Contention CPU de torch | Une question inédite prenait **6 à 9 s** en production contre **0,15 s** en local (le cache d'embedding renvoyait une question déjà posée en 0,01 s, isolant la cause au calcul du vecteur) — torch dimensionnait son parallélisme sur les cœurs annoncés par l'hôte, pas sur le quota réel du conteneur | `OMP_NUM_THREADS=1` dans le `Dockerfile` → 1,41 s → 0,15 s sur 1 vCPU. Ce coût se multiplie par le nombre de reformulations (jusqu'à 4) : non réglé, cette seule étape atteignait 29 s |
+
+Effet de bord à surveiller : le compteur du rate limiter vit en mémoire du
+processus. Correct avec un seul worker ; **passer à plusieurs workers ou
+plusieurs répliques nécessitera d'abord de brancher Redis sur le limiteur**,
+sans quoi la limite annoncée serait multipliée par le nombre de processus.
+
+Autres repères retenus : image Docker ≈ 1,2 Go (torch/sentence-transformers
+1,3 Go, `storage/` 487 Mo, `data/` 80 Mo) ; Railway est en `amd64` — ne jamais
+publier une image construite sur un Mac Apple Silicon (arm64), la CI force
+`platforms: linux/amd64`.
+
+### Reste à faire pour l'intégration publique bcm.mr
+
+1. Renseigner `CORS_ALLOWED_ORIGINS` avec les domaines exacts de la BCM (`https://bcm.mr` et `https://www.bcm.mr` sont deux origines distinctes pour le navigateur — les deux si le site répond sur les deux).
+2. Retirer `INTERNAL_ACCESS_USERNAME`/`PASSWORD` une fois l'accès interne devenu inutile.
+3. Suivre `docs/INTEGRATION_EQUIPE_BCM.md` pour la balise `<script>` à transmettre à l'équipe technique BCM.

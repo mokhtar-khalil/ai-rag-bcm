@@ -28,6 +28,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from api.providers import (
     stream_answer,
     answer_with_provider,
+    plan_queries_gemini,
     plan_queries_openai,
     rerank_openai,
     resolve_provider,
@@ -128,6 +129,16 @@ def _source_excerpt(text: str, question: str, limit: int = 420) -> str:
             best_start = start
     excerpt = compact[best_start : best_start + limit].strip()
     return f"{'… ' if best_start else ''}{excerpt}{' …' if best_start + limit < len(compact) else ''}"
+
+
+# La reformulation reste un appel LLM générique (elle ne renvoie qu'une
+# reformulation de la question, jamais un extrait du rapport) : elle ne
+# dépend donc d'aucune capacité propre à un fournisseur et peut tourner sur
+# n'importe lequel de ceux qui exposent une sortie JSON structurée. Les noms
+# des fonctions sont résolus au moment de l'appel (jamais figés dans un
+# dictionnaire au chargement du module) afin que les tests puissent toujours
+# les remplacer par un double via monkeypatch.
+_QUERY_PLANNING_PROVIDERS = {"openai", "gemini"}
 
 
 def _needs_query_planning(results: list[dict[str, Any]], question: str) -> bool:
@@ -1190,14 +1201,18 @@ def create_app(
         # Étape 2 : si les premiers résultats sont fragiles, le planificateur crée
         # plusieurs reformulations. Chaque variante est recherchée séparément.
         if (
-            provider == "openai"
+            provider in _QUERY_PLANNING_PROVIDERS
             and not confirmed_scope
             and not followup
             and _needs_query_planning(result_sets[0], retrieval_question)
         ):
             yield ("stage", "reformulation")
             try:
-                query_plan = plan_queries_openai(retrieval_question, settings)
+                query_plan = (
+                    plan_queries_openai(retrieval_question, settings)
+                    if provider == "openai"
+                    else plan_queries_gemini(retrieval_question, settings)
+                )
                 known_queries = {base_retrieval_query.casefold()}
                 for planned_question in query_plan["queries"]:
                     planned_query = build_retrieval_query(
