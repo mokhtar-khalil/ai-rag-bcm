@@ -109,6 +109,144 @@ QUERY_EXPANSIONS: tuple[tuple[tuple[str, ...], str], ...] = (
 )
 
 
+# Extrait de « LISTE DES ABRÉVIATIONS » (Rapport annuel 2025, p. 12) : un
+# sigle officiel du rapport résolu vers son développé, et réciproquement.
+# Contrairement au glossaire colloquial ci-dessus, cette table est fermée et
+# entièrement dérivée du document — aucune supposition sur la façon dont un
+# utilisateur formule sa question. Elle corrige un angle mort précis : « PIB »
+# n'a par exemple aucune chance de croiser lexicalement le passage qui donne
+# son montant, rédigé en toutes lettres (« produit intérieur brut »). « PDF »
+# est exclu : il entre en collision avec le format de citation interne
+# (« p. PDF N ») et ne désigne ici aucune notion utile aux questions posées.
+REPORT_ACRONYMS: dict[str, str] = {
+    "ACH": "Chambre de compensation automatique",
+    "AFD": "Agence Française de Développement",
+    "AFI": "Alliance pour l’Inclusion Financière",
+    "AFRITAC": "Africa Technical Assistance Center",
+    "ANSADE": "Agence Nationale de la Statistique et de l’Analyse Démographique",
+    "APAM": "Association des Professionnels d’Assurance de Mauritanie",
+    "ATS": "Automated Transfer System",
+    "BAD": "Banque Africaine de Développement",
+    "BCE": "Banque Centrale Européenne",
+    "BCK": "Banque Centrale de Koweït",
+    "BCM": "Banque Centrale de Mauritanie",
+    "BICR": "Bureau d’Informations sur le Crédit",
+    "BID": "Banque Islamique de Développement",
+    "BIT": "Bon Islamique de Trésor",
+    "BM": "Banque Mondiale",
+    "BoE": "Banque d’Angleterre",
+    "BoJ": "Banque du Japon",
+    "BSA": "Bank Supervision Application",
+    "CAF": "Coût, Assurance et Fret",
+    "CAPEC": "Caisses populaires d’Épargne et de Crédit",
+    "CBDC": "Monnaie numérique de banque centrale",
+    "CBS": "Core Banking System",
+    "CEEM": "Centre d’Études en Économie Monétaire",
+    "CPM": "Conseil de Politique Monétaire",
+    "CPRSF": "Comité de Prévention des Risques Systémiques et de la Stabilité Financière",
+    "CSD": "Central Securities Depository",
+    "CSPCT": "Conseil des Systèmes de Paiement, de Compensation et de Règlement des Titres",
+    "DA": "Dinar Arabe",
+    "DGD": "Direction Générale des Douanes",
+    "DGSBSF": "Direction Générale de la Supervision Bancaire et de la Stabilité Financière",
+    "DTS": "Droits de Tirage Spéciaux",
+    "eKYC": "Electronic Know Your Customer, ou identification électronique du client",
+    "EMEs": "Établissements de Monnaie Électronique",
+    "ESG": "Environnement, Social et Gouvernance",
+    "ESRS": "European Sustainability Reporting Standards",
+    "FAD": "Fonds Africain de Développement",
+    "FADEA": "Fonds d’Abu Dhabi pour le Développement Économique Arabe",
+    "FADES": "Fonds Arabe pour le Développement Économique et Social",
+    "FEC": "Facilité élargie de crédit",
+    "FED": "Réserve Fédérale des États-Unis",
+    "FIDA": "Fonds International de Développement Agricole",
+    "FKDEA": "Fonds Koweïtien pour Développement Économique Arabe",
+    "FMA": "Fonds monétaire arabe",
+    "FMI": "Fonds monétaire international",
+    "FNRH": "Fonds National des Revenus des Hydrocarbures",
+    "FOB": "Free On Board",
+    "FPSO": "Floating Production Storage and Offloading",
+    "FRD": "Fond de Résilience et Durabilité",
+    "FTSE": "Footsie",
+    "FVI": "Finance Verte Inclusive",
+    "GAFI": "Groupe d’Action Financière",
+    "GES": "Gaz à Effet de Serre",
+    "GIMTEL": "Groupement Interbancaire de Monétique et des Transactions Électroniques",
+    "GTA": "Grand Tortue Ahmeyim",
+    "HTM": "Held-To-Maturity (Titres détenus jusqu’à échéance)",
+    "HTCS": "Held-To-Collect-and-Sell (Titres détenus pour collecte et vente)",
+    "IA": "Intelligence artificielle",
+    "IAS": "International Accounting Standards",
+    "IDA": "Association Internationale de Développement",
+    "IDE": "Investissements directs étrangers",
+    "IFRS": "International Financial Reporting Standards",
+    "IMF": "Institution de Microfinance",
+    "LBC-FT": "Lutte contre le blanchiment de capitaux et le financement du terrorisme",
+    "LCR": "Liquidité à court terme",
+    "LFI": "Loi de Finances Initiale",
+    "LPRC": "Loan Prime Rate",
+    "MA": "Ministère de l’Agriculture",
+    "MCM": "Société des Mines de Cuivre de Mauritanie",
+    "MDRI": "Multilateral Debt Relief Initiative",
+    "ME": "Ministère de l’Élevage",
+    "MENAFAT": "Groupe d’Action Financière Moyen-Orient et Afrique du Nord",
+    "MF": "Ministère des Finances",
+    "MIB": "Marché Interbancaire de Change",
+    "MPMEs": "Micro, petites et moyennes entreprises",
+    "NEET": "Not in Employment, Éducation or Training",
+    "MRU": "Ouguiya, monnaie nationale de la Mauritanie",
+    "NSFR": "Liquidité à court terme et à long terme",
+    "ODD": "Objectifs de Développement Durable",
+    "OPEP": "Organisation des Pays Exportateurs de Pétrole",
+    "PAMIF": "Projet d’Appui à la Modernisation de l’Infrastructure Financière",
+    "PAFIID": "Programme d’Appui à la Finance Innovante, Inclusive et Durable",
+    "PIB": "Produit Intérieur Brut",
+    "PROCAPEC": "Agence Nationale de Promotion des Caisses Populaires de Crédit et d’Épargne",
+    "RTGS": "Système de règlement brut en temps réel",
+    "ROA": "Rendement des Actifs (Return on Assets)",
+    "ROE": "Rendement des Capitaux Propres (Return on Equity)",
+    "RSE": "Responsabilité Sociale des Entreprises",
+    "SAR": "Riyal Saoudien",
+    "SASB": "Sustainability Accounting Standards Board",
+    "SCAPP": "Stratégie de Croissance Accélérée et de Prospérité Partagée",
+    "SFI": "Société Financière Internationale",
+    "SMCP": "Société Mauritanienne de Commercialisation de Poissons",
+    "SNEF": "Stratégie Nationale d’Éducation Financière",
+    "SNIF": "Stratégie Nationale d’Inclusion Financière",
+    "SNIM": "Société Nationale Industrielle et Minière",
+    "SNP": "Système National de Paiement",
+    "SNPN": "Stratégie Nationale de Paiement Numérique",
+    "SOMELEC": "Société Mauritanienne de l’Électricité",
+    "TASIAST": "Société des Mines de Tasiast",
+    "TVA": "Taxe sur la valeur ajoutée",
+    "USD": "Dollar américain",
+}
+
+# Sigles de deux lettres exclus du sens sigle → développé : « MA », « ME »,
+# « DA », « IA », « BM », « MF » croisent des mots français courants
+# (« ma », « me », « da »...). La correspondance sur le sigle exige déjà la
+# casse exacte et une frontière de mot, ce qui écarte l'essentiel du risque,
+# mais un sigle de deux lettres reste trop court pour l'exclure entièrement à
+# la casse près. Le sens développé → sigle reste actif pour ces entrées : une
+# question qui nomme « Banque Mondiale » en toutes lettres profite quand même
+# de l'ajout de « BM ».
+_MIN_ACRONYM_LENGTH_FOR_FORWARD_MATCH = 3
+
+
+def _expand_report_acronyms(question: str) -> list[str]:
+    """Ajoute le développé d'un sigle du rapport, ou l'inverse, sans appel LLM."""
+    additions: list[str] = []
+    folded_question = _fold(question)
+    for acronym, expansion in REPORT_ACRONYMS.items():
+        if len(acronym) >= _MIN_ACRONYM_LENGTH_FOR_FORWARD_MATCH and re.search(
+            rf"\b{re.escape(acronym)}\b", question
+        ):
+            additions.append(expansion)
+        elif _fold(expansion) in folded_question:
+            additions.append(acronym)
+    return additions
+
+
 def _fold(text: str) -> str:
     """Produit une version sans accents ni distinction de casse."""
     normalized = unicodedata.normalize("NFKD", text.casefold())
@@ -130,6 +268,7 @@ def build_retrieval_query(question: str) -> str:
         for triggers, expansion in QUERY_EXPANSIONS
         if any(trigger in folded for trigger in triggers)
     ]
+    additions.extend(_expand_report_acronyms(normalized))
     # Un même mot peut désigner plusieurs périmètres dans un rapport bancaire.
     # L'expansion conserve volontairement les deux familles de sens ; le système
     # demandera ensuite une clarification au lieu d'en privilégier une en dur.

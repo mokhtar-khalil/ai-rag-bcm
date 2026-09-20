@@ -1,0 +1,7321 @@
+{
+  "created_at": "2026-09-20T17:50:32.820025+00:00",
+  "mode": "hybrid",
+  "index_metadata": {
+    "index_schema_version": 10,
+    "report_title": "Rapport annuel BCM - exercice 2025",
+    "report_file": "Rapport annuel 2025-BCM.pdf",
+    "report_sha256": "351ca37b009580794234ccff170581930ee53581d327600a86f8c5191a7b4884",
+    "pdf_pages": 127,
+    "documents": 8,
+    "pages_par_source": {
+      "lettre": 43,
+      "pdf": 127
+    },
+    "chunks": 2595,
+    "semantic_index": true,
+    "corpus_fingerprint": {
+      "Rapport annuel 2025-BCM.pdf": "351ca37b009580794234ccff170581930ee53581d327600a86f8c5191a7b4884",
+      "ocr/BCM-lettre-information-2026-01-janvier.json": "be9edc462f4070c84ba2e2dd0f68cf6188c9bd639d31ba6635ac366c47f384e8",
+      "ocr/BCM-lettre-information-2026-02-fevrier.json": "ac5856828e9a8eac6636b006eec23f51c154588303b9f71717a141ab79181c78",
+      "ocr/BCM-lettre-information-2026-03-mars.json": "0f627c65448f1f53cdb85a8d6e36b5abe78683fcad0b7ced64eb90a8e2bd8dbe",
+      "ocr/BCM-lettre-information-2026-04-avril.json": "b5132668fd6b2e9f01ddc6bb802dd9f01fcd4d3254f5d1affa3a82a234a22354",
+      "ocr/BCM-lettre-information-2026-05-mai.json": "13614845076aee3dc20a99fa185833add06fb807c3e164789313db9f2e022f3d",
+      "ocr/BCM-lettre-information-2026-06-juin.json": "a377ce4fbede0b9f3872b370c4f15c6e3eaf0a9beec35948abe8bdb04867996e",
+      "ocr/BCM-lettre-information-2026-07-juillet.json": "a8bbd94f9a30479e249b23c2a32edb194f3f2778b8dd886bd44de433395c0a9f"
+    },
+    "embedding_dimensions": 384
+  },
+  "metrics": {
+    "cases": 191,
+    "answerable_cases": 185,
+    "unanswerable_cases": 6,
+    "hit_at_1": 0.6865,
+    "hit_at_3": 0.8541,
+    "hit_at_5": 0.9243,
+    "hit_at_12": 0.9622,
+    "mrr": 0.7823,
+    "answerable_acceptance": 1.0,
+    "grounded_hit_at_5": 0.9243,
+    "refusal_accuracy": 1.0,
+    "success_by_difficulty": {
+      "absent": 1.0,
+      "ambigue": 1.0,
+      "direct": 0.9407,
+      "liste": 0.8571,
+      "paraphrase": 0.9091,
+      "raisonnement": 0.95
+    }
+  },
+  "details": [
+    {
+      "id": "gdp_01",
+      "question": "Quel a été le taux de croissance du PIB réel en Mauritanie en 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        5,
+        21,
+        121
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 5,
+          "score": 0.5483,
+          "chunk_id": 13
+        },
+        {
+          "page": 5,
+          "score": 0.6251,
+          "chunk_id": 25
+        },
+        {
+          "page": 23,
+          "score": 0.4538,
+          "chunk_id": 549
+        },
+        {
+          "page": 60,
+          "score": 0.4395,
+          "chunk_id": 1145
+        },
+        {
+          "page": 106,
+          "score": 0.4383,
+          "chunk_id": 1768
+        }
+      ]
+    },
+    {
+      "id": "gdp_02",
+      "question": "De combien l'activité économique mauritanienne a-t-elle progressé en volume durant l'exercice ?",
+      "difficulty": "paraphrase",
+      "expected_pages": [
+        5,
+        21,
+        121
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 5,
+          "score": 0.5408,
+          "chunk_id": 13
+        },
+        {
+          "page": 5,
+          "score": 0.5035,
+          "chunk_id": 27
+        },
+        {
+          "page": 12,
+          "score": 0.4603,
+          "chunk_id": 359
+        },
+        {
+          "page": 2,
+          "score": 0.4334,
+          "chunk_id": 1
+        },
+        {
+          "page": 23,
+          "score": 0.4275,
+          "chunk_id": 549
+        }
+      ]
+    },
+    {
+      "id": "gdp_03",
+      "question": "La croissance a-t-elle accéléré ou ralenti entre 2024 et 2025, et de combien ?",
+      "difficulty": "raisonnement",
+      "expected_pages": [
+        5,
+        21
+      ],
+      "first_expected_rank": 5,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 13,
+          "score": 0.5,
+          "chunk_id": 377
+        },
+        {
+          "page": 13,
+          "score": 0.4714,
+          "chunk_id": 379
+        },
+        {
+          "page": 23,
+          "score": 0.4543,
+          "chunk_id": 547
+        },
+        {
+          "page": 4,
+          "score": 0.4465,
+          "chunk_id": 3
+        },
+        {
+          "page": 5,
+          "score": 0.4493,
+          "chunk_id": 13
+        }
+      ]
+    },
+    {
+      "id": "inflation_01",
+      "question": "Quel a été le taux d'inflation moyen en Mauritanie en 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        5,
+        23
+      ],
+      "first_expected_rank": 3,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 20608,
+          "score": 0.4824,
+          "chunk_id": 2577
+        },
+        {
+          "page": 25,
+          "score": 0.4714,
+          "chunk_id": 626
+        },
+        {
+          "page": 5,
+          "score": 0.4594,
+          "chunk_id": 17
+        },
+        {
+          "page": 25,
+          "score": 0.4526,
+          "chunk_id": 625
+        },
+        {
+          "page": 20603,
+          "score": 0.4514,
+          "chunk_id": 2549
+        }
+      ]
+    },
+    {
+      "id": "inflation_02",
+      "question": "À quel rythme les prix à la consommation ont-ils augmenté en moyenne pendant l'année ?",
+      "difficulty": "paraphrase",
+      "expected_pages": [
+        5,
+        23
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 23,
+          "score": 0.5552,
+          "chunk_id": 549
+        },
+        {
+          "page": 23,
+          "score": 0.4561,
+          "chunk_id": 550
+        },
+        {
+          "page": 23,
+          "score": 0.451,
+          "chunk_id": 570
+        },
+        {
+          "page": 20611,
+          "score": 0.4678,
+          "chunk_id": 2588
+        },
+        {
+          "page": 5,
+          "score": 0.445,
+          "chunk_id": 37
+        }
+      ]
+    },
+    {
+      "id": "reserves_01",
+      "question": "Quel était le niveau des réserves officielles brutes fin décembre 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        5
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 5,
+          "score": 0.6339,
+          "chunk_id": 47
+        },
+        {
+          "page": 50,
+          "score": 0.4646,
+          "chunk_id": 1005
+        },
+        {
+          "page": 5,
+          "score": 0.4849,
+          "chunk_id": 21
+        },
+        {
+          "page": 51,
+          "score": 0.4576,
+          "chunk_id": 1011
+        },
+        {
+          "page": 20602,
+          "score": 0.4489,
+          "chunk_id": 2541
+        }
+      ]
+    },
+    {
+      "id": "reserves_02",
+      "question": "De quel coussin en devises le pays disposait-il pour couvrir ses achats extérieurs hors extractif à la fin de l'année ?",
+      "difficulty": "paraphrase",
+      "expected_pages": [
+        5
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 5,
+          "score": 0.5177,
+          "chunk_id": 21
+        },
+        {
+          "page": 56,
+          "score": 0.471,
+          "chunk_id": 1101
+        },
+        {
+          "page": 5,
+          "score": 0.5254,
+          "chunk_id": 47
+        },
+        {
+          "page": 20606,
+          "score": 0.4344,
+          "chunk_id": 2564
+        },
+        {
+          "page": 20602,
+          "score": 0.4352,
+          "chunk_id": 2541
+        }
+      ]
+    },
+    {
+      "id": "money_01",
+      "question": "Quelle part de la masse monétaire était constituée de dépôts à vue ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        31
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 31,
+          "score": 0.5631,
+          "chunk_id": 735
+        },
+        {
+          "page": 31,
+          "score": 0.537,
+          "chunk_id": 734
+        },
+        {
+          "page": 118,
+          "score": 0.4478,
+          "chunk_id": 2166
+        },
+        {
+          "page": 44,
+          "score": 0.4486,
+          "chunk_id": 924
+        },
+        {
+          "page": 113,
+          "score": 0.4386,
+          "chunk_id": 1952
+        }
+      ]
+    },
+    {
+      "id": "money_02",
+      "question": "Quelle forme de liquidité dominait l'encours monétaire et dans quelle proportion ?",
+      "difficulty": "paraphrase",
+      "expected_pages": [
+        31
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 31,
+          "score": 0.5355,
+          "chunk_id": 735
+        },
+        {
+          "page": 44,
+          "score": 0.4775,
+          "chunk_id": 933
+        },
+        {
+          "page": 44,
+          "score": 0.4547,
+          "chunk_id": 923
+        },
+        {
+          "page": 25,
+          "score": 0.4427,
+          "chunk_id": 628
+        },
+        {
+          "page": 25,
+          "score": 0.4385,
+          "chunk_id": 627
+        }
+      ]
+    },
+    {
+      "id": "treasury_01",
+      "question": "Quel était l'encours global des valeurs du Trésor à fin décembre 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        27
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 27,
+          "score": 0.6221,
+          "chunk_id": 652
+        },
+        {
+          "page": 27,
+          "score": 0.5175,
+          "chunk_id": 649
+        },
+        {
+          "page": 7,
+          "score": 0.471,
+          "chunk_id": 68
+        },
+        {
+          "page": 7,
+          "score": 0.4813,
+          "chunk_id": 67
+        },
+        {
+          "page": 25,
+          "score": 0.4556,
+          "chunk_id": 624
+        }
+      ]
+    },
+    {
+      "id": "treasury_02",
+      "question": "À combien s'élevait le stock de titres publics mauritaniens à la clôture de l'exercice ?",
+      "difficulty": "paraphrase",
+      "expected_pages": [
+        27
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 27,
+          "score": 0.5637,
+          "chunk_id": 652
+        },
+        {
+          "page": 27,
+          "score": 0.4795,
+          "chunk_id": 649
+        },
+        {
+          "page": 2,
+          "score": 0.4366,
+          "chunk_id": 1
+        },
+        {
+          "page": 25,
+          "score": 0.4353,
+          "chunk_id": 624
+        },
+        {
+          "page": 28,
+          "score": 0.4485,
+          "chunk_id": 679
+        }
+      ]
+    },
+    {
+      "id": "solvency_01",
+      "question": "Quel était le ratio moyen de solvabilité des banques en 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        34,
+        42
+      ],
+      "first_expected_rank": 2,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 38,
+          "score": 0.4785,
+          "chunk_id": 846
+        },
+        {
+          "page": 34,
+          "score": 0.476,
+          "chunk_id": 769
+        },
+        {
+          "page": 42,
+          "score": 0.489,
+          "chunk_id": 900
+        },
+        {
+          "page": 20603,
+          "score": 0.4394,
+          "chunk_id": 2549
+        },
+        {
+          "page": 34,
+          "score": 0.4515,
+          "chunk_id": 783
+        }
+      ]
+    },
+    {
+      "id": "solvency_02",
+      "question": "Les fonds propres réglementaires couvraient-ils les risques bancaires à quel niveau moyen ?",
+      "difficulty": "paraphrase",
+      "expected_pages": [
+        34,
+        42
+      ],
+      "first_expected_rank": 4,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 38,
+          "score": 0.5183,
+          "chunk_id": 846
+        },
+        {
+          "page": 38,
+          "score": 0.4942,
+          "chunk_id": 847
+        },
+        {
+          "page": 38,
+          "score": 0.4972,
+          "chunk_id": 854
+        },
+        {
+          "page": 34,
+          "score": 0.4803,
+          "chunk_id": 769
+        },
+        {
+          "page": 42,
+          "score": 0.4997,
+          "chunk_id": 900
+        }
+      ]
+    },
+    {
+      "id": "banks_01",
+      "question": "À combien s'élevait le total des actifs du secteur bancaire fin 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        40
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 40,
+          "score": 0.5918,
+          "chunk_id": 879
+        },
+        {
+          "page": 39,
+          "score": 0.4568,
+          "chunk_id": 866
+        },
+        {
+          "page": 7,
+          "score": 0.4618,
+          "chunk_id": 81
+        },
+        {
+          "page": 40,
+          "score": 0.4772,
+          "chunk_id": 877
+        },
+        {
+          "page": 7,
+          "score": 0.4506,
+          "chunk_id": 69
+        }
+      ]
+    },
+    {
+      "id": "banks_02",
+      "question": "Quelle était la taille du bilan agrégé des établissements bancaires à la fin de l'année ?",
+      "difficulty": "paraphrase",
+      "expected_pages": [
+        40
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 40,
+          "score": 0.5682,
+          "chunk_id": 879
+        },
+        {
+          "page": 38,
+          "score": 0.4554,
+          "chunk_id": 846
+        },
+        {
+          "page": 40,
+          "score": 0.4976,
+          "chunk_id": 880
+        },
+        {
+          "page": 39,
+          "score": 0.4414,
+          "chunk_id": 866
+        },
+        {
+          "page": 33,
+          "score": 0.438,
+          "chunk_id": 757
+        }
+      ]
+    },
+    {
+      "id": "npl_01",
+      "question": "Quel était le taux de sinistralité du portefeuille bancaire en 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        41
+      ],
+      "first_expected_rank": 3,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 43,
+          "score": 0.4823,
+          "chunk_id": 908
+        },
+        {
+          "page": 25,
+          "score": 0.4413,
+          "chunk_id": 627
+        },
+        {
+          "page": 41,
+          "score": 0.4488,
+          "chunk_id": 886
+        },
+        {
+          "page": 33,
+          "score": 0.4313,
+          "chunk_id": 753
+        },
+        {
+          "page": 20603,
+          "score": 0.4335,
+          "chunk_id": 2549
+        }
+      ]
+    },
+    {
+      "id": "npl_02",
+      "question": "Quelle proportion des crédits présentait des difficultés de remboursement ?",
+      "difficulty": "paraphrase",
+      "expected_pages": [
+        41
+      ],
+      "first_expected_rank": 8,
+      "relevant": true,
+      "success_at_5_or_refusal": false,
+      "top_results": [
+        {
+          "page": 39,
+          "score": 0.4924,
+          "chunk_id": 861
+        },
+        {
+          "page": 106,
+          "score": 0.446,
+          "chunk_id": 1769
+        },
+        {
+          "page": 20407,
+          "score": 0.4481,
+          "chunk_id": 2499
+        },
+        {
+          "page": 105,
+          "score": 0.436,
+          "chunk_id": 1764
+        },
+        {
+          "page": 32,
+          "score": 0.4302,
+          "chunk_id": 745
+        }
+      ]
+    },
+    {
+      "id": "insurance_01",
+      "question": "Quelle branche représentait plus de 74 % des contrats d'assurance ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        47
+      ],
+      "first_expected_rank": 2,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 46,
+          "score": 0.4438,
+          "chunk_id": 955
+        },
+        {
+          "page": 47,
+          "score": 0.6159,
+          "chunk_id": 981
+        },
+        {
+          "page": 46,
+          "score": 0.434,
+          "chunk_id": 954
+        },
+        {
+          "page": 47,
+          "score": 0.4223,
+          "chunk_id": 978
+        },
+        {
+          "page": 48,
+          "score": 0.4204,
+          "chunk_id": 1000
+        }
+      ]
+    },
+    {
+      "id": "gas_01",
+      "question": "Quel montant les exportations de gaz du projet Grand Tortue Ahmeyim ont-elles atteint en 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        5,
+        55
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 55,
+          "score": 0.582,
+          "chunk_id": 1048
+        },
+        {
+          "page": 55,
+          "score": 0.6153,
+          "chunk_id": 1060
+        },
+        {
+          "page": 5,
+          "score": 0.5405,
+          "chunk_id": 15
+        },
+        {
+          "page": 5,
+          "score": 0.5126,
+          "chunk_id": 14
+        },
+        {
+          "page": 18,
+          "score": 0.4317,
+          "chunk_id": 482
+        }
+      ]
+    },
+    {
+      "id": "gas_02",
+      "question": "Combien le premier envoi de GNL a-t-il rapporté au pays pendant l'exercice ?",
+      "difficulty": "paraphrase",
+      "expected_pages": [
+        5,
+        55
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 55,
+          "score": 0.6118,
+          "chunk_id": 1048
+        },
+        {
+          "page": 5,
+          "score": 0.5658,
+          "chunk_id": 15
+        },
+        {
+          "page": 55,
+          "score": 0.5123,
+          "chunk_id": 1049
+        },
+        {
+          "page": 5,
+          "score": 0.5299,
+          "chunk_id": 14
+        },
+        {
+          "page": 55,
+          "score": 0.4293,
+          "chunk_id": 1064
+        }
+      ]
+    },
+    {
+      "id": "current_account_01",
+      "question": "Quel était le déficit du compte courant en 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        5,
+        54
+      ],
+      "first_expected_rank": 4,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 106,
+          "score": 0.439,
+          "chunk_id": 1768
+        },
+        {
+          "page": 56,
+          "score": 0.4392,
+          "chunk_id": 1098
+        },
+        {
+          "page": 8,
+          "score": 0.5599,
+          "chunk_id": 103
+        },
+        {
+          "page": 5,
+          "score": 0.4902,
+          "chunk_id": 20
+        },
+        {
+          "page": 20603,
+          "score": 0.4358,
+          "chunk_id": 2549
+        }
+      ]
+    },
+    {
+      "id": "current_account_02",
+      "question": "De combien les échanges courants avec l'extérieur étaient-ils déficitaires après leur amélioration ?",
+      "difficulty": "paraphrase",
+      "expected_pages": [
+        5,
+        54
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 5,
+          "score": 0.4897,
+          "chunk_id": 20
+        },
+        {
+          "page": 45,
+          "score": 0.4413,
+          "chunk_id": 938
+        },
+        {
+          "page": 56,
+          "score": 0.4352,
+          "chunk_id": 1105
+        },
+        {
+          "page": 54,
+          "score": 0.4622,
+          "chunk_id": 1030
+        },
+        {
+          "page": 56,
+          "score": 0.4372,
+          "chunk_id": 1092
+        }
+      ]
+    },
+    {
+      "id": "budget_01",
+      "question": "À combien s'est établi le déficit budgétaire en 2025 par rapport à 2024 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        5,
+        60
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 60,
+          "score": 0.5187,
+          "chunk_id": 1152
+        },
+        {
+          "page": 18,
+          "score": 0.4929,
+          "chunk_id": 494
+        },
+        {
+          "page": 5,
+          "score": 0.4782,
+          "chunk_id": 15
+        },
+        {
+          "page": 59,
+          "score": 0.4736,
+          "chunk_id": 1136
+        },
+        {
+          "page": 60,
+          "score": 0.4795,
+          "chunk_id": 1144
+        }
+      ]
+    },
+    {
+      "id": "revenue_01",
+      "question": "Quel montant de recettes budgétaires l'État a-t-il collecté à fin décembre 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        5,
+        59
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 59,
+          "score": 0.5628,
+          "chunk_id": 1134
+        },
+        {
+          "page": 5,
+          "score": 0.5047,
+          "chunk_id": 15
+        },
+        {
+          "page": 59,
+          "score": 0.4763,
+          "chunk_id": 1142
+        },
+        {
+          "page": 32,
+          "score": 0.4626,
+          "chunk_id": 744
+        },
+        {
+          "page": 50,
+          "score": 0.4518,
+          "chunk_id": 1005
+        }
+      ]
+    },
+    {
+      "id": "debt_01",
+      "question": "Quelle devise occupait la première place dans l'encours de la dette en 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        61
+      ],
+      "first_expected_rank": 2,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 60,
+          "score": 0.4885,
+          "chunk_id": 1148
+        },
+        {
+          "page": 61,
+          "score": 0.4542,
+          "chunk_id": 1177
+        },
+        {
+          "page": 60,
+          "score": 0.4378,
+          "chunk_id": 1145
+        },
+        {
+          "page": 62,
+          "score": 0.4394,
+          "chunk_id": 1210
+        },
+        {
+          "page": 62,
+          "score": 0.4368,
+          "chunk_id": 1215
+        }
+      ]
+    },
+    {
+      "id": "payments_01",
+      "question": "Pourquoi la BCM a-t-elle conçu une cartographie des risques de ses plateformes de paiement ?",
+      "difficulty": "raisonnement",
+      "expected_pages": [
+        65
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 65,
+          "score": 0.5453,
+          "chunk_id": 1256
+        },
+        {
+          "page": 65,
+          "score": 0.4563,
+          "chunk_id": 1258
+        },
+        {
+          "page": 64,
+          "score": 0.4678,
+          "chunk_id": 1250
+        },
+        {
+          "page": 64,
+          "score": 0.4497,
+          "chunk_id": 1251
+        },
+        {
+          "page": 20403,
+          "score": 0.4438,
+          "chunk_id": 2480
+        }
+      ]
+    },
+    {
+      "id": "cash_01",
+      "question": "Quel montant les opérations de retrait fiduciaire ont-elles atteint en 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        66
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 66,
+          "score": 0.4989,
+          "chunk_id": 1263
+        },
+        {
+          "page": 68,
+          "score": 0.455,
+          "chunk_id": 1291
+        },
+        {
+          "page": 56,
+          "score": 0.4447,
+          "chunk_id": 1098
+        },
+        {
+          "page": 60,
+          "score": 0.4401,
+          "chunk_id": 1145
+        },
+        {
+          "page": 67,
+          "score": 0.4397,
+          "chunk_id": 1267
+        }
+      ]
+    },
+    {
+      "id": "fintech_01",
+      "question": "À quoi sert la sandbox réglementaire mise en place pour les fintechs ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        71
+      ],
+      "first_expected_rank": 3,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 70,
+          "score": 0.4942,
+          "chunk_id": 1318
+        },
+        {
+          "page": 93,
+          "score": 0.4776,
+          "chunk_id": 1583
+        },
+        {
+          "page": 71,
+          "score": 0.4556,
+          "chunk_id": 1327
+        },
+        {
+          "page": 73,
+          "score": 0.4452,
+          "chunk_id": 1362
+        },
+        {
+          "page": 65,
+          "score": 0.4379,
+          "chunk_id": 1258
+        }
+      ]
+    },
+    {
+      "id": "it_01",
+      "question": "Quels projets informatiques la BCM prévoyait-elle de lancer ou poursuivre en 2026 ?",
+      "difficulty": "liste",
+      "expected_pages": [
+        75
+      ],
+      "first_expected_rank": 9,
+      "relevant": true,
+      "success_at_5_or_refusal": false,
+      "top_results": [
+        {
+          "page": 20101,
+          "score": 0.4919,
+          "chunk_id": 2421
+        },
+        {
+          "page": 20402,
+          "score": 0.4799,
+          "chunk_id": 2476
+        },
+        {
+          "page": 81,
+          "score": 0.4756,
+          "chunk_id": 1413
+        },
+        {
+          "page": 73,
+          "score": 0.4705,
+          "chunk_id": 1367
+        },
+        {
+          "page": 51,
+          "score": 0.4739,
+          "chunk_id": 1025
+        }
+      ]
+    },
+    {
+      "id": "strategy_01",
+      "question": "Quels sont les axes prioritaires de la stratégie de modernisation 2024-2027 ?",
+      "difficulty": "liste",
+      "expected_pages": [
+        80
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 80,
+          "score": 0.5432,
+          "chunk_id": 1407
+        },
+        {
+          "page": 86,
+          "score": 0.5309,
+          "chunk_id": 1505
+        },
+        {
+          "page": 80,
+          "score": 0.51,
+          "chunk_id": 1399
+        },
+        {
+          "page": 51,
+          "score": 0.4622,
+          "chunk_id": 1025
+        },
+        {
+          "page": 56,
+          "score": 0.4442,
+          "chunk_id": 1098
+        }
+      ]
+    },
+    {
+      "id": "esg_01",
+      "question": "Quelle démarche environnementale et sociale la BCM a-t-elle engagée en 2025 ?",
+      "difficulty": "paraphrase",
+      "expected_pages": [
+        84
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 84,
+          "score": 0.5692,
+          "chunk_id": 1466
+        },
+        {
+          "page": 86,
+          "score": 0.5021,
+          "chunk_id": 1501
+        },
+        {
+          "page": 84,
+          "score": 0.4824,
+          "chunk_id": 1467
+        },
+        {
+          "page": 80,
+          "score": 0.5098,
+          "chunk_id": 1404
+        },
+        {
+          "page": 20603,
+          "score": 0.4753,
+          "chunk_id": 2548
+        }
+      ]
+    },
+    {
+      "id": "ifrs_01",
+      "question": "Quel impact la norme IFRS 18 devrait-elle avoir sur les états financiers ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        99,
+        100
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 99,
+          "score": 0.5267,
+          "chunk_id": 1634
+        },
+        {
+          "page": 100,
+          "score": 0.5121,
+          "chunk_id": 1675
+        },
+        {
+          "page": 99,
+          "score": 0.5426,
+          "chunk_id": 1631
+        },
+        {
+          "page": 99,
+          "score": 0.5103,
+          "chunk_id": 1674
+        },
+        {
+          "page": 12,
+          "score": 0.4691,
+          "chunk_id": 358
+        }
+      ]
+    },
+    {
+      "id": "risk_01",
+      "question": "D'où proviennent les risques opérationnels non financiers auxquels la BCM est exposée ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        108
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 108,
+          "score": 0.579,
+          "chunk_id": 1786
+        },
+        {
+          "page": 108,
+          "score": 0.4737,
+          "chunk_id": 1787
+        },
+        {
+          "page": 20402,
+          "score": 0.4491,
+          "chunk_id": 2476
+        },
+        {
+          "page": 65,
+          "score": 0.4474,
+          "chunk_id": 1258
+        },
+        {
+          "page": 98,
+          "score": 0.4471,
+          "chunk_id": 1623
+        }
+      ]
+    },
+    {
+      "id": "foreign_deposits_01",
+      "question": "Pourquoi les dépôts à terme en monnaie étrangère de la BCM ont-ils diminué en 2025 ?",
+      "difficulty": "raisonnement",
+      "expected_pages": [
+        110
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 110,
+          "score": 0.5216,
+          "chunk_id": 1796
+        },
+        {
+          "page": 110,
+          "score": 0.4713,
+          "chunk_id": 1797
+        },
+        {
+          "page": 106,
+          "score": 0.4712,
+          "chunk_id": 1768
+        },
+        {
+          "page": 106,
+          "score": 0.4782,
+          "chunk_id": 1767
+        },
+        {
+          "page": 98,
+          "score": 0.4589,
+          "chunk_id": 1623
+        }
+      ]
+    },
+    {
+      "id": "bank_customer_deposits_01",
+      "question": "Le montant de dépôt dans les banques : comparaison entre 2024 et 2025",
+      "difficulty": "ambigue",
+      "expected_pages": [
+        33,
+        42
+      ],
+      "first_expected_rank": 2,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 113,
+          "score": 0.5085,
+          "chunk_id": 1952
+        },
+        {
+          "page": 33,
+          "score": 0.4815,
+          "chunk_id": 761
+        },
+        {
+          "page": 114,
+          "score": 0.4959,
+          "chunk_id": 1982
+        },
+        {
+          "page": 44,
+          "score": 0.4438,
+          "chunk_id": 932
+        },
+        {
+          "page": 60,
+          "score": 0.4406,
+          "chunk_id": 1145
+        }
+      ]
+    },
+    {
+      "id": "absent_01",
+      "question": "Quelle est la recette traditionnelle du sushi japonais ?",
+      "difficulty": "absent",
+      "expected_pages": [],
+      "first_expected_rank": null,
+      "relevant": false,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 16,
+          "score": 0.4137,
+          "chunk_id": 427
+        },
+        {
+          "page": 4,
+          "score": 0.3633,
+          "chunk_id": 7
+        },
+        {
+          "page": 4,
+          "score": 0.3596,
+          "chunk_id": 4
+        },
+        {
+          "page": 16,
+          "score": 0.3587,
+          "chunk_id": 423
+        },
+        {
+          "page": 99,
+          "score": 0.374,
+          "chunk_id": 1636
+        }
+      ]
+    },
+    {
+      "id": "absent_02",
+      "question": "Quel temps fera-t-il demain à Nouadhibou ?",
+      "difficulty": "absent",
+      "expected_pages": [],
+      "first_expected_rank": null,
+      "relevant": false,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 22,
+          "score": 0.4218,
+          "chunk_id": 530
+        },
+        {
+          "page": 67,
+          "score": 0.4026,
+          "chunk_id": 1268
+        },
+        {
+          "page": 67,
+          "score": 0.4001,
+          "chunk_id": 1269
+        },
+        {
+          "page": 22,
+          "score": 0.4061,
+          "chunk_id": 529
+        },
+        {
+          "page": 20301,
+          "score": 0.3938,
+          "chunk_id": 2446
+        }
+      ]
+    },
+    {
+      "id": "absent_03",
+      "question": "Qui a remporté la Coupe du monde de football 2026 ?",
+      "difficulty": "absent",
+      "expected_pages": [],
+      "first_expected_rank": null,
+      "relevant": false,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 8,
+          "score": 0.3898,
+          "chunk_id": 88
+        },
+        {
+          "page": 20603,
+          "score": 0.3851,
+          "chunk_id": 2549
+        },
+        {
+          "page": 20501,
+          "score": 0.3854,
+          "chunk_id": 2507
+        },
+        {
+          "page": 20408,
+          "score": 0.3851,
+          "chunk_id": 2504
+        },
+        {
+          "page": 20602,
+          "score": 0.3849,
+          "chunk_id": 2542
+        }
+      ]
+    },
+    {
+      "id": "absent_04",
+      "question": "Quel est le prix actuel d'un billet d'avion Paris-Nouakchott ?",
+      "difficulty": "absent",
+      "expected_pages": [],
+      "first_expected_rank": null,
+      "relevant": false,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 20301,
+          "score": 0.4228,
+          "chunk_id": 2447
+        },
+        {
+          "page": 20603,
+          "score": 0.4159,
+          "chunk_id": 2549
+        },
+        {
+          "page": 20301,
+          "score": 0.4171,
+          "chunk_id": 2446
+        },
+        {
+          "page": 20503,
+          "score": 0.4372,
+          "chunk_id": 2515
+        },
+        {
+          "page": 20001,
+          "score": 0.4098,
+          "chunk_id": 2419
+        }
+      ]
+    },
+    {
+      "id": "absent_05",
+      "question": "Donne-moi le cours exact du bitcoin aujourd'hui.",
+      "difficulty": "absent",
+      "expected_pages": [],
+      "first_expected_rank": null,
+      "relevant": false,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 2,
+          "score": 0.4186,
+          "chunk_id": 1
+        },
+        {
+          "page": 20303,
+          "score": 0.4123,
+          "chunk_id": 2455
+        },
+        {
+          "page": 20301,
+          "score": 0.4098,
+          "chunk_id": 2446
+        },
+        {
+          "page": 20306,
+          "score": 0.4469,
+          "chunk_id": 2466
+        },
+        {
+          "page": 28,
+          "score": 0.4089,
+          "chunk_id": 674
+        }
+      ]
+    },
+    {
+      "id": "absent_06",
+      "question": "Quelle est la population de la ville de Marseille en 2026 ?",
+      "difficulty": "absent",
+      "expected_pages": [],
+      "first_expected_rank": null,
+      "relevant": false,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 24,
+          "score": 0.4548,
+          "chunk_id": 604
+        },
+        {
+          "page": 73,
+          "score": 0.4123,
+          "chunk_id": 1366
+        },
+        {
+          "page": 73,
+          "score": 0.4125,
+          "chunk_id": 1367
+        },
+        {
+          "page": 20603,
+          "score": 0.4093,
+          "chunk_id": 2548
+        },
+        {
+          "page": 20602,
+          "score": 0.4069,
+          "chunk_id": 2541
+        }
+      ]
+    },
+    {
+      "id": "s1_croissance_mondiale",
+      "question": "Quel taux de croissance le FMI a-t-il estimé pour l'économie mondiale en 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        13
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 13,
+          "score": 0.6165,
+          "chunk_id": 370
+        },
+        {
+          "page": 13,
+          "score": 0.5287,
+          "chunk_id": 363
+        },
+        {
+          "page": 89,
+          "score": 0.4547,
+          "chunk_id": 1543
+        },
+        {
+          "page": 16,
+          "score": 0.4498,
+          "chunk_id": 420
+        },
+        {
+          "page": 20304,
+          "score": 0.4656,
+          "chunk_id": 2456
+        }
+      ]
+    },
+    {
+      "id": "s1_chomage_mondial",
+      "question": "Combien de personnes étaient sans emploi dans le monde en 2025 d'après les données citées dans le rapport ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        14
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 14,
+          "score": 0.4941,
+          "chunk_id": 384
+        },
+        {
+          "page": 13,
+          "score": 0.4337,
+          "chunk_id": 370
+        },
+        {
+          "page": 24,
+          "score": 0.4417,
+          "chunk_id": 600
+        },
+        {
+          "page": 119,
+          "score": 0.4358,
+          "chunk_id": 2192
+        },
+        {
+          "page": 24,
+          "score": 0.4312,
+          "chunk_id": 606
+        }
+      ]
+    },
+    {
+      "id": "s1_top_exportateurs",
+      "question": "Quels sont les trois premiers pays exportateurs mondiaux de marchandises en 2025, et quelle part des exportations mondiales représente chacun ?",
+      "difficulty": "liste",
+      "expected_pages": [
+        15
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 15,
+          "score": 0.5189,
+          "chunk_id": 408
+        },
+        {
+          "page": 15,
+          "score": 0.5058,
+          "chunk_id": 401
+        },
+        {
+          "page": 14,
+          "score": 0.4913,
+          "chunk_id": 396
+        },
+        {
+          "page": 14,
+          "score": 0.5035,
+          "chunk_id": 398
+        },
+        {
+          "page": 19,
+          "score": 0.4468,
+          "chunk_id": 504
+        }
+      ]
+    },
+    {
+      "id": "s1_nasdaq",
+      "question": "De combien de points à combien de points le Nasdaq Composite est-il passé au cours de l'année 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        15
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 15,
+          "score": 0.4955,
+          "chunk_id": 403
+        },
+        {
+          "page": 15,
+          "score": 0.4611,
+          "chunk_id": 412
+        },
+        {
+          "page": 20601,
+          "score": 0.4287,
+          "chunk_id": 2539
+        },
+        {
+          "page": 86,
+          "score": 0.4287,
+          "chunk_id": 1491
+        },
+        {
+          "page": 23,
+          "score": 0.4222,
+          "chunk_id": 549
+        }
+      ]
+    },
+    {
+      "id": "s1_boj_taux",
+      "question": "Quelle grande banque centrale a relevé son taux directeur en 2025 alors que la plupart des autres l'abaissaient, et à quel niveau l'a-t-elle porté ?",
+      "difficulty": "raisonnement",
+      "expected_pages": [
+        16
+      ],
+      "first_expected_rank": 2,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 20601,
+          "score": 0.4845,
+          "chunk_id": 2539
+        },
+        {
+          "page": 16,
+          "score": 0.4882,
+          "chunk_id": 423
+        },
+        {
+          "page": 16,
+          "score": 0.5186,
+          "chunk_id": 431
+        },
+        {
+          "page": 20608,
+          "score": 0.4748,
+          "chunk_id": 2577
+        },
+        {
+          "page": 25,
+          "score": 0.4627,
+          "chunk_id": 626
+        }
+      ]
+    },
+    {
+      "id": "s1_eur_usd",
+      "question": "Comment le taux de change euro/dollar a-t-il évolué entre le début et la fin de l'année 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        16
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 16,
+          "score": 0.4763,
+          "chunk_id": 426
+        },
+        {
+          "page": 20407,
+          "score": 0.4511,
+          "chunk_id": 2498
+        },
+        {
+          "page": 20406,
+          "score": 0.454,
+          "chunk_id": 2494
+        },
+        {
+          "page": 16,
+          "score": 0.4686,
+          "chunk_id": 435
+        },
+        {
+          "page": 30,
+          "score": 0.4436,
+          "chunk_id": 703
+        }
+      ]
+    },
+    {
+      "id": "s1_deficit_bresil",
+      "question": "Parmi les grandes économies émergentes, laquelle a connu la plus forte dégradation de son déficit budgétaire entre 2024 et 2025 ?",
+      "difficulty": "raisonnement",
+      "expected_pages": [
+        17,
+        18
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 18,
+          "score": 0.497,
+          "chunk_id": 479
+        },
+        {
+          "page": 18,
+          "score": 0.4657,
+          "chunk_id": 494
+        },
+        {
+          "page": 60,
+          "score": 0.4971,
+          "chunk_id": 1152
+        },
+        {
+          "page": 5,
+          "score": 0.4521,
+          "chunk_id": 15
+        },
+        {
+          "page": 13,
+          "score": 0.476,
+          "chunk_id": 364
+        }
+      ]
+    },
+    {
+      "id": "s1_or_banques_centrales",
+      "question": "Quelle quantité d'or les banques centrales ont-elles achetée dans le monde en 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        19
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 19,
+          "score": 0.4852,
+          "chunk_id": 506
+        },
+        {
+          "page": 19,
+          "score": 0.4866,
+          "chunk_id": 505
+        },
+        {
+          "page": 4,
+          "score": 0.4349,
+          "chunk_id": 4
+        },
+        {
+          "page": 16,
+          "score": 0.4292,
+          "chunk_id": 420
+        },
+        {
+          "page": 110,
+          "score": 0.4237,
+          "chunk_id": 1798
+        }
+      ]
+    },
+    {
+      "id": "s1_brent",
+      "question": "À quel niveau le prix du baril de Brent s'est-il établi fin décembre 2025, et quel repli cela représente-t-il depuis le début de l'année ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        18
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 18,
+          "score": 0.5401,
+          "chunk_id": 498
+        },
+        {
+          "page": 18,
+          "score": 0.5013,
+          "chunk_id": 480
+        },
+        {
+          "page": 17,
+          "score": 0.4352,
+          "chunk_id": 464
+        },
+        {
+          "page": 50,
+          "score": 0.4304,
+          "chunk_id": 1005
+        },
+        {
+          "page": 99,
+          "score": 0.4323,
+          "chunk_id": 1647
+        }
+      ]
+    },
+    {
+      "id": "s1_riz_vs_agricoles",
+      "question": "Entre le sucre, le blé et le riz, quelle matière première agricole a enregistré la plus forte baisse de prix entre 2024 et 2025 ?",
+      "difficulty": "liste",
+      "expected_pages": [
+        19
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 19,
+          "score": 0.4757,
+          "chunk_id": 515
+        },
+        {
+          "page": 55,
+          "score": 0.465,
+          "chunk_id": 1082
+        },
+        {
+          "page": 19,
+          "score": 0.4689,
+          "chunk_id": 504
+        },
+        {
+          "page": 55,
+          "score": 0.4544,
+          "chunk_id": 1052
+        },
+        {
+          "page": 23,
+          "score": 0.4495,
+          "chunk_id": 569
+        }
+      ]
+    },
+    {
+      "id": "s2_secteur_primaire",
+      "question": "Quelle a été la croissance du PIB réel du secteur primaire en 2025, et quelle part représente-t-il dans le PIB nominal total ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        22
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 22,
+          "score": 0.5891,
+          "chunk_id": 539
+        },
+        {
+          "page": 22,
+          "score": 0.5703,
+          "chunk_id": 538
+        },
+        {
+          "page": 122,
+          "score": 0.6051,
+          "chunk_id": 2246
+        },
+        {
+          "page": 5,
+          "score": 0.5498,
+          "chunk_id": 13
+        },
+        {
+          "page": 121,
+          "score": 0.5672,
+          "chunk_id": 2197
+        }
+      ]
+    },
+    {
+      "id": "s2_ralentissement_secondaire",
+      "question": "Pourquoi la croissance du secteur secondaire a-t-elle ralenti en 2025 malgré la forte progression du BTP ?",
+      "difficulty": "raisonnement",
+      "expected_pages": [
+        23
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 23,
+          "score": 0.5028,
+          "chunk_id": 546
+        },
+        {
+          "page": 23,
+          "score": 0.4893,
+          "chunk_id": 547
+        },
+        {
+          "page": 23,
+          "score": 0.5399,
+          "chunk_id": 554
+        },
+        {
+          "page": 5,
+          "score": 0.4377,
+          "chunk_id": 13
+        },
+        {
+          "page": 22,
+          "score": 0.4352,
+          "chunk_id": 528
+        }
+      ]
+    },
+    {
+      "id": "s2_composition_primaire",
+      "question": "Comment se répartit le secteur primaire mauritanien entre élevage, agriculture et pêche en 2025 ?",
+      "difficulty": "liste",
+      "expected_pages": [
+        22
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 22,
+          "score": 0.5307,
+          "chunk_id": 533
+        },
+        {
+          "page": 22,
+          "score": 0.5084,
+          "chunk_id": 532
+        },
+        {
+          "page": 22,
+          "score": 0.5024,
+          "chunk_id": 540
+        },
+        {
+          "page": 122,
+          "score": 0.4925,
+          "chunk_id": 2242
+        },
+        {
+          "page": 123,
+          "score": 0.4774,
+          "chunk_id": 2294
+        }
+      ]
+    },
+    {
+      "id": "s2_part_extractif_exports",
+      "question": "Quelle part des exportations mauritaniennes le secteur extractif représente-t-il ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        22
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 22,
+          "score": 0.5123,
+          "chunk_id": 534
+        },
+        {
+          "page": 22,
+          "score": 0.4676,
+          "chunk_id": 528
+        },
+        {
+          "page": 55,
+          "score": 0.4694,
+          "chunk_id": 1089
+        },
+        {
+          "page": 55,
+          "score": 0.4653,
+          "chunk_id": 1053
+        },
+        {
+          "page": 5,
+          "score": 0.4331,
+          "chunk_id": 13
+        }
+      ]
+    },
+    {
+      "id": "s2_partenaires_commerciaux",
+      "question": "Quels sont les principaux partenaires commerciaux de la Mauritanie cités dans le rapport ?",
+      "difficulty": "liste",
+      "expected_pages": [
+        22
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 22,
+          "score": 0.5086,
+          "chunk_id": 529
+        },
+        {
+          "page": 20502,
+          "score": 0.4275,
+          "chunk_id": 2512
+        },
+        {
+          "page": 20502,
+          "score": 0.4301,
+          "chunk_id": 2513
+        },
+        {
+          "page": 2,
+          "score": 0.4415,
+          "chunk_id": 1
+        },
+        {
+          "page": 20603,
+          "score": 0.4354,
+          "chunk_id": 2548
+        }
+      ]
+    },
+    {
+      "id": "s2_postes_baisse_inflation",
+      "question": "Quels postes de consommation ont vu leurs prix baisser en 2025 alors que l'inflation globale restait positive ?",
+      "difficulty": "liste",
+      "expected_pages": [
+        23
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 23,
+          "score": 0.4567,
+          "chunk_id": 549
+        },
+        {
+          "page": 20608,
+          "score": 0.4397,
+          "chunk_id": 2577
+        },
+        {
+          "page": 23,
+          "score": 0.4346,
+          "chunk_id": 551
+        },
+        {
+          "page": 17,
+          "score": 0.4432,
+          "chunk_id": 442
+        },
+        {
+          "page": 18,
+          "score": 0.4291,
+          "chunk_id": 482
+        }
+      ]
+    },
+    {
+      "id": "s2_chomage_femmes",
+      "question": "Quel était le taux de chômage national au quatrième trimestre 2025, et comment se compare-t-il à celui des femmes ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        24
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 24,
+          "score": 0.5358,
+          "chunk_id": 605
+        },
+        {
+          "page": 14,
+          "score": 0.5237,
+          "chunk_id": 393
+        },
+        {
+          "page": 24,
+          "score": 0.4944,
+          "chunk_id": 606
+        },
+        {
+          "page": 14,
+          "score": 0.4715,
+          "chunk_id": 385
+        },
+        {
+          "page": 24,
+          "score": 0.5269,
+          "chunk_id": 620
+        }
+      ]
+    },
+    {
+      "id": "s2_emploi_urbain_rural",
+      "question": "Le taux d'emploi a-t-il évolué de la même façon en milieu urbain et en milieu rural entre le quatrième trimestre 2024 et celui de 2025 ?",
+      "difficulty": "raisonnement",
+      "expected_pages": [
+        24
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 24,
+          "score": 0.5883,
+          "chunk_id": 615
+        },
+        {
+          "page": 24,
+          "score": 0.5564,
+          "chunk_id": 605
+        },
+        {
+          "page": 13,
+          "score": 0.4193,
+          "chunk_id": 377
+        },
+        {
+          "page": 60,
+          "score": 0.4221,
+          "chunk_id": 1148
+        },
+        {
+          "page": 22,
+          "score": 0.4174,
+          "chunk_id": 528
+        }
+      ]
+    },
+    {
+      "id": "s2_population_totale",
+      "question": "Quelle est la population totale de la Mauritanie estimée en 2025, et quel est l'âge moyen de la population ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        24
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 24,
+          "score": 0.6299,
+          "chunk_id": 611
+        },
+        {
+          "page": 24,
+          "score": 0.5449,
+          "chunk_id": 604
+        },
+        {
+          "page": 73,
+          "score": 0.4254,
+          "chunk_id": 1366
+        },
+        {
+          "page": 110,
+          "score": 0.4282,
+          "chunk_id": 1801
+        },
+        {
+          "page": 4,
+          "score": 0.4248,
+          "chunk_id": 8
+        }
+      ]
+    },
+    {
+      "id": "s2_axes_strategiques_emploi",
+      "question": "Quels sont les quatre axes stratégiques de la vision 2025-2030 pour la promotion de l'emploi présentés dans le rapport ?",
+      "difficulty": "liste",
+      "expected_pages": [
+        24
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 24,
+          "score": 0.5229,
+          "chunk_id": 600
+        },
+        {
+          "page": 24,
+          "score": 0.5079,
+          "chunk_id": 606
+        },
+        {
+          "page": 24,
+          "score": 0.578,
+          "chunk_id": 622
+        },
+        {
+          "page": 47,
+          "score": 0.4406,
+          "chunk_id": 978
+        },
+        {
+          "page": 47,
+          "score": 0.518,
+          "chunk_id": 993
+        }
+      ]
+    },
+    {
+      "id": "s3_taux_directeur",
+      "question": "De quel niveau à quel niveau la BCM a-t-elle abaissé son taux directeur en 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        25
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 25,
+          "score": 0.4994,
+          "chunk_id": 626
+        },
+        {
+          "page": 20608,
+          "score": 0.4951,
+          "chunk_id": 2577
+        },
+        {
+          "page": 20601,
+          "score": 0.4921,
+          "chunk_id": 2539
+        },
+        {
+          "page": 20601,
+          "score": 0.4939,
+          "chunk_id": 2536
+        },
+        {
+          "page": 98,
+          "score": 0.4697,
+          "chunk_id": 1623
+        }
+      ]
+    },
+    {
+      "id": "s3_encours_tresor",
+      "question": "De combien l'encours des valeurs du Trésor a-t-il progressé entre fin 2024 et fin 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        25,
+        27
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 27,
+          "score": 0.5082,
+          "chunk_id": 652
+        },
+        {
+          "page": 27,
+          "score": 0.5083,
+          "chunk_id": 650
+        },
+        {
+          "page": 7,
+          "score": 0.4907,
+          "chunk_id": 67
+        },
+        {
+          "page": 25,
+          "score": 0.4825,
+          "chunk_id": 624
+        },
+        {
+          "page": 7,
+          "score": 0.4514,
+          "chunk_id": 68
+        }
+      ]
+    },
+    {
+      "id": "s3_pic_liquidite",
+      "question": "À quel niveau la liquidité bancaire a-t-elle atteint un pic historique en 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        26
+      ],
+      "first_expected_rank": 4,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 25,
+          "score": 0.5111,
+          "chunk_id": 627
+        },
+        {
+          "page": 42,
+          "score": 0.5106,
+          "chunk_id": 900
+        },
+        {
+          "page": 34,
+          "score": 0.4971,
+          "chunk_id": 783
+        },
+        {
+          "page": 26,
+          "score": 0.4915,
+          "chunk_id": 636
+        },
+        {
+          "page": 33,
+          "score": 0.4888,
+          "chunk_id": 754
+        }
+      ]
+    },
+    {
+      "id": "s3_facilites_depot",
+      "question": "Comment le recours des banques aux facilités de dépôt a-t-il évolué face à la montée en puissance des opérations d'open market en 2025 ?",
+      "difficulty": "raisonnement",
+      "expected_pages": [
+        26
+      ],
+      "first_expected_rank": 2,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 113,
+          "score": 0.482,
+          "chunk_id": 1952
+        },
+        {
+          "page": 26,
+          "score": 0.4939,
+          "chunk_id": 635
+        },
+        {
+          "page": 25,
+          "score": 0.4656,
+          "chunk_id": 627
+        },
+        {
+          "page": 26,
+          "score": 0.4605,
+          "chunk_id": 639
+        },
+        {
+          "page": 7,
+          "score": 0.4603,
+          "chunk_id": 65
+        }
+      ]
+    },
+    {
+      "id": "s3_volume_eur_mib",
+      "question": "Quel volume d'échanges en euros le marché interbancaire de change a-t-il atteint en 2025, comparé à 2024 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        29
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 29,
+          "score": 0.4811,
+          "chunk_id": 693
+        },
+        {
+          "page": 28,
+          "score": 0.4924,
+          "chunk_id": 670
+        },
+        {
+          "page": 30,
+          "score": 0.477,
+          "chunk_id": 702
+        },
+        {
+          "page": 30,
+          "score": 0.4684,
+          "chunk_id": 703
+        },
+        {
+          "page": 29,
+          "score": 0.4699,
+          "chunk_id": 694
+        }
+      ]
+    },
+    {
+      "id": "s3_usd_mru_extremes",
+      "question": "À quelles dates et à quels niveaux le taux de change USD/MRU a-t-il atteint son maximum et son minimum en 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        29
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 29,
+          "score": 0.5229,
+          "chunk_id": 694
+        },
+        {
+          "page": 29,
+          "score": 0.4905,
+          "chunk_id": 698
+        },
+        {
+          "page": 30,
+          "score": 0.4731,
+          "chunk_id": 702
+        },
+        {
+          "page": 30,
+          "score": 0.4668,
+          "chunk_id": 703
+        },
+        {
+          "page": 30,
+          "score": 0.4557,
+          "chunk_id": 710
+        }
+      ]
+    },
+    {
+      "id": "s3_composition_masse_monetaire",
+      "question": "Comment se répartit la masse monétaire mauritanienne entre dépôts à vue, dépôts à terme et billets en circulation à fin 2025 ?",
+      "difficulty": "liste",
+      "expected_pages": [
+        31
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 31,
+          "score": 0.5925,
+          "chunk_id": 732
+        },
+        {
+          "page": 113,
+          "score": 0.4811,
+          "chunk_id": 1952
+        },
+        {
+          "page": 113,
+          "score": 0.4606,
+          "chunk_id": 1963
+        },
+        {
+          "page": 67,
+          "score": 0.4537,
+          "chunk_id": 1274
+        },
+        {
+          "page": 31,
+          "score": 0.5476,
+          "chunk_id": 734
+        }
+      ]
+    },
+    {
+      "id": "s3_croissance_masse_monetaire",
+      "question": "De combien la masse monétaire a-t-elle progressé entre décembre 2024 et décembre 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        30
+      ],
+      "first_expected_rank": 2,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 31,
+          "score": 0.5769,
+          "chunk_id": 732
+        },
+        {
+          "page": 30,
+          "score": 0.5189,
+          "chunk_id": 714
+        },
+        {
+          "page": 7,
+          "score": 0.4832,
+          "chunk_id": 67
+        },
+        {
+          "page": 99,
+          "score": 0.4806,
+          "chunk_id": 1647
+        },
+        {
+          "page": 110,
+          "score": 0.4533,
+          "chunk_id": 1801
+        }
+      ]
+    },
+    {
+      "id": "s3_or_monetaire_bcm",
+      "question": "Quel est le montant des avoirs en or monétaire détenus par la BCM à fin 2025, et de combien ont-ils augmenté sur un an ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        30,
+        31
+      ],
+      "first_expected_rank": 4,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 98,
+          "score": 0.4834,
+          "chunk_id": 1629
+        },
+        {
+          "page": 98,
+          "score": 0.4847,
+          "chunk_id": 1623
+        },
+        {
+          "page": 110,
+          "score": 0.4766,
+          "chunk_id": 1797
+        },
+        {
+          "page": 31,
+          "score": 0.4739,
+          "chunk_id": 734
+        },
+        {
+          "page": 106,
+          "score": 0.4724,
+          "chunk_id": 1777
+        }
+      ]
+    },
+    {
+      "id": "s3_credit_economie",
+      "question": "De combien l'encours des crédits à l'économie a-t-il progressé en 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        32
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 32,
+          "score": 0.4884,
+          "chunk_id": 744
+        },
+        {
+          "page": 60,
+          "score": 0.4396,
+          "chunk_id": 1148
+        },
+        {
+          "page": 34,
+          "score": 0.4352,
+          "chunk_id": 784
+        },
+        {
+          "page": 5,
+          "score": 0.4305,
+          "chunk_id": 13
+        },
+        {
+          "page": 32,
+          "score": 0.5137,
+          "chunk_id": 746
+        }
+      ]
+    },
+    {
+      "id": "s4_solvabilite_recul",
+      "question": "De combien le ratio de solvabilité moyen des banques a-t-il reculé entre 2024 et 2025, et reste-t-il au-dessus du seuil réglementaire ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        34
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 34,
+          "score": 0.545,
+          "chunk_id": 769
+        },
+        {
+          "page": 34,
+          "score": 0.5471,
+          "chunk_id": 783
+        },
+        {
+          "page": 42,
+          "score": 0.5491,
+          "chunk_id": 900
+        },
+        {
+          "page": 38,
+          "score": 0.5205,
+          "chunk_id": 846
+        },
+        {
+          "page": 33,
+          "score": 0.5253,
+          "chunk_id": 764
+        }
+      ]
+    },
+    {
+      "id": "s4_stress_test_npl_severe",
+      "question": "Dans le scénario de stress test le plus sévère sur les prêts non performants, combien de banques additionnelles enregistreraient des fonds propres nets négatifs ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        39
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 39,
+          "score": 0.601,
+          "chunk_id": 861
+        },
+        {
+          "page": 39,
+          "score": 0.5977,
+          "chunk_id": 862
+        },
+        {
+          "page": 38,
+          "score": 0.4787,
+          "chunk_id": 846
+        },
+        {
+          "page": 38,
+          "score": 0.4496,
+          "chunk_id": 849
+        },
+        {
+          "page": 33,
+          "score": 0.4348,
+          "chunk_id": 753
+        }
+      ]
+    },
+    {
+      "id": "s4_concentration_top3",
+      "question": "Quelle part du total-actif bancaire les trois plus grandes banques du pays détenaient-elles en 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        39
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 39,
+          "score": 0.5151,
+          "chunk_id": 866
+        },
+        {
+          "page": 40,
+          "score": 0.4489,
+          "chunk_id": 879
+        },
+        {
+          "page": 39,
+          "score": 0.5103,
+          "chunk_id": 868
+        },
+        {
+          "page": 45,
+          "score": 0.4325,
+          "chunk_id": 936
+        },
+        {
+          "page": 20501,
+          "score": 0.4381,
+          "chunk_id": 2510
+        }
+      ]
+    },
+    {
+      "id": "s4_bankily_part_marche",
+      "question": "Quelle part de marché le wallet Bankily détenait-il en montants et en volumes parmi les huit wallets bancaires actifs ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        43
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 43,
+          "score": 0.5498,
+          "chunk_id": 913
+        },
+        {
+          "page": 43,
+          "score": 0.501,
+          "chunk_id": 910
+        },
+        {
+          "page": 45,
+          "score": 0.4695,
+          "chunk_id": 937
+        },
+        {
+          "page": 39,
+          "score": 0.4374,
+          "chunk_id": 865
+        },
+        {
+          "page": 12,
+          "score": 0.4344,
+          "chunk_id": 356
+        }
+      ]
+    },
+    {
+      "id": "s4_wallets_volume_total",
+      "question": "Quel montant total les wallets bancaires ont-ils traité entre juin 2024 et décembre 2025, et quel est le ticket moyen par transaction ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        43
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 43,
+          "score": 0.5337,
+          "chunk_id": 910
+        },
+        {
+          "page": 43,
+          "score": 0.4975,
+          "chunk_id": 912
+        },
+        {
+          "page": 45,
+          "score": 0.488,
+          "chunk_id": 937
+        },
+        {
+          "page": 25,
+          "score": 0.4527,
+          "chunk_id": 627
+        },
+        {
+          "page": 81,
+          "score": 0.4479,
+          "chunk_id": 1421
+        }
+      ]
+    },
+    {
+      "id": "s4_wallet_importance_systemique",
+      "question": "Pourquoi le wallet leader du marché est-il qualifié de wallet d'importance systémique nationale ?",
+      "difficulty": "raisonnement",
+      "expected_pages": [
+        44
+      ],
+      "first_expected_rank": 4,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 43,
+          "score": 0.4805,
+          "chunk_id": 913
+        },
+        {
+          "page": 12,
+          "score": 0.4449,
+          "chunk_id": 356
+        },
+        {
+          "page": 43,
+          "score": 0.4438,
+          "chunk_id": 910
+        },
+        {
+          "page": 44,
+          "score": 0.4569,
+          "chunk_id": 921
+        },
+        {
+          "page": 25,
+          "score": 0.4358,
+          "chunk_id": 627
+        }
+      ]
+    },
+    {
+      "id": "s4_qualite_portefeuille_imf",
+      "question": "Comment la qualité du portefeuille de crédit des institutions de microfinance a-t-elle évolué entre 2024 et 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        44
+      ],
+      "first_expected_rank": 3,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 85,
+          "score": 0.4977,
+          "chunk_id": 1484
+        },
+        {
+          "page": 93,
+          "score": 0.4813,
+          "chunk_id": 1586
+        },
+        {
+          "page": 44,
+          "score": 0.4791,
+          "chunk_id": 922
+        },
+        {
+          "page": 93,
+          "score": 0.4882,
+          "chunk_id": 1585
+        },
+        {
+          "page": 93,
+          "score": 0.4518,
+          "chunk_id": 1593
+        }
+      ]
+    },
+    {
+      "id": "s4_penetration_assurance",
+      "question": "Quel est le taux de pénétration de l'assurance en Mauritanie, et combien de compagnies se partagent le marché ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        46
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 46,
+          "score": 0.4971,
+          "chunk_id": 956
+        },
+        {
+          "page": 46,
+          "score": 0.4767,
+          "chunk_id": 955
+        },
+        {
+          "page": 46,
+          "score": 0.4606,
+          "chunk_id": 960
+        },
+        {
+          "page": 47,
+          "score": 0.4452,
+          "chunk_id": 978
+        },
+        {
+          "page": 47,
+          "score": 0.4248,
+          "chunk_id": 980
+        }
+      ]
+    },
+    {
+      "id": "s4_capital_min_assurance",
+      "question": "Quel est le capital social minimum actuellement exigé pour les compagnies d'assurance mauritaniennes, et comment se compare-t-il aux standards de la zone CIMA ?",
+      "difficulty": "raisonnement",
+      "expected_pages": [
+        47
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 47,
+          "score": 0.5303,
+          "chunk_id": 974
+        },
+        {
+          "page": 48,
+          "score": 0.4383,
+          "chunk_id": 994
+        },
+        {
+          "page": 47,
+          "score": 0.4306,
+          "chunk_id": 978
+        },
+        {
+          "page": 46,
+          "score": 0.4233,
+          "chunk_id": 954
+        },
+        {
+          "page": 46,
+          "score": 0.4815,
+          "chunk_id": 956
+        }
+      ]
+    },
+    {
+      "id": "s4_contrat_programme_leviers",
+      "question": "Combien de leviers opérationnels comprend le Contrat-Programme 2025-2030 signé entre la BCM et l'APAM pour réformer le secteur des assurances ?",
+      "difficulty": "liste",
+      "expected_pages": [
+        47
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 47,
+          "score": 0.5398,
+          "chunk_id": 978
+        },
+        {
+          "page": 47,
+          "score": 0.5158,
+          "chunk_id": 979
+        },
+        {
+          "page": 48,
+          "score": 0.5029,
+          "chunk_id": 998
+        },
+        {
+          "page": 48,
+          "score": 0.476,
+          "chunk_id": 1000
+        },
+        {
+          "page": 46,
+          "score": 0.4862,
+          "chunk_id": 951
+        }
+      ]
+    },
+    {
+      "id": "s5_reserves_niveau",
+      "question": "À combien se sont établies les réserves de change de la BCM au 31 décembre 2025, et quelle progression cela représente-t-il sur un an ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        50
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 50,
+          "score": 0.5224,
+          "chunk_id": 1005
+        },
+        {
+          "page": 50,
+          "score": 0.5384,
+          "chunk_id": 1007
+        },
+        {
+          "page": 98,
+          "score": 0.4906,
+          "chunk_id": 1629
+        },
+        {
+          "page": 98,
+          "score": 0.4905,
+          "chunk_id": 1623
+        },
+        {
+          "page": 112,
+          "score": 0.4911,
+          "chunk_id": 1904
+        }
+      ]
+    },
+    {
+      "id": "s5_facteurs_hausse_reserves",
+      "question": "Quels facteurs expliquent principalement la progression des réserves de change en 2025 ?",
+      "difficulty": "raisonnement",
+      "expected_pages": [
+        50
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 50,
+          "score": 0.5064,
+          "chunk_id": 1005
+        },
+        {
+          "page": 50,
+          "score": 0.5081,
+          "chunk_id": 1007
+        },
+        {
+          "page": 51,
+          "score": 0.4828,
+          "chunk_id": 1011
+        },
+        {
+          "page": 20602,
+          "score": 0.4574,
+          "chunk_id": 2541
+        },
+        {
+          "page": 30,
+          "score": 0.4495,
+          "chunk_id": 703
+        }
+      ]
+    },
+    {
+      "id": "s5_revenus_globaux_reserves",
+      "question": "À combien se sont élevés les revenus globaux générés par la gestion des réserves de change en 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        51
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 51,
+          "score": 0.6068,
+          "chunk_id": 1011
+        },
+        {
+          "page": 50,
+          "score": 0.4867,
+          "chunk_id": 1005
+        },
+        {
+          "page": 50,
+          "score": 0.4509,
+          "chunk_id": 1004
+        },
+        {
+          "page": 20602,
+          "score": 0.4481,
+          "chunk_id": 2541
+        },
+        {
+          "page": 5,
+          "score": 0.4426,
+          "chunk_id": 22
+        }
+      ]
+    },
+    {
+      "id": "s5_repartition_tranches",
+      "question": "Comment les revenus de placement des réserves de change se répartissent-ils entre les différentes tranches du portefeuille ?",
+      "difficulty": "liste",
+      "expected_pages": [
+        51
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 51,
+          "score": 0.4751,
+          "chunk_id": 1011
+        },
+        {
+          "page": 50,
+          "score": 0.4454,
+          "chunk_id": 1005
+        },
+        {
+          "page": 50,
+          "score": 0.4792,
+          "chunk_id": 1007
+        },
+        {
+          "page": 51,
+          "score": 0.4388,
+          "chunk_id": 1015
+        },
+        {
+          "page": 20305,
+          "score": 0.4368,
+          "chunk_id": 2463
+        }
+      ]
+    },
+    {
+      "id": "s5_notation_min_titres",
+      "question": "Quelle notation minimale de crédit la BCM exige-t-elle pour les titres souverains dans lesquels elle place ses réserves ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        50
+      ],
+      "first_expected_rank": 10,
+      "relevant": true,
+      "success_at_5_or_refusal": false,
+      "top_results": [
+        {
+          "page": 102,
+          "score": 0.4726,
+          "chunk_id": 1708
+        },
+        {
+          "page": 106,
+          "score": 0.4641,
+          "chunk_id": 1769
+        },
+        {
+          "page": 105,
+          "score": 0.465,
+          "chunk_id": 1762
+        },
+        {
+          "page": 105,
+          "score": 0.4541,
+          "chunk_id": 1763
+        },
+        {
+          "page": 98,
+          "score": 0.4513,
+          "chunk_id": 1623
+        }
+      ]
+    },
+    {
+      "id": "s5_part_htm_htcs",
+      "question": "Quelle part de l'allocation globale des réserves de change les portefeuilles HTM/HTCS représentaient-ils à fin 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        52
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 52,
+          "score": 0.4992,
+          "chunk_id": 1026
+        },
+        {
+          "page": 51,
+          "score": 0.4577,
+          "chunk_id": 1012
+        },
+        {
+          "page": 51,
+          "score": 0.4337,
+          "chunk_id": 1011
+        },
+        {
+          "page": 12,
+          "score": 0.558,
+          "chunk_id": 358
+        },
+        {
+          "page": 50,
+          "score": 0.4343,
+          "chunk_id": 1007
+        }
+      ]
+    },
+    {
+      "id": "s5_nouvelle_devise_reserves",
+      "question": "Quelle nouvelle devise la BCM prévoit-elle d'intégrer progressivement dans la structure de ses réserves de change ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        51
+      ],
+      "first_expected_rank": 3,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 20402,
+          "score": 0.4813,
+          "chunk_id": 2476
+        },
+        {
+          "page": 50,
+          "score": 0.4767,
+          "chunk_id": 1005
+        },
+        {
+          "page": 51,
+          "score": 0.4674,
+          "chunk_id": 1019
+        },
+        {
+          "page": 30,
+          "score": 0.4681,
+          "chunk_id": 704
+        },
+        {
+          "page": 98,
+          "score": 0.4646,
+          "chunk_id": 1623
+        }
+      ]
+    },
+    {
+      "id": "s5_bloomberg_ticker",
+      "question": "Sous quel ticker les données monétaires et financières mauritaniennes sont-elles désormais diffusées sur Bloomberg Terminal ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        52
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 52,
+          "score": 0.6146,
+          "chunk_id": 1028
+        },
+        {
+          "page": 76,
+          "score": 0.4317,
+          "chunk_id": 1385
+        },
+        {
+          "page": 52,
+          "score": 0.5008,
+          "chunk_id": 1029
+        },
+        {
+          "page": 20603,
+          "score": 0.4287,
+          "chunk_id": 2547
+        },
+        {
+          "page": 25,
+          "score": 0.4244,
+          "chunk_id": 624
+        }
+      ]
+    },
+    {
+      "id": "s5_capital_cube_ida",
+      "question": "Quel système intégré de gestion de portefeuille la BCM a-t-elle mis en production en 2025 pour ses réserves de change ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        52
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 52,
+          "score": 0.5073,
+          "chunk_id": 1027
+        },
+        {
+          "page": 50,
+          "score": 0.4922,
+          "chunk_id": 1005
+        },
+        {
+          "page": 20402,
+          "score": 0.4744,
+          "chunk_id": 2476
+        },
+        {
+          "page": 52,
+          "score": 0.4695,
+          "chunk_id": 1028
+        },
+        {
+          "page": 51,
+          "score": 0.4592,
+          "chunk_id": 1015
+        }
+      ]
+    },
+    {
+      "id": "s5_mou_partenaires",
+      "question": "Avec quelles institutions la BCM a-t-elle signé des mémorandums d'entente en 2025 pour renforcer sa gestion des réserves ?",
+      "difficulty": "liste",
+      "expected_pages": [
+        51
+      ],
+      "first_expected_rank": 3,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 20402,
+          "score": 0.471,
+          "chunk_id": 2476
+        },
+        {
+          "page": 20603,
+          "score": 0.473,
+          "chunk_id": 2547
+        },
+        {
+          "page": 51,
+          "score": 0.467,
+          "chunk_id": 1019
+        },
+        {
+          "page": 98,
+          "score": 0.4613,
+          "chunk_id": 1623
+        },
+        {
+          "page": 50,
+          "score": 0.4597,
+          "chunk_id": 1005
+        }
+      ]
+    },
+    {
+      "id": "s6_deficit_compte_courant",
+      "question": "De combien le déficit du compte des transactions courantes s'est-il réduit entre 2024 et 2025, en dollars et en pourcentage du PIB ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        54
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 54,
+          "score": 0.5069,
+          "chunk_id": 1034
+        },
+        {
+          "page": 5,
+          "score": 0.4847,
+          "chunk_id": 20
+        },
+        {
+          "page": 5,
+          "score": 0.5048,
+          "chunk_id": 13
+        },
+        {
+          "page": 54,
+          "score": 0.4488,
+          "chunk_id": 1031
+        },
+        {
+          "page": 5,
+          "score": 0.5052,
+          "chunk_id": 45
+        }
+      ]
+    },
+    {
+      "id": "s6_partenaires_gta",
+      "question": "Quels partenaires internationaux sont associés au projet gazier Grand Tortue Ahmeyim aux côtés de la Mauritanie et du Sénégal ?",
+      "difficulty": "liste",
+      "expected_pages": [
+        55
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 55,
+          "score": 0.5565,
+          "chunk_id": 1048
+        },
+        {
+          "page": 55,
+          "score": 0.493,
+          "chunk_id": 1050
+        },
+        {
+          "page": 5,
+          "score": 0.4525,
+          "chunk_id": 15
+        },
+        {
+          "page": 5,
+          "score": 0.44,
+          "chunk_id": 14
+        },
+        {
+          "page": 56,
+          "score": 0.4086,
+          "chunk_id": 1096
+        }
+      ]
+    },
+    {
+      "id": "s6_top3_exports",
+      "question": "Quels trois produits dominent les exportations mauritaniennes, et quelle part des recettes totales représentent-ils ?",
+      "difficulty": "liste",
+      "expected_pages": [
+        55
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 55,
+          "score": 0.5031,
+          "chunk_id": 1051
+        },
+        {
+          "page": 55,
+          "score": 0.4535,
+          "chunk_id": 1053
+        },
+        {
+          "page": 5,
+          "score": 0.4537,
+          "chunk_id": 15
+        },
+        {
+          "page": 22,
+          "score": 0.4297,
+          "chunk_id": 533
+        },
+        {
+          "page": 55,
+          "score": 0.4472,
+          "chunk_id": 1075
+        }
+      ]
+    },
+    {
+      "id": "s6_fer_vs_or",
+      "question": "Pourquoi les exportations de minerai de fer ont-elles reculé en 2025 alors que celles de l'or progressaient ?",
+      "difficulty": "raisonnement",
+      "expected_pages": [
+        55
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 55,
+          "score": 0.5655,
+          "chunk_id": 1068
+        },
+        {
+          "page": 55,
+          "score": 0.5604,
+          "chunk_id": 1067
+        },
+        {
+          "page": 5,
+          "score": 0.4857,
+          "chunk_id": 18
+        },
+        {
+          "page": 54,
+          "score": 0.4613,
+          "chunk_id": 1031
+        },
+        {
+          "page": 5,
+          "score": 0.4459,
+          "chunk_id": 21
+        }
+      ]
+    },
+    {
+      "id": "s6_composition_smcp",
+      "question": "Comment se compose la structure des exportations de produits de la pêche de la SMCP en 2025, par catégorie ?",
+      "difficulty": "liste",
+      "expected_pages": [
+        55
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 55,
+          "score": 0.5006,
+          "chunk_id": 1055
+        },
+        {
+          "page": 55,
+          "score": 0.5028,
+          "chunk_id": 1075
+        },
+        {
+          "page": 22,
+          "score": 0.4532,
+          "chunk_id": 533
+        },
+        {
+          "page": 54,
+          "score": 0.451,
+          "chunk_id": 1031
+        },
+        {
+          "page": 22,
+          "score": 0.4349,
+          "chunk_id": 528
+        }
+      ]
+    },
+    {
+      "id": "s6_importations_moteurs",
+      "question": "De combien les importations mauritaniennes ont-elles progressé en 2025, et quels postes en sont les principaux moteurs ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        55
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 55,
+          "score": 0.4596,
+          "chunk_id": 1056
+        },
+        {
+          "page": 22,
+          "score": 0.4415,
+          "chunk_id": 529
+        },
+        {
+          "page": 55,
+          "score": 0.4359,
+          "chunk_id": 1053
+        },
+        {
+          "page": 55,
+          "score": 0.4685,
+          "chunk_id": 1088
+        },
+        {
+          "page": 14,
+          "score": 0.4591,
+          "chunk_id": 396
+        }
+      ]
+    },
+    {
+      "id": "s6_balance_revenus",
+      "question": "Comment le déficit de la balance des revenus a-t-il évolué entre 2024 et 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        56
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 56,
+          "score": 0.5128,
+          "chunk_id": 1092
+        },
+        {
+          "page": 56,
+          "score": 0.5535,
+          "chunk_id": 1105
+        },
+        {
+          "page": 54,
+          "score": 0.4978,
+          "chunk_id": 1034
+        },
+        {
+          "page": 51,
+          "score": 0.4499,
+          "chunk_id": 1011
+        },
+        {
+          "page": 5,
+          "score": 0.437,
+          "chunk_id": 17
+        }
+      ]
+    },
+    {
+      "id": "s6_transferts_prives",
+      "question": "De combien les transferts privés ont-ils augmenté en 2025 par rapport à 2024 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        56
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 56,
+          "score": 0.5395,
+          "chunk_id": 1109
+        },
+        {
+          "page": 56,
+          "score": 0.4828,
+          "chunk_id": 1094
+        },
+        {
+          "page": 111,
+          "score": 0.4606,
+          "chunk_id": 1860
+        },
+        {
+          "page": 63,
+          "score": 0.4527,
+          "chunk_id": 1232
+        },
+        {
+          "page": 123,
+          "score": 0.5042,
+          "chunk_id": 2351
+        }
+      ]
+    },
+    {
+      "id": "s6_ide_chute",
+      "question": "Pourquoi les investissements directs étrangers nets ont-ils chuté en 2025 malgré le démarrage des exportations de gaz ?",
+      "difficulty": "raisonnement",
+      "expected_pages": [
+        56
+      ],
+      "first_expected_rank": 4,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 55,
+          "score": 0.514,
+          "chunk_id": 1050
+        },
+        {
+          "page": 5,
+          "score": 0.4759,
+          "chunk_id": 15
+        },
+        {
+          "page": 55,
+          "score": 0.5014,
+          "chunk_id": 1060
+        },
+        {
+          "page": 56,
+          "score": 0.4646,
+          "chunk_id": 1096
+        },
+        {
+          "page": 106,
+          "score": 0.4363,
+          "chunk_id": 1768
+        }
+      ]
+    },
+    {
+      "id": "s6_code_investissements",
+      "question": "Combien de projets d'investissement ont été approuvés dans le cadre du nouveau Code des investissements 2025 depuis juillet 2025, et combien d'emplois directs cela représente-t-il ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        56
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 56,
+          "score": 0.5468,
+          "chunk_id": 1128
+        },
+        {
+          "page": 56,
+          "score": 0.5206,
+          "chunk_id": 1099
+        },
+        {
+          "page": 48,
+          "score": 0.4455,
+          "chunk_id": 994
+        },
+        {
+          "page": 20602,
+          "score": 0.4416,
+          "chunk_id": 2541
+        },
+        {
+          "page": 91,
+          "score": 0.4336,
+          "chunk_id": 1563
+        }
+      ]
+    },
+    {
+      "id": "s7_recettes_budgetaires",
+      "question": "À combien se sont établies les recettes budgétaires de l'État à fin 2025, et quelle part les recettes fiscales représentent-elles ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        59
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 59,
+          "score": 0.597,
+          "chunk_id": 1134
+        },
+        {
+          "page": 5,
+          "score": 0.5248,
+          "chunk_id": 15
+        },
+        {
+          "page": 5,
+          "score": 0.5392,
+          "chunk_id": 31
+        },
+        {
+          "page": 59,
+          "score": 0.4838,
+          "chunk_id": 1142
+        },
+        {
+          "page": 60,
+          "score": 0.4524,
+          "chunk_id": 1145
+        }
+      ]
+    },
+    {
+      "id": "s7_deficit_budgetaire",
+      "question": "De combien le déficit budgétaire s'est-il réduit entre 2024 et 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        60
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 60,
+          "score": 0.526,
+          "chunk_id": 1152
+        },
+        {
+          "page": 18,
+          "score": 0.5017,
+          "chunk_id": 494
+        },
+        {
+          "page": 60,
+          "score": 0.5307,
+          "chunk_id": 1153
+        },
+        {
+          "page": 5,
+          "score": 0.4617,
+          "chunk_id": 15
+        },
+        {
+          "page": 17,
+          "score": 0.5037,
+          "chunk_id": 477
+        }
+      ]
+    },
+    {
+      "id": "s7_dette_pib",
+      "question": "Quel pourcentage du PIB la dette extérieure mauritanienne représentait-elle à fin 2025, comparé à 2024 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        60
+      ],
+      "first_expected_rank": 2,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 5,
+          "score": 0.5208,
+          "chunk_id": 13
+        },
+        {
+          "page": 60,
+          "score": 0.4855,
+          "chunk_id": 1145
+        },
+        {
+          "page": 60,
+          "score": 0.4829,
+          "chunk_id": 1148
+        },
+        {
+          "page": 60,
+          "score": 0.492,
+          "chunk_id": 1156
+        },
+        {
+          "page": 54,
+          "score": 0.4689,
+          "chunk_id": 1034
+        }
+      ]
+    },
+    {
+      "id": "s7_creanciers_bilateraux",
+      "question": "Quels sont les principaux créanciers bilatéraux de la Mauritanie et leurs parts respectives dans la dette bilatérale en 2025 ?",
+      "difficulty": "liste",
+      "expected_pages": [
+        60
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 60,
+          "score": 0.5299,
+          "chunk_id": 1167
+        },
+        {
+          "page": 61,
+          "score": 0.4836,
+          "chunk_id": 1180
+        },
+        {
+          "page": 60,
+          "score": 0.5163,
+          "chunk_id": 1149
+        },
+        {
+          "page": 63,
+          "score": 0.4613,
+          "chunk_id": 1232
+        },
+        {
+          "page": 61,
+          "score": 0.4673,
+          "chunk_id": 1179
+        }
+      ]
+    },
+    {
+      "id": "s7_devise_dette",
+      "question": "Quelle devise domine l'encours de la dette extérieure mauritanienne en 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        61
+      ],
+      "first_expected_rank": 5,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 60,
+          "score": 0.5181,
+          "chunk_id": 1148
+        },
+        {
+          "page": 60,
+          "score": 0.5138,
+          "chunk_id": 1156
+        },
+        {
+          "page": 62,
+          "score": 0.485,
+          "chunk_id": 1215
+        },
+        {
+          "page": 62,
+          "score": 0.4584,
+          "chunk_id": 1210
+        },
+        {
+          "page": 61,
+          "score": 0.4808,
+          "chunk_id": 1178
+        }
+      ]
+    },
+    {
+      "id": "s7_service_dette_bcm",
+      "question": "Pourquoi le service de la dette payé par la BCM a-t-il augmenté de 32% en 2025 ?",
+      "difficulty": "raisonnement",
+      "expected_pages": [
+        61
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 61,
+          "score": 0.4655,
+          "chunk_id": 1178
+        },
+        {
+          "page": 25,
+          "score": 0.4545,
+          "chunk_id": 625
+        },
+        {
+          "page": 98,
+          "score": 0.4594,
+          "chunk_id": 1623
+        },
+        {
+          "page": 46,
+          "score": 0.4518,
+          "chunk_id": 951
+        },
+        {
+          "page": 61,
+          "score": 0.4669,
+          "chunk_id": 1180
+        }
+      ]
+    },
+    {
+      "id": "s7_fades_service",
+      "question": "Quel créancier multilatéral est le principal bénéficiaire du service de la dette extérieure en 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        61
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 61,
+          "score": 0.574,
+          "chunk_id": 1179
+        },
+        {
+          "page": 60,
+          "score": 0.5232,
+          "chunk_id": 1173
+        },
+        {
+          "page": 61,
+          "score": 0.4911,
+          "chunk_id": 1180
+        },
+        {
+          "page": 60,
+          "score": 0.5081,
+          "chunk_id": 1172
+        },
+        {
+          "page": 61,
+          "score": 0.4999,
+          "chunk_id": 1203
+        }
+      ]
+    },
+    {
+      "id": "s7_nouveaux_prets",
+      "question": "À combien se sont élevés les nouveaux accords de prêts extérieurs signés en 2025, et par qui ont-ils été intégralement contractés ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        63
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 63,
+          "score": 0.5445,
+          "chunk_id": 1232
+        },
+        {
+          "page": 63,
+          "score": 0.4479,
+          "chunk_id": 1233
+        },
+        {
+          "page": 113,
+          "score": 0.4334,
+          "chunk_id": 1952
+        },
+        {
+          "page": 63,
+          "score": 0.6605,
+          "chunk_id": 1246
+        },
+        {
+          "page": 5,
+          "score": 0.431,
+          "chunk_id": 15
+        }
+      ]
+    },
+    {
+      "id": "s7_secteurs_financements",
+      "question": "À quels secteurs sont principalement destinés les nouveaux financements extérieurs contractés en 2025 ?",
+      "difficulty": "liste",
+      "expected_pages": [
+        63
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 63,
+          "score": 0.5023,
+          "chunk_id": 1233
+        },
+        {
+          "page": 63,
+          "score": 0.4634,
+          "chunk_id": 1232
+        },
+        {
+          "page": 56,
+          "score": 0.4492,
+          "chunk_id": 1098
+        },
+        {
+          "page": 22,
+          "score": 0.4458,
+          "chunk_id": 528
+        },
+        {
+          "page": 5,
+          "score": 0.4405,
+          "chunk_id": 17
+        }
+      ]
+    },
+    {
+      "id": "s7_contribution_climat",
+      "question": "Quelle mesure fiscale liée au climat le Projet de Loi de Finances 2025 a-t-il introduite pour la première fois ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        60
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 60,
+          "score": 0.5409,
+          "chunk_id": 1145
+        },
+        {
+          "page": 60,
+          "score": 0.4608,
+          "chunk_id": 1148
+        },
+        {
+          "page": 102,
+          "score": 0.4288,
+          "chunk_id": 1711
+        },
+        {
+          "page": 5,
+          "score": 0.4278,
+          "chunk_id": 15
+        },
+        {
+          "page": 55,
+          "score": 0.4293,
+          "chunk_id": 1048
+        }
+      ]
+    },
+    {
+      "id": "s8_dgsmp",
+      "question": "Quelle direction de la BCM est chargée des systèmes et moyens de paiement ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        64
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 64,
+          "score": 0.5963,
+          "chunk_id": 1250
+        },
+        {
+          "page": 65,
+          "score": 0.5111,
+          "chunk_id": 1258
+        },
+        {
+          "page": 64,
+          "score": 0.5241,
+          "chunk_id": 1251
+        },
+        {
+          "page": 20403,
+          "score": 0.4789,
+          "chunk_id": 2480
+        },
+        {
+          "page": 20403,
+          "score": 0.4609,
+          "chunk_id": 2481
+        }
+      ]
+    },
+    {
+      "id": "s8_realisations_2025",
+      "question": "Quelles réalisations significatives la DGSMP a-t-elle menées en 2025 en matière de surveillance des paiements ?",
+      "difficulty": "liste",
+      "expected_pages": [
+        64,
+        65
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 64,
+          "score": 0.5046,
+          "chunk_id": 1250
+        },
+        {
+          "page": 64,
+          "score": 0.4674,
+          "chunk_id": 1251
+        },
+        {
+          "page": 20603,
+          "score": 0.4464,
+          "chunk_id": 2549
+        },
+        {
+          "page": 76,
+          "score": 0.4278,
+          "chunk_id": 1385
+        },
+        {
+          "page": 73,
+          "score": 0.4303,
+          "chunk_id": 1366
+        }
+      ]
+    },
+    {
+      "id": "s8_objectifs_cartographie",
+      "question": "Quels sont les trois objectifs poursuivis par la méthodologie de cartographie des risques des plateformes opérées par la BCM ?",
+      "difficulty": "liste",
+      "expected_pages": [
+        65
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 65,
+          "score": 0.6105,
+          "chunk_id": 1256
+        },
+        {
+          "page": 64,
+          "score": 0.4483,
+          "chunk_id": 1251
+        },
+        {
+          "page": 64,
+          "score": 0.4488,
+          "chunk_id": 1250
+        },
+        {
+          "page": 20603,
+          "score": 0.4384,
+          "chunk_id": 2547
+        },
+        {
+          "page": 65,
+          "score": 0.4389,
+          "chunk_id": 1258
+        }
+      ]
+    },
+    {
+      "id": "s8_fonds_garantie",
+      "question": "Quel dispositif la BCM envisage-t-elle de mettre en place pour couvrir le risque de liquidité dans les paiements ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        65
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 65,
+          "score": 0.5418,
+          "chunk_id": 1258
+        },
+        {
+          "page": 65,
+          "score": 0.5345,
+          "chunk_id": 1257
+        },
+        {
+          "page": 64,
+          "score": 0.475,
+          "chunk_id": 1251
+        },
+        {
+          "page": 64,
+          "score": 0.4656,
+          "chunk_id": 1250
+        },
+        {
+          "page": 20402,
+          "score": 0.4543,
+          "chunk_id": 2476
+        }
+      ]
+    },
+    {
+      "id": "s8_iso20022",
+      "question": "Quelle norme internationale la BCM applique-t-elle pour renforcer l'utilisation des codes de motifs de paiement ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        65
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 65,
+          "score": 0.5615,
+          "chunk_id": 1257
+        },
+        {
+          "page": 65,
+          "score": 0.5202,
+          "chunk_id": 1258
+        },
+        {
+          "page": 64,
+          "score": 0.4685,
+          "chunk_id": 1250
+        },
+        {
+          "page": 20403,
+          "score": 0.4587,
+          "chunk_id": 2480
+        },
+        {
+          "page": 20403,
+          "score": 0.449,
+          "chunk_id": 2481
+        }
+      ]
+    },
+    {
+      "id": "s8_portail_investisseurs",
+      "question": "Pour quelle infrastructure la BCM envisage-t-elle de mettre en place un portail des investisseurs ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        65
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 65,
+          "score": 0.6334,
+          "chunk_id": 1258
+        },
+        {
+          "page": 84,
+          "score": 0.4559,
+          "chunk_id": 1474
+        },
+        {
+          "page": 64,
+          "score": 0.4527,
+          "chunk_id": 1250
+        },
+        {
+          "page": 20402,
+          "score": 0.4446,
+          "chunk_id": 2476
+        },
+        {
+          "page": 28,
+          "score": 0.4427,
+          "chunk_id": 674
+        }
+      ]
+    },
+    {
+      "id": "s8_cip",
+      "question": "Quel est le rôle de la future Centrale des Incidents de Paiement envisagée par la BCM ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        65
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 65,
+          "score": 0.5491,
+          "chunk_id": 1258
+        },
+        {
+          "page": 20402,
+          "score": 0.4715,
+          "chunk_id": 2476
+        },
+        {
+          "page": 64,
+          "score": 0.4715,
+          "chunk_id": 1251
+        },
+        {
+          "page": 64,
+          "score": 0.4676,
+          "chunk_id": 1250
+        },
+        {
+          "page": 20603,
+          "score": 0.4633,
+          "chunk_id": 2548
+        }
+      ]
+    },
+    {
+      "id": "s8_norme_rib",
+      "question": "Que garantit la norme du RIB mise en application par la BCM sur le système de paiement ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        65
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 65,
+          "score": 0.5894,
+          "chunk_id": 1257
+        },
+        {
+          "page": 64,
+          "score": 0.5026,
+          "chunk_id": 1250
+        },
+        {
+          "page": 65,
+          "score": 0.4875,
+          "chunk_id": 1258
+        },
+        {
+          "page": 20403,
+          "score": 0.4597,
+          "chunk_id": 2480
+        },
+        {
+          "page": 12,
+          "score": 0.457,
+          "chunk_id": 356
+        }
+      ]
+    },
+    {
+      "id": "s8_systemes_couverts",
+      "question": "Quels systèmes de paiement sont couverts par les statistiques d'activité des paiements en 2025 présentées dans le rapport ?",
+      "difficulty": "liste",
+      "expected_pages": [
+        65
+      ],
+      "first_expected_rank": 4,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 20603,
+          "score": 0.5141,
+          "chunk_id": 2549
+        },
+        {
+          "page": 64,
+          "score": 0.4774,
+          "chunk_id": 1251
+        },
+        {
+          "page": 64,
+          "score": 0.4686,
+          "chunk_id": 1250
+        },
+        {
+          "page": 65,
+          "score": 0.5686,
+          "chunk_id": 1262
+        },
+        {
+          "page": 76,
+          "score": 0.4559,
+          "chunk_id": 1385
+        }
+      ]
+    },
+    {
+      "id": "s8_raison_surveillance",
+      "question": "Pourquoi la BCM a-t-elle mis en place un dispositif de surveillance couvrant à la fois ses propres infrastructures et celles d'acteurs externes ?",
+      "difficulty": "raisonnement",
+      "expected_pages": [
+        64
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 64,
+          "score": 0.5189,
+          "chunk_id": 1251
+        },
+        {
+          "page": 64,
+          "score": 0.5232,
+          "chunk_id": 1250
+        },
+        {
+          "page": 20206,
+          "score": 0.4706,
+          "chunk_id": 2445
+        },
+        {
+          "page": 65,
+          "score": 0.4522,
+          "chunk_id": 1258
+        },
+        {
+          "page": 20603,
+          "score": 0.4537,
+          "chunk_id": 2547
+        }
+      ]
+    },
+    {
+      "id": "s9_retraits_2025",
+      "question": "Quel montant total les opérations de retrait ont-elles atteint en 2025, et quelle variation cela représente-t-il par rapport à 2024 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        66
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 66,
+          "score": 0.4708,
+          "chunk_id": 1263
+        },
+        {
+          "page": 112,
+          "score": 0.486,
+          "chunk_id": 1922
+        },
+        {
+          "page": 67,
+          "score": 0.4649,
+          "chunk_id": 1267
+        },
+        {
+          "page": 63,
+          "score": 0.4498,
+          "chunk_id": 1232
+        },
+        {
+          "page": 110,
+          "score": 0.4448,
+          "chunk_id": 1801
+        }
+      ]
+    },
+    {
+      "id": "s9_part_retraits_banques",
+      "question": "Quelle part des retraits en 2025 les banques commerciales et le Trésor ont-ils représentée ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        67
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 67,
+          "score": 0.5175,
+          "chunk_id": 1267
+        },
+        {
+          "page": 27,
+          "score": 0.4581,
+          "chunk_id": 649
+        },
+        {
+          "page": 67,
+          "score": 0.633,
+          "chunk_id": 1271
+        },
+        {
+          "page": 118,
+          "score": 0.4308,
+          "chunk_id": 2168
+        },
+        {
+          "page": 25,
+          "score": 0.4309,
+          "chunk_id": 624
+        }
+      ]
+    },
+    {
+      "id": "s9_paquets_tries",
+      "question": "Combien de paquets de billets la salle de tri du siège a-t-elle traités en 2025, contre 2024 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        67
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 67,
+          "score": 0.656,
+          "chunk_id": 1273
+        },
+        {
+          "page": 67,
+          "score": 0.5997,
+          "chunk_id": 1275
+        },
+        {
+          "page": 81,
+          "score": 0.475,
+          "chunk_id": 1421
+        },
+        {
+          "page": 81,
+          "score": 0.4719,
+          "chunk_id": 1427
+        },
+        {
+          "page": 60,
+          "score": 0.43,
+          "chunk_id": 1145
+        }
+      ]
+    },
+    {
+      "id": "s9_achats_eur",
+      "question": "De combien les achats de devises en euros ont-ils progressé en 2025 par rapport à 2024 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        67
+      ],
+      "first_expected_rank": 2,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 29,
+          "score": 0.4895,
+          "chunk_id": 693
+        },
+        {
+          "page": 67,
+          "score": 0.4724,
+          "chunk_id": 1283
+        },
+        {
+          "page": 67,
+          "score": 0.4883,
+          "chunk_id": 1268
+        },
+        {
+          "page": 14,
+          "score": 0.4641,
+          "chunk_id": 396
+        },
+        {
+          "page": 7,
+          "score": 0.4486,
+          "chunk_id": 68
+        }
+      ]
+    },
+    {
+      "id": "s9_autorisations_emission",
+      "question": "Combien d'autorisations d'émission de billets ont été réalisées en 2025, pour quelle valeur totale ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        67
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 67,
+          "score": 0.5128,
+          "chunk_id": 1269
+        },
+        {
+          "page": 67,
+          "score": 0.5293,
+          "chunk_id": 1270
+        },
+        {
+          "page": 67,
+          "score": 0.4586,
+          "chunk_id": 1274
+        },
+        {
+          "page": 113,
+          "score": 0.4359,
+          "chunk_id": 1952
+        },
+        {
+          "page": 68,
+          "score": 0.4338,
+          "chunk_id": 1291
+        }
+      ]
+    },
+    {
+      "id": "s9_billets_commemoratifs",
+      "question": "Quelle part de la valeur totale émise en 2025 les billets commémoratifs de 50 MRU représentent-ils ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        67
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 67,
+          "score": 0.5284,
+          "chunk_id": 1269
+        },
+        {
+          "page": 113,
+          "score": 0.4718,
+          "chunk_id": 1952
+        },
+        {
+          "page": 67,
+          "score": 0.5642,
+          "chunk_id": 1270
+        },
+        {
+          "page": 112,
+          "score": 0.4454,
+          "chunk_id": 1922
+        },
+        {
+          "page": 68,
+          "score": 0.4384,
+          "chunk_id": 1293
+        }
+      ]
+    },
+    {
+      "id": "s9_circulation_fiduciaire",
+      "question": "À combien s'est établie la circulation fiduciaire au 31 décembre 2025, et quelles coupures la dominent ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        68
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 68,
+          "score": 0.5528,
+          "chunk_id": 1289
+        },
+        {
+          "page": 68,
+          "score": 0.4504,
+          "chunk_id": 1291
+        },
+        {
+          "page": 110,
+          "score": 0.4647,
+          "chunk_id": 1830
+        },
+        {
+          "page": 117,
+          "score": 0.4751,
+          "chunk_id": 2148
+        },
+        {
+          "page": 110,
+          "score": 0.4362,
+          "chunk_id": 1801
+        }
+      ]
+    },
+    {
+      "id": "s9_priorites_2026",
+      "question": "Quelles sont les priorités identifiées pour améliorer la gestion fiduciaire en 2026 ?",
+      "difficulty": "liste",
+      "expected_pages": [
+        68
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 68,
+          "score": 0.4544,
+          "chunk_id": 1293
+        },
+        {
+          "page": 68,
+          "score": 0.4711,
+          "chunk_id": 1291
+        },
+        {
+          "page": 28,
+          "score": 0.4491,
+          "chunk_id": 674
+        },
+        {
+          "page": 73,
+          "score": 0.4384,
+          "chunk_id": 1366
+        },
+        {
+          "page": 60,
+          "score": 0.4356,
+          "chunk_id": 1145
+        }
+      ]
+    },
+    {
+      "id": "s9_prix_innovation_map",
+      "question": "Pour quelle distinction la BCM a-t-elle été récompensée lors du Mint & Print Conference 2025 à Istanbul ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        68
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 68,
+          "score": 0.57,
+          "chunk_id": 1291
+        },
+        {
+          "page": 68,
+          "score": 0.4524,
+          "chunk_id": 1292
+        },
+        {
+          "page": 98,
+          "score": 0.4422,
+          "chunk_id": 1623
+        },
+        {
+          "page": 84,
+          "score": 0.4375,
+          "chunk_id": 1466
+        },
+        {
+          "page": 20501,
+          "score": 0.4347,
+          "chunk_id": 2510
+        }
+      ]
+    },
+    {
+      "id": "s9_methodologie_substrats",
+      "question": "Quelles méthodes la BCM a-t-elle combinées dans son expérimentation de substrats de billets récompensée à Istanbul ?",
+      "difficulty": "raisonnement",
+      "expected_pages": [
+        68
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 68,
+          "score": 0.5543,
+          "chunk_id": 1291
+        },
+        {
+          "page": 68,
+          "score": 0.4814,
+          "chunk_id": 1293
+        },
+        {
+          "page": 65,
+          "score": 0.4392,
+          "chunk_id": 1258
+        },
+        {
+          "page": 20402,
+          "score": 0.4368,
+          "chunk_id": 2476
+        },
+        {
+          "page": 64,
+          "score": 0.4364,
+          "chunk_id": 1250
+        }
+      ]
+    },
+    {
+      "id": "s10_taux_inclusion",
+      "question": "Quel était le taux d'inclusion financière en Mauritanie à fin décembre 2025, et comment a-t-il évolué depuis 2022 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        69
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 69,
+          "score": 0.4879,
+          "chunk_id": 1299
+        },
+        {
+          "page": 8,
+          "score": 0.5264,
+          "chunk_id": 97
+        },
+        {
+          "page": 69,
+          "score": 0.5319,
+          "chunk_id": 1304
+        },
+        {
+          "page": 20302,
+          "score": 0.4796,
+          "chunk_id": 2451
+        },
+        {
+          "page": 73,
+          "score": 0.4753,
+          "chunk_id": 1365
+        }
+      ]
+    },
+    {
+      "id": "s10_quatre_strategies",
+      "question": "Quelles sont les quatre stratégies/cadres nationaux complémentaires que la BCM met en œuvre dans le cadre de l'inclusion financière ?",
+      "difficulty": "liste",
+      "expected_pages": [
+        69
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 69,
+          "score": 0.5092,
+          "chunk_id": 1298
+        },
+        {
+          "page": 69,
+          "score": 0.5152,
+          "chunk_id": 1302
+        },
+        {
+          "page": 20302,
+          "score": 0.5002,
+          "chunk_id": 2451
+        },
+        {
+          "page": 73,
+          "score": 0.472,
+          "chunk_id": 1361
+        },
+        {
+          "page": 73,
+          "score": 0.4701,
+          "chunk_id": 1365
+        }
+      ]
+    },
+    {
+      "id": "s10_conseil_reunions",
+      "question": "Combien de fois le Conseil National de l'Inclusion Financière s'est-il réuni en 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        70
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 70,
+          "score": 0.5344,
+          "chunk_id": 1311
+        },
+        {
+          "page": 69,
+          "score": 0.478,
+          "chunk_id": 1302
+        },
+        {
+          "page": 20302,
+          "score": 0.4802,
+          "chunk_id": 2451
+        },
+        {
+          "page": 20603,
+          "score": 0.4709,
+          "chunk_id": 2549
+        },
+        {
+          "page": 95,
+          "score": 0.4695,
+          "chunk_id": 1614
+        }
+      ]
+    },
+    {
+      "id": "s10_instruments_innovation",
+      "question": "Quels sont les trois instruments structurants de la politique d'innovation financière 2025-2028 de la BCM ?",
+      "difficulty": "liste",
+      "expected_pages": [
+        70
+      ],
+      "first_expected_rank": 2,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 69,
+          "score": 0.4918,
+          "chunk_id": 1302
+        },
+        {
+          "page": 70,
+          "score": 0.5004,
+          "chunk_id": 1317
+        },
+        {
+          "page": 68,
+          "score": 0.4636,
+          "chunk_id": 1291
+        },
+        {
+          "page": 83,
+          "score": 0.4615,
+          "chunk_id": 1461
+        },
+        {
+          "page": 20402,
+          "score": 0.4649,
+          "chunk_id": 2476
+        }
+      ]
+    },
+    {
+      "id": "s10_himaya",
+      "question": "Quel dispositif la BCM a-t-elle inauguré en 2025 pour traiter les réclamations des usagers de services financiers ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        71
+      ],
+      "first_expected_rank": 4,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 84,
+          "score": 0.4795,
+          "chunk_id": 1474
+        },
+        {
+          "page": 84,
+          "score": 0.5374,
+          "chunk_id": 1473
+        },
+        {
+          "page": 64,
+          "score": 0.4569,
+          "chunk_id": 1251
+        },
+        {
+          "page": 71,
+          "score": 0.5308,
+          "chunk_id": 1328
+        },
+        {
+          "page": 73,
+          "score": 0.4547,
+          "chunk_id": 1366
+        }
+      ]
+    },
+    {
+      "id": "s10_snpn_meilleur_taux",
+      "question": "Quelle stratégie affiche le taux d'achèvement le plus élevé parmi celles suivies par le PAFIID, et à quel niveau ?",
+      "difficulty": "raisonnement",
+      "expected_pages": [
+        71
+      ],
+      "first_expected_rank": 6,
+      "relevant": true,
+      "success_at_5_or_refusal": false,
+      "top_results": [
+        {
+          "page": 20302,
+          "score": 0.5137,
+          "chunk_id": 2451
+        },
+        {
+          "page": 70,
+          "score": 0.5144,
+          "chunk_id": 1313
+        },
+        {
+          "page": 12,
+          "score": 0.5029,
+          "chunk_id": 359
+        },
+        {
+          "page": 20302,
+          "score": 0.5011,
+          "chunk_id": 2452
+        },
+        {
+          "page": 20505,
+          "score": 0.4968,
+          "chunk_id": 2520
+        }
+      ]
+    },
+    {
+      "id": "s10_langues_videos",
+      "question": "En combien de langues les vidéos éducatives du portail d'éducation financière de la BCM sont-elles proposées, et lesquelles ?",
+      "difficulty": "liste",
+      "expected_pages": [
+        71
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 71,
+          "score": 0.5449,
+          "chunk_id": 1334
+        },
+        {
+          "page": 84,
+          "score": 0.5146,
+          "chunk_id": 1475
+        },
+        {
+          "page": 84,
+          "score": 0.4763,
+          "chunk_id": 1474
+        },
+        {
+          "page": 87,
+          "score": 0.4598,
+          "chunk_id": 1521
+        },
+        {
+          "page": 65,
+          "score": 0.4448,
+          "chunk_id": 1258
+        }
+      ]
+    },
+    {
+      "id": "s10_comite_esg",
+      "question": "Quel organisme la BCM a-t-elle créé en 2025 pour piloter l'intégration des critères environnementaux, sociaux et de gouvernance ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        72
+      ],
+      "first_expected_rank": null,
+      "relevant": true,
+      "success_at_5_or_refusal": false,
+      "top_results": [
+        {
+          "page": 95,
+          "score": 0.4846,
+          "chunk_id": 1612
+        },
+        {
+          "page": 84,
+          "score": 0.4548,
+          "chunk_id": 1466
+        },
+        {
+          "page": 52,
+          "score": 0.4544,
+          "chunk_id": 1028
+        },
+        {
+          "page": 98,
+          "score": 0.4517,
+          "chunk_id": 1623
+        },
+        {
+          "page": 83,
+          "score": 0.4516,
+          "chunk_id": 1461
+        }
+      ]
+    },
+    {
+      "id": "s10_sept_defis",
+      "question": "Quels sont les principaux défis identifiés dans la mise en œuvre des stratégies d'inclusion financière en 2025 ?",
+      "difficulty": "liste",
+      "expected_pages": [
+        72
+      ],
+      "first_expected_rank": 4,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 69,
+          "score": 0.5229,
+          "chunk_id": 1302
+        },
+        {
+          "page": 69,
+          "score": 0.5221,
+          "chunk_id": 1298
+        },
+        {
+          "page": 73,
+          "score": 0.494,
+          "chunk_id": 1366
+        },
+        {
+          "page": 72,
+          "score": 0.5204,
+          "chunk_id": 1343
+        },
+        {
+          "page": 73,
+          "score": 0.4907,
+          "chunk_id": 1365
+        }
+      ]
+    },
+    {
+      "id": "s10_bad_pamif",
+      "question": "Quel partenaire technique a appuyé la mise en place du Core Banking System, de l'ERP et du RTGS de la BCM ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        73
+      ],
+      "first_expected_rank": null,
+      "relevant": true,
+      "success_at_5_or_refusal": false,
+      "top_results": [
+        {
+          "page": 80,
+          "score": 0.501,
+          "chunk_id": 1402
+        },
+        {
+          "page": 80,
+          "score": 0.4851,
+          "chunk_id": 1403
+        },
+        {
+          "page": 65,
+          "score": 0.4705,
+          "chunk_id": 1258
+        },
+        {
+          "page": 64,
+          "score": 0.4631,
+          "chunk_id": 1253
+        },
+        {
+          "page": 12,
+          "score": 0.4739,
+          "chunk_id": 356
+        }
+      ]
+    },
+    {
+      "id": "s11_infra_paiement",
+      "question": "Quels systèmes composent l'infrastructure du système national de paiement mise en place par la BCM ?",
+      "difficulty": "liste",
+      "expected_pages": [
+        74
+      ],
+      "first_expected_rank": 12,
+      "relevant": true,
+      "success_at_5_or_refusal": false,
+      "top_results": [
+        {
+          "page": 64,
+          "score": 0.5457,
+          "chunk_id": 1250
+        },
+        {
+          "page": 64,
+          "score": 0.5359,
+          "chunk_id": 1253
+        },
+        {
+          "page": 65,
+          "score": 0.5005,
+          "chunk_id": 1258
+        },
+        {
+          "page": 20403,
+          "score": 0.4971,
+          "chunk_id": 2480
+        },
+        {
+          "page": 20603,
+          "score": 0.5053,
+          "chunk_id": 2549
+        }
+      ]
+    },
+    {
+      "id": "s11_mfa_cybersecurite",
+      "question": "Quelles mesures de renforcement de la cybersécurité la BCM a-t-elle mises en place en 2025 ?",
+      "difficulty": "liste",
+      "expected_pages": [
+        74
+      ],
+      "first_expected_rank": null,
+      "relevant": true,
+      "success_at_5_or_refusal": false,
+      "top_results": [
+        {
+          "page": 20603,
+          "score": 0.478,
+          "chunk_id": 2547
+        },
+        {
+          "page": 84,
+          "score": 0.4886,
+          "chunk_id": 1466
+        },
+        {
+          "page": 65,
+          "score": 0.4718,
+          "chunk_id": 1258
+        },
+        {
+          "page": 20101,
+          "score": 0.4799,
+          "chunk_id": 2421
+        },
+        {
+          "page": 64,
+          "score": 0.4708,
+          "chunk_id": 1250
+        }
+      ]
+    },
+    {
+      "id": "s11_ia_blockchain",
+      "question": "Dans quels deux domaines technologiques émergents la BCM souhaite-t-elle favoriser l'innovation ?",
+      "difficulty": "liste",
+      "expected_pages": [
+        74
+      ],
+      "first_expected_rank": null,
+      "relevant": true,
+      "success_at_5_or_refusal": false,
+      "top_results": [
+        {
+          "page": 83,
+          "score": 0.4749,
+          "chunk_id": 1461
+        },
+        {
+          "page": 9,
+          "score": 0.457,
+          "chunk_id": 105
+        },
+        {
+          "page": 20403,
+          "score": 0.4514,
+          "chunk_id": 2480
+        },
+        {
+          "page": 20101,
+          "score": 0.4445,
+          "chunk_id": 2422
+        },
+        {
+          "page": 68,
+          "score": 0.4418,
+          "chunk_id": 1292
+        }
+      ]
+    },
+    {
+      "id": "s11_projets_2026",
+      "question": "Quels deux grands projets d'infrastructure de marché sont prévus pour 2026 par la direction informatique de la BCM ?",
+      "difficulty": "liste",
+      "expected_pages": [
+        75
+      ],
+      "first_expected_rank": 3,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 28,
+          "score": 0.4759,
+          "chunk_id": 674
+        },
+        {
+          "page": 81,
+          "score": 0.4671,
+          "chunk_id": 1413
+        },
+        {
+          "page": 75,
+          "score": 0.499,
+          "chunk_id": 1376
+        },
+        {
+          "page": 20101,
+          "score": 0.4631,
+          "chunk_id": 2421
+        },
+        {
+          "page": 73,
+          "score": 0.4603,
+          "chunk_id": 1367
+        }
+      ]
+    },
+    {
+      "id": "s11_iso27001",
+      "question": "À quelle norme ISO la BCM prépare-t-elle sa certification en matière de sécurité informatique ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        75
+      ],
+      "first_expected_rank": 2,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 65,
+          "score": 0.4771,
+          "chunk_id": 1257
+        },
+        {
+          "page": 75,
+          "score": 0.5063,
+          "chunk_id": 1377
+        },
+        {
+          "page": 74,
+          "score": 0.4721,
+          "chunk_id": 1373
+        },
+        {
+          "page": 84,
+          "score": 0.4575,
+          "chunk_id": 1466
+        },
+        {
+          "page": 76,
+          "score": 0.4462,
+          "chunk_id": 1386
+        }
+      ]
+    },
+    {
+      "id": "s11_banques_data_governance",
+      "question": "Combien de banques transmettent régulièrement leurs données à la BCM dans le cadre du programme BCM Data Governance, et via combien d'interfaces ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        75
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 75,
+          "score": 0.5091,
+          "chunk_id": 1378
+        },
+        {
+          "page": 75,
+          "score": 0.5001,
+          "chunk_id": 1379
+        },
+        {
+          "page": 20501,
+          "score": 0.4404,
+          "chunk_id": 2509
+        },
+        {
+          "page": 65,
+          "score": 0.4393,
+          "chunk_id": 1258
+        },
+        {
+          "page": 81,
+          "score": 0.4391,
+          "chunk_id": 1413
+        }
+      ]
+    },
+    {
+      "id": "s11_cartographie_comptable",
+      "question": "Combien de comptes le chantier de cartographie comptable de la BCM a-t-il analysés, et combien de mappings a-t-il produits ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        76
+      ],
+      "first_expected_rank": 3,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 102,
+          "score": 0.4393,
+          "chunk_id": 1708
+        },
+        {
+          "page": 20603,
+          "score": 0.4405,
+          "chunk_id": 2548
+        },
+        {
+          "page": 76,
+          "score": 0.4395,
+          "chunk_id": 1385
+        },
+        {
+          "page": 98,
+          "score": 0.4374,
+          "chunk_id": 1623
+        },
+        {
+          "page": 76,
+          "score": 0.4855,
+          "chunk_id": 1382
+        }
+      ]
+    },
+    {
+      "id": "s11_monographie_indicateurs",
+      "question": "Combien d'indicateurs et de visualisations la monographie des actifs décisionnels de la BCM a-t-elle documentés ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        76
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 76,
+          "score": 0.5323,
+          "chunk_id": 1384
+        },
+        {
+          "page": 98,
+          "score": 0.446,
+          "chunk_id": 1623
+        },
+        {
+          "page": 20402,
+          "score": 0.4447,
+          "chunk_id": 2476
+        },
+        {
+          "page": 20603,
+          "score": 0.4443,
+          "chunk_id": 2547
+        },
+        {
+          "page": 20601,
+          "score": 0.4458,
+          "chunk_id": 2536
+        }
+      ]
+    },
+    {
+      "id": "s11_concordance_centrales_risques",
+      "question": "Quel taux de concordance la reconstitution des centrales des risques a-t-elle atteint à la BCM ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        76
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 76,
+          "score": 0.5075,
+          "chunk_id": 1385
+        },
+        {
+          "page": 20603,
+          "score": 0.4521,
+          "chunk_id": 2547
+        },
+        {
+          "page": 20402,
+          "score": 0.4501,
+          "chunk_id": 2476
+        },
+        {
+          "page": 98,
+          "score": 0.4487,
+          "chunk_id": 1623
+        },
+        {
+          "page": 20406,
+          "score": 0.4583,
+          "chunk_id": 2494
+        }
+      ]
+    },
+    {
+      "id": "s11_nouvelles_sources_donnees",
+      "question": "Quelles nouvelles sources de données la BCM prévoit-elle d'intégrer à sa gouvernance des données à l'avenir ?",
+      "difficulty": "liste",
+      "expected_pages": [
+        76
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 76,
+          "score": 0.5123,
+          "chunk_id": 1385
+        },
+        {
+          "page": 75,
+          "score": 0.4843,
+          "chunk_id": 1378
+        },
+        {
+          "page": 76,
+          "score": 0.4668,
+          "chunk_id": 1386
+        },
+        {
+          "page": 20101,
+          "score": 0.4583,
+          "chunk_id": 2421
+        },
+        {
+          "page": 20402,
+          "score": 0.4507,
+          "chunk_id": 2476
+        }
+      ]
+    },
+    {
+      "id": "s12_loi_statut",
+      "question": "Quel texte de loi régit le statut juridique de la BCM depuis 2024 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        78
+      ],
+      "first_expected_rank": 2,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 98,
+          "score": 0.4986,
+          "chunk_id": 1623
+        },
+        {
+          "page": 78,
+          "score": 0.5008,
+          "chunk_id": 1388
+        },
+        {
+          "page": 98,
+          "score": 0.4868,
+          "chunk_id": 1628
+        },
+        {
+          "page": 3,
+          "score": 0.4756,
+          "chunk_id": 2
+        },
+        {
+          "page": 118,
+          "score": 0.4758,
+          "chunk_id": 2168
+        }
+      ]
+    },
+    {
+      "id": "s12_quatre_conseils",
+      "question": "Quels sont les quatre conseils stratégiques qui composent la gouvernance de la BCM ?",
+      "difficulty": "liste",
+      "expected_pages": [
+        79
+      ],
+      "first_expected_rank": 2,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 20402,
+          "score": 0.4688,
+          "chunk_id": 2477
+        },
+        {
+          "page": 79,
+          "score": 0.5054,
+          "chunk_id": 1394
+        },
+        {
+          "page": 20602,
+          "score": 0.4619,
+          "chunk_id": 2541
+        },
+        {
+          "page": 81,
+          "score": 0.4562,
+          "chunk_id": 1414
+        },
+        {
+          "page": 20402,
+          "score": 0.4551,
+          "chunk_id": 2476
+        }
+      ]
+    },
+    {
+      "id": "s12_carte_strategique",
+      "question": "Combien d'objectifs stratégiques compte la carte stratégique de la BCM pour la période 2024-2027, et autour de combien d'axes ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        80
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 80,
+          "score": 0.6044,
+          "chunk_id": 1407
+        },
+        {
+          "page": 80,
+          "score": 0.5324,
+          "chunk_id": 1399
+        },
+        {
+          "page": 51,
+          "score": 0.4977,
+          "chunk_id": 1025
+        },
+        {
+          "page": 86,
+          "score": 0.5485,
+          "chunk_id": 1505
+        },
+        {
+          "page": 98,
+          "score": 0.4563,
+          "chunk_id": 1623
+        }
+      ]
+    },
+    {
+      "id": "s12_enjeux_esg",
+      "question": "Combien d'enjeux matériels ont été identifiés dans le diagnostic ESG de la BCM en 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        80
+      ],
+      "first_expected_rank": 2,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 84,
+          "score": 0.5411,
+          "chunk_id": 1468
+        },
+        {
+          "page": 80,
+          "score": 0.5195,
+          "chunk_id": 1404
+        },
+        {
+          "page": 84,
+          "score": 0.5142,
+          "chunk_id": 1466
+        },
+        {
+          "page": 87,
+          "score": 0.4799,
+          "chunk_id": 1521
+        },
+        {
+          "page": 86,
+          "score": 0.4596,
+          "chunk_id": 1501
+        }
+      ]
+    },
+    {
+      "id": "s12_lettre_information",
+      "question": "Quand la BCM a-t-elle lancé sa Lettre d'Information périodique, et combien de numéros avaient été publiés entre septembre 2025 et mai 2026 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        81
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 81,
+          "score": 0.6009,
+          "chunk_id": 1422
+        },
+        {
+          "page": 81,
+          "score": 0.6123,
+          "chunk_id": 1413
+        },
+        {
+          "page": 20601,
+          "score": 0.4808,
+          "chunk_id": 2536
+        },
+        {
+          "page": 20401,
+          "score": 0.4932,
+          "chunk_id": 2470
+        },
+        {
+          "page": 20501,
+          "score": 0.4748,
+          "chunk_id": 2507
+        }
+      ]
+    },
+    {
+      "id": "s12_versements_controle_general",
+      "question": "Quel montant total les versements effectués par les établissements bancaires au Contrôle Général ont-ils atteint en 2025, comparé à 2024 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        81
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 81,
+          "score": 0.5361,
+          "chunk_id": 1421
+        },
+        {
+          "page": 67,
+          "score": 0.4497,
+          "chunk_id": 1267
+        },
+        {
+          "page": 60,
+          "score": 0.4394,
+          "chunk_id": 1145
+        },
+        {
+          "page": 20604,
+          "score": 0.4382,
+          "chunk_id": 2551
+        },
+        {
+          "page": 98,
+          "score": 0.4433,
+          "chunk_id": 1623
+        }
+      ]
+    },
+    {
+      "id": "s12_note_conformite",
+      "question": "Quelle note globale de conformité un cabinet indépendant a-t-il attribuée à la BCM en 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        82
+      ],
+      "first_expected_rank": 2,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 98,
+          "score": 0.4683,
+          "chunk_id": 1623
+        },
+        {
+          "page": 82,
+          "score": 0.4805,
+          "chunk_id": 1433
+        },
+        {
+          "page": 118,
+          "score": 0.4549,
+          "chunk_id": 2168
+        },
+        {
+          "page": 106,
+          "score": 0.4543,
+          "chunk_id": 1769
+        },
+        {
+          "page": 84,
+          "score": 0.4575,
+          "chunk_id": 1466
+        }
+      ]
+    },
+    {
+      "id": "s12_domaines_audit_interne",
+      "question": "Sur quels domaines l'audit interne de la BCM a-t-il concentré ses missions en 2025 ?",
+      "difficulty": "liste",
+      "expected_pages": [
+        82
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 82,
+          "score": 0.4905,
+          "chunk_id": 1435
+        },
+        {
+          "page": 84,
+          "score": 0.4784,
+          "chunk_id": 1466
+        },
+        {
+          "page": 20603,
+          "score": 0.4727,
+          "chunk_id": 2547
+        },
+        {
+          "page": 83,
+          "score": 0.4734,
+          "chunk_id": 1461
+        },
+        {
+          "page": 83,
+          "score": 0.4696,
+          "chunk_id": 1453
+        }
+      ]
+    },
+    {
+      "id": "s12_ceem_creation",
+      "question": "Quand le Centre d'Études en Économie Monétaire de la BCM a-t-il été créé, et quand la Chaire d'économie monétaire a-t-elle été lancée ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        83
+      ],
+      "first_expected_rank": 3,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 20303,
+          "score": 0.5418,
+          "chunk_id": 2454
+        },
+        {
+          "page": 20406,
+          "score": 0.5426,
+          "chunk_id": 2494
+        },
+        {
+          "page": 83,
+          "score": 0.5302,
+          "chunk_id": 1462
+        },
+        {
+          "page": 20408,
+          "score": 0.5251,
+          "chunk_id": 2503
+        },
+        {
+          "page": 83,
+          "score": 0.489,
+          "chunk_id": 1458
+        }
+      ]
+    },
+    {
+      "id": "s12_cahiers_ceem",
+      "question": "Comment s'appelle la première revue scientifique de l'histoire de la BCM, et quand son premier numéro est-il paru ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        83
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 83,
+          "score": 0.5411,
+          "chunk_id": 1458
+        },
+        {
+          "page": 20406,
+          "score": 0.5435,
+          "chunk_id": 2494
+        },
+        {
+          "page": 20406,
+          "score": 0.5117,
+          "chunk_id": 2495
+        },
+        {
+          "page": 20303,
+          "score": 0.514,
+          "chunk_id": 2454
+        },
+        {
+          "page": 83,
+          "score": 0.5175,
+          "chunk_id": 1457
+        }
+      ]
+    },
+    {
+      "id": "s13_mission_fmi_novembre",
+      "question": "Quelle mission du FMI a séjourné à Nouakchott du 28 octobre au 7 novembre 2025, et qui la conduisait ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        89
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 89,
+          "score": 0.7275,
+          "chunk_id": 1536
+        },
+        {
+          "page": 89,
+          "score": 0.6323,
+          "chunk_id": 1533
+        },
+        {
+          "page": 20301,
+          "score": 0.4942,
+          "chunk_id": 2447
+        },
+        {
+          "page": 92,
+          "score": 0.4688,
+          "chunk_id": 1572
+        },
+        {
+          "page": 20304,
+          "score": 0.4646,
+          "chunk_id": 2457
+        }
+      ]
+    },
+    {
+      "id": "s13_decaissement_fmi",
+      "question": "Quels montants de décaissement le FMI a-t-il approuvés à l'issue de la 5e revue du programme, annoncés le 7 novembre 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        89
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 89,
+          "score": 0.5221,
+          "chunk_id": 1534
+        },
+        {
+          "page": 89,
+          "score": 0.4884,
+          "chunk_id": 1533
+        },
+        {
+          "page": 20304,
+          "score": 0.4769,
+          "chunk_id": 2457
+        },
+        {
+          "page": 89,
+          "score": 0.4769,
+          "chunk_id": 1543
+        },
+        {
+          "page": 63,
+          "score": 0.449,
+          "chunk_id": 1231
+        }
+      ]
+    },
+    {
+      "id": "s13_bourse_casablanca",
+      "question": "Avec quelle institution la BCM a-t-elle signé un protocole d'accord le 17 avril 2025 en vue de créer la Bourse de Nouakchott ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        91
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 91,
+          "score": 0.596,
+          "chunk_id": 1566
+        },
+        {
+          "page": 91,
+          "score": 0.5829,
+          "chunk_id": 1560
+        },
+        {
+          "page": 20301,
+          "score": 0.5006,
+          "chunk_id": 2446
+        },
+        {
+          "page": 20301,
+          "score": 0.4845,
+          "chunk_id": 2447
+        },
+        {
+          "page": 98,
+          "score": 0.4629,
+          "chunk_id": 1623
+        }
+      ]
+    },
+    {
+      "id": "s13_partenariat_banque_france",
+      "question": "Quel partenariat la BCM a-t-elle signé avec la Banque de France le 27 février 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        91
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 91,
+          "score": 0.5202,
+          "chunk_id": 1561
+        },
+        {
+          "page": 20501,
+          "score": 0.5076,
+          "chunk_id": 2507
+        },
+        {
+          "page": 91,
+          "score": 0.5243,
+          "chunk_id": 1562
+        },
+        {
+          "page": 91,
+          "score": 0.5543,
+          "chunk_id": 1567
+        },
+        {
+          "page": 84,
+          "score": 0.4657,
+          "chunk_id": 1466
+        }
+      ]
+    },
+    {
+      "id": "s13_accord_nbk_bahrein",
+      "question": "Quel accord a été signé le 25 novembre 2025 entre la BCM et la National Bank of Kuwait Bahreïn ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        91
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 91,
+          "score": 0.6872,
+          "chunk_id": 1568
+        },
+        {
+          "page": 91,
+          "score": 0.656,
+          "chunk_id": 1562
+        },
+        {
+          "page": 30,
+          "score": 0.4809,
+          "chunk_id": 707
+        },
+        {
+          "page": 98,
+          "score": 0.4525,
+          "chunk_id": 1623
+        },
+        {
+          "page": 20501,
+          "score": 0.4586,
+          "chunk_id": 2507
+        }
+      ]
+    },
+    {
+      "id": "s13_sessions_microfinance",
+      "question": "Combien de sessions le programme de renforcement des capacités des institutions de microfinance a-t-il comporté en 2025, et sur quels thèmes ?",
+      "difficulty": "liste",
+      "expected_pages": [
+        92,
+        93
+      ],
+      "first_expected_rank": 2,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 85,
+          "score": 0.6031,
+          "chunk_id": 1484
+        },
+        {
+          "page": 93,
+          "score": 0.5199,
+          "chunk_id": 1585
+        },
+        {
+          "page": 85,
+          "score": 0.5327,
+          "chunk_id": 1483
+        },
+        {
+          "page": 44,
+          "score": 0.4714,
+          "chunk_id": 922
+        },
+        {
+          "page": 93,
+          "score": 0.5205,
+          "chunk_id": 1584
+        }
+      ]
+    },
+    {
+      "id": "s13_lancement_innovation",
+      "question": "Quand la BCM a-t-elle lancé sa politique d'innovation articulée autour du DigiLab, de la Sandbox réglementaire et du Label Fintech ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        94
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 94,
+          "score": 0.5598,
+          "chunk_id": 1600
+        },
+        {
+          "page": 70,
+          "score": 0.5764,
+          "chunk_id": 1318
+        },
+        {
+          "page": 93,
+          "score": 0.4892,
+          "chunk_id": 1583
+        },
+        {
+          "page": 73,
+          "score": 0.4906,
+          "chunk_id": 1361
+        },
+        {
+          "page": 87,
+          "score": 0.4591,
+          "chunk_id": 1523
+        }
+      ]
+    },
+    {
+      "id": "s13_billet_50_ouguiyas",
+      "question": "À quelle occasion la BCM a-t-elle émis une version nouvelle du billet de 50 Ouguiyas en 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        94
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 94,
+          "score": 0.5439,
+          "chunk_id": 1601
+        },
+        {
+          "page": 94,
+          "score": 0.4973,
+          "chunk_id": 1602
+        },
+        {
+          "page": 98,
+          "score": 0.4522,
+          "chunk_id": 1623
+        },
+        {
+          "page": 20601,
+          "score": 0.4446,
+          "chunk_id": 2536
+        },
+        {
+          "page": 68,
+          "score": 0.448,
+          "chunk_id": 1291
+        }
+      ]
+    },
+    {
+      "id": "s13_comite_pafiid",
+      "question": "Quand s'est tenue la première réunion du Comité de pilotage du PAFIID, et sur quoi a-t-elle porté ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        94
+      ],
+      "first_expected_rank": 2,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 70,
+          "score": 0.5383,
+          "chunk_id": 1313
+        },
+        {
+          "page": 94,
+          "score": 0.5685,
+          "chunk_id": 1610
+        },
+        {
+          "page": 94,
+          "score": 0.5395,
+          "chunk_id": 1602
+        },
+        {
+          "page": 20302,
+          "score": 0.5131,
+          "chunk_id": 2451
+        },
+        {
+          "page": 20302,
+          "score": 0.4932,
+          "chunk_id": 2452
+        }
+      ]
+    },
+    {
+      "id": "s13_etats_generaux_assurance",
+      "question": "Quand se sont tenus les États généraux de l'assurance en 2025, et qu'ont-ils adopté à leur issue ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        95
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 95,
+          "score": 0.56,
+          "chunk_id": 1618
+        },
+        {
+          "page": 95,
+          "score": 0.5585,
+          "chunk_id": 1619
+        },
+        {
+          "page": 47,
+          "score": 0.5103,
+          "chunk_id": 978
+        },
+        {
+          "page": 48,
+          "score": 0.4558,
+          "chunk_id": 1000
+        },
+        {
+          "page": 47,
+          "score": 0.5056,
+          "chunk_id": 990
+        }
+      ]
+    },
+    {
+      "id": "s14_resultat_net_exercice",
+      "question": "Quel a été le résultat net de la BCM pour l'exercice 2025, comparé à 2024 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        115
+      ],
+      "first_expected_rank": null,
+      "relevant": true,
+      "success_at_5_or_refusal": false,
+      "top_results": [
+        {
+          "page": 116,
+          "score": 0.4827,
+          "chunk_id": 2085
+        },
+        {
+          "page": 3,
+          "score": 0.4922,
+          "chunk_id": 2
+        },
+        {
+          "page": 84,
+          "score": 0.4896,
+          "chunk_id": 1466
+        },
+        {
+          "page": 98,
+          "score": 0.4697,
+          "chunk_id": 1623
+        },
+        {
+          "page": 116,
+          "score": 0.4755,
+          "chunk_id": 2078
+        }
+      ]
+    },
+    {
+      "id": "s14_capital_social",
+      "question": "À combien s'élevait le capital social de la BCM au 31 décembre 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        98,
+        115
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 98,
+          "score": 0.5203,
+          "chunk_id": 1629
+        },
+        {
+          "page": 98,
+          "score": 0.5027,
+          "chunk_id": 1623
+        },
+        {
+          "page": 110,
+          "score": 0.5074,
+          "chunk_id": 1830
+        },
+        {
+          "page": 84,
+          "score": 0.4724,
+          "chunk_id": 1466
+        },
+        {
+          "page": 106,
+          "score": 0.4614,
+          "chunk_id": 1777
+        }
+      ]
+    },
+    {
+      "id": "s14_avoirs_or",
+      "question": "Quel montant les avoirs en or de la BCM ont-ils atteint fin 2025, et quelle progression cela représente-t-il sur un an ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        110
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 110,
+          "score": 0.486,
+          "chunk_id": 1797
+        },
+        {
+          "page": 116,
+          "score": 0.478,
+          "chunk_id": 2085
+        },
+        {
+          "page": 98,
+          "score": 0.4735,
+          "chunk_id": 1623
+        },
+        {
+          "page": 40,
+          "score": 0.485,
+          "chunk_id": 884
+        },
+        {
+          "page": 20602,
+          "score": 0.4717,
+          "chunk_id": 2542
+        }
+      ]
+    },
+    {
+      "id": "s14_hausse_or_raison",
+      "question": "Pourquoi les avoirs en or de la BCM ont-ils fortement progressé en valeur en 2025 alors qu'aucun achat n'a eu lieu ?",
+      "difficulty": "raisonnement",
+      "expected_pages": [
+        110
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 110,
+          "score": 0.4637,
+          "chunk_id": 1797
+        },
+        {
+          "page": 25,
+          "score": 0.4617,
+          "chunk_id": 624
+        },
+        {
+          "page": 100,
+          "score": 0.4621,
+          "chunk_id": 1678
+        },
+        {
+          "page": 98,
+          "score": 0.4495,
+          "chunk_id": 1623
+        },
+        {
+          "page": 86,
+          "score": 0.4523,
+          "chunk_id": 1505
+        }
+      ]
+    },
+    {
+      "id": "s14_baisse_depots_terme",
+      "question": "De combien les dépôts à terme de la BCM ont-ils diminué en 2025, et pourquoi ?",
+      "difficulty": "raisonnement",
+      "expected_pages": [
+        110
+      ],
+      "first_expected_rank": 2,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 98,
+          "score": 0.467,
+          "chunk_id": 1623
+        },
+        {
+          "page": 110,
+          "score": 0.4656,
+          "chunk_id": 1797
+        },
+        {
+          "page": 26,
+          "score": 0.4621,
+          "chunk_id": 636
+        },
+        {
+          "page": 113,
+          "score": 0.4549,
+          "chunk_id": 1952
+        },
+        {
+          "page": 20603,
+          "score": 0.4582,
+          "chunk_id": 2547
+        }
+      ]
+    },
+    {
+      "id": "s14_resultat_change",
+      "question": "Comment le résultat de change de la BCM a-t-il évolué entre 2024 et 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        116
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 116,
+          "score": 0.5053,
+          "chunk_id": 2085
+        },
+        {
+          "page": 98,
+          "score": 0.4716,
+          "chunk_id": 1623
+        },
+        {
+          "page": 20402,
+          "score": 0.4671,
+          "chunk_id": 2476
+        },
+        {
+          "page": 46,
+          "score": 0.4685,
+          "chunk_id": 951
+        },
+        {
+          "page": 116,
+          "score": 0.4658,
+          "chunk_id": 2078
+        }
+      ]
+    },
+    {
+      "id": "s14_methode_comptable_or",
+      "question": "Quelle méthode comptable la BCM utilise-t-elle pour évaluer ses avoirs en or au bilan, en l'absence de norme IFRS spécifique ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        100
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 100,
+          "score": 0.5234,
+          "chunk_id": 1677
+        },
+        {
+          "page": 100,
+          "score": 0.4794,
+          "chunk_id": 1678
+        },
+        {
+          "page": 99,
+          "score": 0.5072,
+          "chunk_id": 1634
+        },
+        {
+          "page": 99,
+          "score": 0.5282,
+          "chunk_id": 1631
+        },
+        {
+          "page": 110,
+          "score": 0.457,
+          "chunk_id": 1797
+        }
+      ]
+    },
+    {
+      "id": "s14_monnaie_fonctionnelle",
+      "question": "Quelle est la monnaie fonctionnelle et de présentation des états financiers de la BCM ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        99
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 99,
+          "score": 0.5461,
+          "chunk_id": 1635
+        },
+        {
+          "page": 98,
+          "score": 0.479,
+          "chunk_id": 1623
+        },
+        {
+          "page": 83,
+          "score": 0.4671,
+          "chunk_id": 1461
+        },
+        {
+          "page": 99,
+          "score": 0.5234,
+          "chunk_id": 1634
+        },
+        {
+          "page": 20402,
+          "score": 0.4612,
+          "chunk_id": 2476
+        }
+      ]
+    },
+    {
+      "id": "s14_plus_values_latentes",
+      "question": "Quel montant de plus-values latentes issues de la réévaluation des avoirs et engagements en devises a été comptabilisé en 2025, et ces plus-values sont-elles distribuables ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        115
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 115,
+          "score": 0.5603,
+          "chunk_id": 2059
+        },
+        {
+          "page": 115,
+          "score": 0.4863,
+          "chunk_id": 2028
+        },
+        {
+          "page": 116,
+          "score": 0.4524,
+          "chunk_id": 2083
+        },
+        {
+          "page": 117,
+          "score": 0.4478,
+          "chunk_id": 2138
+        },
+        {
+          "page": 110,
+          "score": 0.4497,
+          "chunk_id": 1798
+        }
+      ]
+    },
+    {
+      "id": "s14_resultat_autres_activites",
+      "question": "Comment le résultat net des autres activités de la BCM a-t-il évolué entre 2024 et 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        116
+      ],
+      "first_expected_rank": 2,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 46,
+          "score": 0.4754,
+          "chunk_id": 951
+        },
+        {
+          "page": 116,
+          "score": 0.4765,
+          "chunk_id": 2085
+        },
+        {
+          "page": 84,
+          "score": 0.4749,
+          "chunk_id": 1466
+        },
+        {
+          "page": 98,
+          "score": 0.4653,
+          "chunk_id": 1623
+        },
+        {
+          "page": 3,
+          "score": 0.4706,
+          "chunk_id": 2
+        }
+      ]
+    },
+    {
+      "id": "s15_btp_croissance_2025",
+      "question": "Selon l'Annexe 1, quel a été le taux de croissance réelle du secteur Bâtiment et Travaux Publics en 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        121
+      ],
+      "first_expected_rank": null,
+      "relevant": true,
+      "success_at_5_or_refusal": false,
+      "top_results": [
+        {
+          "page": 23,
+          "score": 0.464,
+          "chunk_id": 547
+        },
+        {
+          "page": 23,
+          "score": 0.4598,
+          "chunk_id": 548
+        },
+        {
+          "page": 5,
+          "score": 0.4785,
+          "chunk_id": 14
+        },
+        {
+          "page": 28,
+          "score": 0.4352,
+          "chunk_id": 674
+        },
+        {
+          "page": 46,
+          "score": 0.4294,
+          "chunk_id": 951
+        }
+      ]
+    },
+    {
+      "id": "s15_pib_secondaire_2023",
+      "question": "Selon l'Annexe 2, quel était le PIB sectoriel à prix courant du secteur secondaire en 2023, en millions MRU ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        121
+      ],
+      "first_expected_rank": 3,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 5,
+          "score": 0.4876,
+          "chunk_id": 13
+        },
+        {
+          "page": 123,
+          "score": 0.4792,
+          "chunk_id": 2302
+        },
+        {
+          "page": 121,
+          "score": 0.4564,
+          "chunk_id": 2195
+        },
+        {
+          "page": 122,
+          "score": 0.4725,
+          "chunk_id": 2250
+        },
+        {
+          "page": 121,
+          "score": 0.4513,
+          "chunk_id": 2194
+        }
+      ]
+    },
+    {
+      "id": "s15_contribution_2022",
+      "question": "D'après l'Annexe 3, quel secteur a le plus contribué à la croissance du PIB réel en 2022 ?",
+      "difficulty": "raisonnement",
+      "expected_pages": [
+        122
+      ],
+      "first_expected_rank": 2,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 5,
+          "score": 0.5381,
+          "chunk_id": 13
+        },
+        {
+          "page": 122,
+          "score": 0.4583,
+          "chunk_id": 2242
+        },
+        {
+          "page": 23,
+          "score": 0.4491,
+          "chunk_id": 549
+        },
+        {
+          "page": 21,
+          "score": 0.4611,
+          "chunk_id": 523
+        },
+        {
+          "page": 23,
+          "score": 0.4425,
+          "chunk_id": 548
+        }
+      ]
+    },
+    {
+      "id": "s15_btp_valeur_courante_2025",
+      "question": "Selon l'Annexe 4, quel a été le taux de croissance en valeur courante du secteur Bâtiment et Travaux Publics en 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        122
+      ],
+      "first_expected_rank": 6,
+      "relevant": true,
+      "success_at_5_or_refusal": false,
+      "top_results": [
+        {
+          "page": 5,
+          "score": 0.4814,
+          "chunk_id": 14
+        },
+        {
+          "page": 23,
+          "score": 0.4377,
+          "chunk_id": 549
+        },
+        {
+          "page": 23,
+          "score": 0.4384,
+          "chunk_id": 547
+        },
+        {
+          "page": 13,
+          "score": 0.4436,
+          "chunk_id": 367
+        },
+        {
+          "page": 28,
+          "score": 0.4351,
+          "chunk_id": 674
+        }
+      ]
+    },
+    {
+      "id": "s15_part_extractif_2025",
+      "question": "Selon l'Annexe 5, quelle part du PIB courant le secteur des activités extractives représentait-il en 2025 ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        123
+      ],
+      "first_expected_rank": 2,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 5,
+          "score": 0.5218,
+          "chunk_id": 13
+        },
+        {
+          "page": 123,
+          "score": 0.538,
+          "chunk_id": 2303
+        },
+        {
+          "page": 123,
+          "score": 0.4913,
+          "chunk_id": 2294
+        },
+        {
+          "page": 122,
+          "score": 0.505,
+          "chunk_id": 2251
+        },
+        {
+          "page": 122,
+          "score": 0.4809,
+          "chunk_id": 2242
+        }
+      ]
+    },
+    {
+      "id": "s15_balance_commerciale_2022",
+      "question": "Selon l'Annexe 6, à combien s'élevait la balance commerciale de la Mauritanie en 2022, en milliards MRU ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        123
+      ],
+      "first_expected_rank": 1,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 123,
+          "score": 0.4947,
+          "chunk_id": 2322
+        },
+        {
+          "page": 113,
+          "score": 0.4477,
+          "chunk_id": 1952
+        },
+        {
+          "page": 60,
+          "score": 0.443,
+          "chunk_id": 1145
+        },
+        {
+          "page": 20401,
+          "score": 0.4412,
+          "chunk_id": 2470
+        },
+        {
+          "page": 56,
+          "score": 0.4366,
+          "chunk_id": 1115
+        }
+      ]
+    },
+    {
+      "id": "s15_exports_or_2023",
+      "question": "Selon l'Annexe 7, à combien se sont élevées les exportations d'or de la Mauritanie en 2023, en milliards de dollars ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        124
+      ],
+      "first_expected_rank": null,
+      "relevant": true,
+      "success_at_5_or_refusal": false,
+      "top_results": [
+        {
+          "page": 55,
+          "score": 0.4681,
+          "chunk_id": 1050
+        },
+        {
+          "page": 5,
+          "score": 0.4574,
+          "chunk_id": 17
+        },
+        {
+          "page": 5,
+          "score": 0.4621,
+          "chunk_id": 18
+        },
+        {
+          "page": 55,
+          "score": 0.4525,
+          "chunk_id": 1051
+        },
+        {
+          "page": 55,
+          "score": 0.4464,
+          "chunk_id": 1064
+        }
+      ]
+    },
+    {
+      "id": "s15_peche_trajectoire",
+      "question": "Comment la croissance réelle du secteur de la pêche a-t-elle évolué entre 2021 et 2025 selon l'Annexe 1 ?",
+      "difficulty": "liste",
+      "expected_pages": [
+        121
+      ],
+      "first_expected_rank": 11,
+      "relevant": true,
+      "success_at_5_or_refusal": false,
+      "top_results": [
+        {
+          "page": 55,
+          "score": 0.4484,
+          "chunk_id": 1053
+        },
+        {
+          "page": 55,
+          "score": 0.4417,
+          "chunk_id": 1075
+        },
+        {
+          "page": 22,
+          "score": 0.4465,
+          "chunk_id": 533
+        },
+        {
+          "page": 22,
+          "score": 0.4374,
+          "chunk_id": 539
+        },
+        {
+          "page": 122,
+          "score": 0.4384,
+          "chunk_id": 2242
+        }
+      ]
+    },
+    {
+      "id": "s15_pib_marche_2021",
+      "question": "Selon l'Annexe 2, quel a été le PIB aux prix du marché de la Mauritanie en 2021, en millions MRU ?",
+      "difficulty": "direct",
+      "expected_pages": [
+        121
+      ],
+      "first_expected_rank": 5,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 5,
+          "score": 0.4862,
+          "chunk_id": 13
+        },
+        {
+          "page": 5,
+          "score": 0.5235,
+          "chunk_id": 27
+        },
+        {
+          "page": 23,
+          "score": 0.4394,
+          "chunk_id": 549
+        },
+        {
+          "page": 106,
+          "score": 0.4351,
+          "chunk_id": 1768
+        },
+        {
+          "page": 121,
+          "score": 0.4338,
+          "chunk_id": 2194
+        }
+      ]
+    },
+    {
+      "id": "s15_part_tertiaire_evolution",
+      "question": "Comment la part du secteur tertiaire dans le PIB courant a-t-elle évolué entre 2021 et 2025 selon l'Annexe 5 ?",
+      "difficulty": "liste",
+      "expected_pages": [
+        123
+      ],
+      "first_expected_rank": 5,
+      "relevant": true,
+      "success_at_5_or_refusal": true,
+      "top_results": [
+        {
+          "page": 5,
+          "score": 0.5028,
+          "chunk_id": 13
+        },
+        {
+          "page": 23,
+          "score": 0.4984,
+          "chunk_id": 549
+        },
+        {
+          "page": 23,
+          "score": 0.5467,
+          "chunk_id": 565
+        },
+        {
+          "page": 5,
+          "score": 0.5327,
+          "chunk_id": 25
+        },
+        {
+          "page": 123,
+          "score": 0.4384,
+          "chunk_id": 2294
+        }
+      ]
+    }
+  ]
+}
