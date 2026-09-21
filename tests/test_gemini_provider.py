@@ -61,7 +61,7 @@ def test_generate_gemini_rejects_invalid_citation(monkeypatch) -> None:
 def test_answer_with_provider_routes_to_gemini(monkeypatch) -> None:
     monkeypatch.setattr(
         "api.providers.generate_gemini",
-        lambda question, results, history, settings=None, language=None: "réponse gemini",
+        lambda question, results, history, settings=None, language=None, quality=None: "réponse gemini",
     )
     assert (
         answer_with_provider("gemini", "question", [], [], None, None) == "réponse gemini"

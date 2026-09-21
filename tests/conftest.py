@@ -26,7 +26,9 @@ def generation_diffusee(fausse_generation):
     décrire la réponse attendue par une simple fonction, comme auparavant.
     """
 
-    def flux(provider, question, results, history, settings=None, language=None):
+    def flux(
+        provider, question, results, history, settings=None, language=None, quality=None
+    ):
         reponse = fausse_generation(
             provider, question, results, history, settings, language
         )

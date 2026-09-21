@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "bcm-api",
+      "runtimeExecutable": ".venv/bin/python",
+      "runtimeArgs": ["-m", "api.app"],
+      "port": 5000
+    }
+  ]
+}

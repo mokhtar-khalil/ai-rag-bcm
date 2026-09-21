@@ -71,6 +71,9 @@
       placeholder: "Posez votre question…",
       send: "Envoyer",
       newConversation: "Nouvelle conversation",
+      qualityLabel: "Vitesse de réponse",
+      qualityFast: "Rapide",
+      qualityThorough: "Approfondi",
       sourcesTitle: "Sources",
       page: "Page",
       stages: {
@@ -120,6 +123,9 @@
       placeholder: "اكتب سؤالك…",
       send: "إرسال",
       newConversation: "محادثة جديدة",
+      qualityLabel: "سرعة الإجابة",
+      qualityFast: "سريعة",
+      qualityThorough: "معمّقة",
       sourcesTitle: "المصادر",
       page: "صفحة",
       stages: {
@@ -219,7 +225,7 @@
   }
 
   function freshSession() {
-    return { id: generateSessionId(), consent: null, lastActivity: Date.now() };
+    return { id: generateSessionId(), consent: null, lastActivity: Date.now(), quality: "fast" };
   }
 
   function loadSession() {
@@ -231,6 +237,11 @@
         typeof parsed.id === "string" &&
         typeof parsed.lastActivity === "number"
       ) {
+        // Une session enregistrée avant ce réglage n'a pas de champ « quality » :
+        // le normaliser évite un état où aucun des deux boutons n'apparaît actif.
+        if (parsed.quality !== "fast" && parsed.quality !== "thorough") {
+          parsed.quality = "fast";
+        }
         return parsed;
       }
     } catch (err) {
@@ -546,6 +557,15 @@
     ".bcm-footer button:hover{color:" +
     CONFIG.accentColor +
     ";}" +
+    // Réglage secondaire, volontairement discret : la plupart des visiteurs
+    // n'ont pas besoin d'y toucher, mais ceux qui veulent une réponse qui
+    // prend le temps de recouper plusieurs passages doivent pouvoir le demander.
+    ".bcm-quality{display:inline-flex;gap:2px;background:#f3f4f6;border-radius:9px;padding:2px;margin-bottom:6px;}" +
+    ".bcm-quality button{background:transparent;border:none;border-radius:7px;padding:4px 9px;font-size:10.5px;font-weight:600;color:#9ca3af;white-space:nowrap;cursor:pointer;transition:background .15s ease,color .15s ease;}" +
+    ".bcm-quality button:hover{color:#4b5563;}" +
+    ".bcm-quality button.actif{background:#fff;color:" +
+    CONFIG.accentColor +
+    ";box-shadow:0 1px 2px rgba(0,0,0,.1);}" +
     ".bcm-disclaimer{margin-top:3px;font-size:10px;line-height:1.4;color:#b0b4bb;}" +
     ".bcm-feedback{display:flex;align-items:center;gap:2px;margin-top:8px;padding-top:8px;border-top:1px solid #f0f1f3;}" +
     ".bcm-feedback-btn{background:none;border:none;padding:5px;border-radius:7px;cursor:pointer;color:#b0b4bb;display:inline-flex;align-items:center;justify-content:center;}" +
@@ -664,6 +684,10 @@
     '<button type="button" class="bcm-send" id="bcm-send"></button>' +
     "</div>" +
     '<div class="bcm-footer">' +
+    '<div class="bcm-quality" id="bcm-quality" role="group">' +
+    '<button type="button" data-quality="fast"></button>' +
+    '<button type="button" data-quality="thorough"></button>' +
+    "</div>" +
     '<button type="button" id="bcm-new"></button>' +
     '<div class="bcm-disclaimer" id="bcm-disclaimer"></div>' +
     "</div>";
@@ -672,6 +696,8 @@
   var els = {
     title: shadow.getElementById("bcm-title"),
     langButtons: shadow.getElementById("bcm-lang").querySelectorAll("button"),
+    qualityGroup: shadow.getElementById("bcm-quality"),
+    qualityButtons: shadow.getElementById("bcm-quality").querySelectorAll("button"),
     close: shadow.getElementById("bcm-close"),
     dot: shadow.getElementById("bcm-dot"),
     statusText: shadow.getElementById("bcm-status-text"),
@@ -698,6 +724,14 @@
     els.disclaimer.textContent = texts.disclaimer;
     Array.prototype.forEach.call(els.langButtons, function (bouton) {
       var actif = bouton.getAttribute("data-lang") === state.language;
+      bouton.classList.toggle("actif", actif);
+      bouton.setAttribute("aria-pressed", actif ? "true" : "false");
+    });
+    els.qualityGroup.setAttribute("aria-label", texts.qualityLabel);
+    Array.prototype.forEach.call(els.qualityButtons, function (bouton) {
+      var quality = bouton.getAttribute("data-quality");
+      var actif = quality === state.session.quality;
+      bouton.textContent = quality === "fast" ? texts.qualityFast : texts.qualityThorough;
       bouton.classList.toggle("actif", actif);
       bouton.setAttribute("aria-pressed", actif ? "true" : "false");
     });
@@ -1205,6 +1239,7 @@
       language: state.language,
       session_id: state.session.id,
       consent_analytics: state.session.consent === true,
+      quality: state.session.quality === "thorough" ? "thorough" : "fast",
     });
   }
 
@@ -1452,6 +1487,15 @@
       renderStatic();
       renderMessages();
       renderSuggestions();
+    });
+  });
+  Array.prototype.forEach.call(els.qualityButtons, function (bouton) {
+    bouton.addEventListener("click", function () {
+      var choisie = bouton.getAttribute("data-quality");
+      if (choisie === state.session.quality) return;
+      state.session.quality = choisie;
+      saveSession();
+      renderStatic();
     });
   });
   els.newConversation.addEventListener("click", newConversation);

@@ -1041,6 +1041,16 @@ def create_app(
             return
         else:
             language = requested_language
+        requested_quality = payload.get("quality")
+        if requested_quality is None:
+            # Compatibilité avec les anciens clients : sans choix explicite, le
+            # comportement reste celui d'avant l'ajout de ce réglage.
+            quality = "fast"
+        elif requested_quality not in {"fast", "thorough"}:
+            yield _evenement_erreur("Le champ 'quality' doit valoir 'fast' ou 'thorough'.", 400)
+            return
+        else:
+            quality = requested_quality
         if len(question) > settings.max_question_chars:
             yield _evenement_erreur(
                 f"La question dépasse {settings.max_question_chars:,} caractères.".replace(",", " "),
@@ -1742,6 +1752,7 @@ def create_app(
                 history,
                 settings,
                 language,
+                quality,
             ):
                 if nom_evenement == "delta":
                     yield ("delta", valeur)

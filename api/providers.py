@@ -371,12 +371,27 @@ def rerank_openai(
     return selected
 
 
+# Deux vitesses explicites, choisies par l'utilisateur du widget plutôt que
+# déduites d'une heuristique : « rapide » et « approfondi » s'écartent dans les
+# deux sens du réglage par défaut, pour qu'ils se distinguent vraiment l'un de
+# l'autre. Une valeur absente ou inconnue conserve le réglage de déploiement.
+def _openai_effort(
+    settings: Settings, quality: str | None, selected_language: str
+) -> str:
+    if quality == "thorough":
+        return "high"
+    if quality == "fast":
+        return "low"
+    return "low" if selected_language == "ar" else settings.openai_reasoning_effort
+
+
 def generate_openai(
     question: str,
     results: list[dict[str, Any]],
     history: list[dict[str, str]],
     settings: Settings | None = None,
     language: str | None = None,
+    quality: str | None = None,
 ) -> str:
     """Génère une réponse sourcée et rejette toute citation de page non fournie."""
     from openai import OpenAI
@@ -399,11 +414,7 @@ def generate_openai(
                 f"{answer_language_instruction(question, selected_language)}"
             ),
             input=prompt,
-            reasoning={
-                "effort": (
-                    "low" if selected_language == "ar" else settings.openai_reasoning_effort
-                )
-            },
+            reasoning={"effort": _openai_effort(settings, quality, selected_language)},
             max_output_tokens=settings.openai_max_output_tokens,
         )
     except Exception as exc:
@@ -520,12 +531,31 @@ def _needs_deeper_reasoning(results: list[dict[str, Any]]) -> bool:
     return len(distinct_pages) >= 3 and not strong_direct_match
 
 
+def _gemini_thinking_level(
+    settings: Settings, quality: str | None, results: list[dict[str, Any]]
+) -> str:
+    """Choisit le niveau de réflexion : choix explicite de l'utilisateur du
+    widget d'abord, sinon le réglage de déploiement éventuellement relevé par
+    l'heuristique de raisonnement multi-pages."""
+    base = settings.gemini_thinking_level
+    if not base:
+        return base
+    if quality == "thorough":
+        return "high"
+    if quality == "fast":
+        return base
+    if _needs_deeper_reasoning(results):
+        return _THINKING_ESCALATION.get(base, base)
+    return base
+
+
 def generate_gemini(
     question: str,
     results: list[dict[str, Any]],
     history: list[dict[str, str]],
     settings: Settings | None = None,
     language: str | None = None,
+    quality: str | None = None,
 ) -> str:
     """Génère une réponse sourcée avec l'API Gemini (Google), même contrat que generate_openai."""
     from google import genai
@@ -544,10 +574,9 @@ def generate_gemini(
     # un extrait déjà explicite demande peu de raisonnement autonome, donc le
     # réglage bas reste le défaut. Une question dont les preuves sont éparpillées
     # sur plusieurs pages profite en revanche d'un budget de réflexion plus large
-    # pour les combiner plutôt que de conclure trop vite à une absence.
-    thinking_level = settings.gemini_thinking_level
-    if thinking_level and _needs_deeper_reasoning(results):
-        thinking_level = _THINKING_ESCALATION.get(thinking_level, thinking_level)
+    # pour les combiner plutôt que de conclure trop vite à une absence — et
+    # l'utilisateur du widget peut aussi le demander explicitement.
+    thinking_level = _gemini_thinking_level(settings, quality, results)
     thinking: dict[str, Any] = {}
     if thinking_level:
         thinking["thinking_config"] = types.ThinkingConfig(thinking_level=thinking_level)
@@ -984,6 +1013,7 @@ def stream_answer(
     history: list[dict[str, str]],
     settings: Settings | None = None,
     language: str | None = None,
+    quality: str | None = None,
 ) -> "Iterator[tuple[str, str]]":
     """Produit les fragments de réponse, puis la réponse finalisée.
 
@@ -994,11 +1024,13 @@ def stream_answer(
     par la valeur du dernier événement.
 
     Les fournisseurs qui ne diffusent pas produisent un seul fragment : le point
-    d'entrée reste identique pour tous.
+    d'entrée reste identique pour tous. ``quality`` (« fast » ou « thorough »)
+    reflète le choix explicite de l'utilisateur du widget entre une réponse
+    rapide et une réponse qui prend le temps de recouper les extraits.
     """
     if provider != "openai":
         answer = answer_with_provider(
-            provider, question, results, history, settings, language
+            provider, question, results, history, settings, language, quality
         )
         yield ("delta", answer)
         yield ("final", answer)
@@ -1025,11 +1057,7 @@ def stream_answer(
                 f"{answer_language_instruction(question, selected_language)}"
             ),
             input=prompt,
-            reasoning={
-                "effort": (
-                    "low" if selected_language == "ar" else settings.openai_reasoning_effort
-                )
-            },
+            reasoning={"effort": _openai_effort(settings, quality, selected_language)},
             max_output_tokens=settings.openai_max_output_tokens,
         ) as flux:
             for evenement in flux:
@@ -1062,12 +1090,13 @@ def answer_with_provider(
     history: list[dict[str, str]],
     settings: Settings | None = None,
     language: str | None = None,
+    quality: str | None = None,
 ) -> str:
     """Route la génération vers le fournisseur retenu par l'orchestrateur."""
     if provider == "openai":
-        return generate_openai(question, results, history, settings, language)
+        return generate_openai(question, results, history, settings, language, quality)
     if provider == "gemini":
-        return generate_gemini(question, results, history, settings, language)
+        return generate_gemini(question, results, history, settings, language, quality)
     if provider == "ollama":
         return generate_ollama(question, results, history, settings, language)
     return generate_extractive(question, results)
