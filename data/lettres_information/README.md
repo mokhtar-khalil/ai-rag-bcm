@@ -1,6 +1,6 @@
 # Lettres d'information de la BCM — éditions 2026
 
-Sept PDF, un par édition mensuelle de janvier à juillet 2026.
+Huit PDF, un par édition mensuelle de janvier à août 2026.
 
 ## Provenance
 
