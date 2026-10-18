@@ -48,6 +48,7 @@ from api.charts import (
 from api.analytics import (
     analytics_snapshot,
     ensure_schema,
+    purge_expired_if_due,
     log_feedback,
     log_interaction,
     log_ui_event,
@@ -830,6 +831,8 @@ def create_app(
         ensure_schema(settings)
     except Exception as exc:  # le service reste utilisable sans journalisation
         app.logger.warning("analytics_schema_failed error_type=%s", type(exc).__name__)
+    else:
+        purge_expired_if_due(settings)
 
     def _feedback_token(response_id: str, session_id: str) -> str:
         """Signe le couple réponse/session pour empêcher les retours forgés."""

@@ -13,6 +13,11 @@ Chaque insertion est best-effort : une panne de la base ne doit jamais faire
 la question, la réponse, la langue et l'horodatage — jamais l'adresse IP ni un
 identifiant permettant de retrouver la personne, conformément au périmètre
 annoncé dans le popup de consentement du widget.
+
+Le texte libre reste le seul vecteur de données personnelles : un utilisateur
+peut y écrire son courriel, son téléphone ou son NNI. ``mask_personal_data``
+les remplace par des jetons avant toute insertion, et ``purge_expired``
+supprime les lignes plus anciennes que ``ANALYTICS_RETENTION_DAYS``.
 """
 
 from __future__ import annotations
@@ -20,7 +25,10 @@ from __future__ import annotations
 import hashlib
 import hmac
 import json
+import logging
+import re
 import sqlite3
+import threading
 import unicodedata
 from collections import Counter
 from collections.abc import Iterator
@@ -30,6 +38,9 @@ from statistics import median
 from typing import Any
 
 from core.config import Settings
+
+
+logger = logging.getLogger(__name__)
 
 
 CREATE_TABLE_SQLITE = """
@@ -210,6 +221,67 @@ TOPIC_KEYWORDS = {
 }
 
 
+# Un montant, une part ou une quantité suit souvent la suite de chiffres :
+# « 45000000 MRU » ou « 123456789 habitants » ne sont pas des identifiants.
+_NOT_A_UNIT = (
+    r"(?!\s*(?:%|‰|MRU|MRO|UM|USD|EUR|€|\$|mds?\b|millions?|milliards?|"
+    r"habitants|tonnes|ouguiyas?|dollars?|euros?))"
+)
+# Aucune suite masquée ne doit prolonger un nombre plus large ou décimal.
+_NO_DIGIT_BEFORE = r"(?<![\d.,])"
+_NO_DIGIT_AFTER = r"(?!\d|[.,]\d)"
+
+PERSONAL_DATA_PATTERNS: tuple[tuple[re.Pattern[str], str], ...] = (
+    (
+        re.compile(r"[\w.+-]+@[\w-]+(?:\.[\w-]+)*\.[A-Za-z]{2,}"),
+        "[EMAIL]",
+    ),
+    # Numéro international explicite : indicatif « + » ou « 00 », puis 7 à 14
+    # chiffres éventuellement séparés (« +222 22 12 34 56 », « 0033 6 12 … »).
+    (
+        re.compile(
+            _NO_DIGIT_BEFORE
+            + r"(?:\+|\b00)\d{1,3}(?:[\s.\-]?\d){7,14}"
+            + _NO_DIGIT_AFTER
+        ),
+        "[TEL]",
+    ),
+    # NNI mauritanien (10 chiffres) et toute autre suite d'au moins 9 chiffres
+    # contigus : les montants des publications sont écrits avec séparateurs.
+    (
+        re.compile(_NO_DIGIT_BEFORE + r"\d{9,}" + _NO_DIGIT_AFTER + _NOT_A_UNIT),
+        "[ID]",
+    ),
+    # Numéro mauritanien à 8 chiffres (mobiles 2/3/4, fixes 45) : contigus ou
+    # groupés par deux avec le même séparateur. Exiger un séparateur constant
+    # épargne les plages d'années (« 2020-2025 ») et les montants groupés par
+    # trois (« 300 000 »).
+    (
+        re.compile(
+            _NO_DIGIT_BEFORE
+            + r"[234]\d([ .\-]?)\d{2}\1\d{2}\1\d{2}"
+            + _NO_DIGIT_AFTER
+            + _NOT_A_UNIT
+        ),
+        "[TEL]",
+    ),
+)
+
+
+def mask_personal_data(text: str) -> str:
+    """Remplace courriels, téléphones et identifiants par des jetons neutres.
+
+    Le masquage est volontairement conservateur sur les nombres : montants,
+    pourcentages, années et numéros de page doivent rester lisibles pour
+    l'analyse des questions.
+    """
+    if not text:
+        return text
+    for pattern, token in PERSONAL_DATA_PATTERNS:
+        text = pattern.sub(token, text)
+    return text
+
+
 def _is_postgres(database_url: str) -> bool:
     """Distingue une URL Postgres d'une absence de configuration."""
     return database_url.startswith(("postgres://", "postgresql://"))
@@ -282,6 +354,72 @@ def ensure_schema(settings: Settings) -> None:
             "CREATE INDEX IF NOT EXISTS idx_ui_events_created_at ON ui_events(created_at)"
         )
         conn.commit()
+
+
+# Toutes les tables horodatées du module : la purge les couvre ensemble pour
+# qu'aucun identifiant pseudonymisé ne survive à la durée de conservation.
+ANALYTICS_TABLES = ("logged_questions", "answer_feedback", "model_calls", "ui_events")
+
+# La purge s'exécute au démarrage puis au plus une fois par intervalle, au fil
+# des insertions : un conteneur rarement redéployé purge quand même chaque jour.
+PURGE_INTERVAL = timedelta(hours=6)
+_purge_lock = threading.Lock()
+_last_purge_at: datetime | None = None
+
+
+def _sqlite_timestamp(value: datetime) -> str:
+    """Formate un instant comme le DEFAULT des tables SQLite (UTC, millisecondes)."""
+    return value.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+
+
+def purge_expired(settings: Settings, now: datetime | None = None) -> dict[str, int]:
+    """Supprime les lignes plus anciennes que ``ANALYTICS_RETENTION_DAYS``.
+
+    Retourne le nombre de lignes supprimées par table ; ne fait rien lorsque la
+    conservation vaut 0 (purge désactivée).
+    """
+    days = settings.analytics_retention_days
+    if days <= 0:
+        return {}
+    cutoff = (now or datetime.now(timezone.utc)) - timedelta(days=days)
+    if _is_postgres(settings.analytics_database_url):
+        placeholder, parameter = "%s", cutoff
+    else:
+        # Même format que le DEFAULT des tables : la comparaison
+        # lexicographique des chaînes ISO équivaut alors à la chronologie.
+        placeholder, parameter = "?", _sqlite_timestamp(cutoff)
+    deleted: dict[str, int] = {}
+    with _connection(settings) as conn:
+        for table in ANALYTICS_TABLES:
+            cursor = conn.execute(
+                f"DELETE FROM {table} WHERE created_at < {placeholder}", (parameter,)
+            )
+            deleted[table] = max(cursor.rowcount, 0)
+        conn.commit()
+    return deleted
+
+
+def purge_expired_if_due(settings: Settings, now: datetime | None = None) -> None:
+    """Déclenche la purge si l'intervalle est écoulé, sans jamais lever."""
+    global _last_purge_at
+    if settings.analytics_retention_days <= 0:
+        return
+    current = now or datetime.now(timezone.utc)
+    with _purge_lock:
+        if _last_purge_at is not None and current - _last_purge_at < PURGE_INTERVAL:
+            return
+        _last_purge_at = current
+    try:
+        deleted = purge_expired(settings, current)
+    except Exception as exc:  # la purge ne doit pas faire échouer une écriture
+        logger.warning("analytics_purge_failed error_type=%s", type(exc).__name__)
+        return
+    if any(deleted.values()):
+        logger.info(
+            "analytics_purge retention_days=%s deleted=%s",
+            settings.analytics_retention_days,
+            deleted,
+        )
 
 
 def pseudonymize_session(settings: Settings, session_id: str) -> str:
@@ -358,6 +496,8 @@ def log_interaction(
     model_calls: list[dict[str, Any]],
 ) -> None:
     """Enregistre atomiquement l'interaction et les appels de modèles associés."""
+    question = mask_personal_data(question)
+    answer = mask_personal_data(answer)
     postgres = _is_postgres(settings.analytics_database_url)
     placeholder = "%s" if postgres else "?"
     usage = _aggregate_usage(model_calls)
@@ -414,6 +554,7 @@ def log_interaction(
                 ),
             )
         conn.commit()
+    purge_expired_if_due(settings)
 
 
 def log_question(
@@ -461,6 +602,9 @@ def log_feedback(
     """
     if reason not in ALLOWED_FEEDBACK_REASONS:
         reason = "other"
+    question = mask_personal_data(question)
+    answer = mask_personal_data(answer)
+    comment = mask_personal_data(comment)
     postgres = _is_postgres(settings.analytics_database_url)
     placeholder = "%s" if postgres else "?"
     columns = (
@@ -485,7 +629,9 @@ def log_feedback(
             ),
         )
         conn.commit()
-        return cursor.rowcount != 0
+        inserted = cursor.rowcount != 0
+    purge_expired_if_due(settings)
+    return inserted
 
 
 def log_ui_event(

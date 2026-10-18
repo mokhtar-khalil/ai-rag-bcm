@@ -134,6 +134,7 @@ class Settings:
     analytics_database_url: str = field(repr=False)
     analytics_hash_salt: str = field(repr=False)
     analytics_admin_token: str = field(repr=False)
+    analytics_retention_days: int
     internal_access_username: str = field(repr=False)
     internal_access_password: str = field(repr=False)
 
@@ -293,6 +294,10 @@ def get_settings(environ: Mapping[str, str] | None = None) -> Settings:
         analytics_hash_salt=_text(env, "ANALYTICS_HASH_SALT", ""),
         # Protège l'endpoint d'agrégats destiné au dashboard central.
         analytics_admin_token=_text(env, "ANALYTICS_ADMIN_TOKEN", ""),
+        # Durée de conservation des lignes analytics, en jours. 90 par défaut :
+        # une purge active sans configuration est plus prudente qu'une
+        # conservation illimitée oubliée. 0 désactive explicitement la purge.
+        analytics_retention_days=_integer(env, "ANALYTICS_RETENTION_DAYS", 90, 0, 3650),
         # Contrôle d'accès de la page interne (« / ») et du widget qu'elle
         # charge, tant que l'assistant n'est pas encore intégré publiquement
         # sur bcm.mr. Vide des deux côtés : la page reste ouverte à qui a le

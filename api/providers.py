@@ -247,6 +247,7 @@ def plan_queries_openai(
             # Le plan tient en quelques dizaines de tokens ; la marge sert au raisonnement.
             max_output_tokens=1500,
             text={"format": PLANNER_SCHEMA},
+            store=False,
         )
     except Exception as exc:
         record_model_error(
@@ -334,6 +335,7 @@ def rerank_openai(
             # jusqu'à 120 : à 160, la sortie était parfois vide et l'appel perdu.
             max_output_tokens=1500,
             text={"format": RERANK_SCHEMA},
+            store=False,
         )
     except Exception as exc:
         record_model_error("reranking", "openai", settings.openai_rerank_model, exc, started)
@@ -416,6 +418,8 @@ def generate_openai(
             input=prompt,
             reasoning={"effort": _openai_effort(settings, quality, selected_language)},
             max_output_tokens=settings.openai_max_output_tokens,
+            # OpenAI conserve sinon la réponse côté serveur (store=True par défaut).
+            store=False,
         )
     except Exception as exc:
         record_model_error("generation", "openai", settings.openai_model, exc, started)

@@ -84,13 +84,56 @@ de session. Aucun texte de question n'est placé dans cette table.
 - Le texte n'est conservé qu'après acceptation du popup.
 - Le refus du consentement n'empêche pas l'utilisation de l'assistant.
 - Un clic de feedback vaut accord ponctuel pour cette réponse.
-- Le `session_id` aléatoire est pseudonymisé par HMAC avant stockage.
-- Aucune adresse IP, aucun nom et aucun courriel ne sont collectés.
+- Le `session_id` aléatoire est pseudonymisé par HMAC-SHA256 avant stockage.
+- Aucune adresse IP n'est collectée, et aucun champ ne demande nom ou courriel.
 - `ANALYTICS_HASH_SALT` ne doit jamais être commité.
 - L'export standard est agrégé. `--include-content` doit rester réservé aux
   analystes habilités.
-- Fixer avec le responsable métier une conservation, par exemple 90 jours,
-  puis automatiser la purge conformément à la politique BCM applicable.
+
+### Masquage du texte libre
+
+Une question peut néanmoins contenir une donnée personnelle saisie par
+l'utilisateur. Avant toute insertion dans `logged_questions` et
+`answer_feedback` (question, réponse et commentaire), `mask_personal_data`
+remplace :
+
+| Donnée | Exemple | Jeton |
+| --- | --- | --- |
+| Adresse e-mail | `sidi@exemple.mr` | `[EMAIL]` |
+| Téléphone international (`+` ou `00`) | `+222 46 12 34 56`, `0033612345678` | `[TEL]` |
+| Téléphone mauritanien à 8 chiffres | `22 12 34 56`, `36123456`, `45-25-22-06` | `[TEL]` |
+| Suite d'au moins 9 chiffres contigus (NNI…) | `1234567890` | `[ID]` |
+
+Les chiffres économiques restent intacts : `4,0 %`, `2025`, `2020-2025`,
+`p. 64`, `300 000 MRU`, `1 234 567 890 MRU`, `45000000 MRU`. Une suite suivie
+d'une unité (`%`, `MRU`, `UM`, `USD`, `millions`, `habitants`…) n'est jamais
+masquée. Le masquage est heuristique : un nom propre ou une adresse postale
+n'est pas détecté. Les lignes collectées avant cette version ne sont pas
+réécrites ; la purge les fera disparaître.
+
+### Durée de conservation et purge automatique
+
+`ANALYTICS_RETENTION_DAYS` (entier de 0 à 3650, **90 par défaut**) fixe la
+durée de conservation. Les lignes plus anciennes sont supprimées des quatre
+tables (`logged_questions`, `answer_feedback`, `model_calls`, `ui_events`),
+sous SQLite comme sous PostgreSQL :
+
+- au démarrage de Flask, après la migration du schéma ;
+- puis au plus une fois toutes les 6 heures par processus, après une
+  insertion — un conteneur rarement redéployé purge donc quand même.
+
+Une purge en échec est journalisée (`analytics_purge_failed`) sans faire
+échouer la réponse ni l'insertion. `0` désactive explicitement la purge ; la
+valeur par défaut est active, une conservation illimitée oubliée étant le
+risque le plus grave. Ajuster la durée avec le responsable métier selon la
+politique BCM applicable, et l'annoncer dans le texte de consentement.
+
+### Fournisseur de modèle
+
+Les trois appels OpenAI Responses (planification, reranking, génération)
+passent `store=False` : OpenAI ne conserve pas les réponses côté serveur pour
+consultation ultérieure. Cela ne modifie pas la rétention de sécurité propre à
+l'API, régie par le contrat avec le fournisseur.
 
 ## 5. Développement local — SQLite
 
@@ -155,6 +198,7 @@ APP_ENV=production
 DATABASE_URL=${{Postgres.DATABASE_URL}}
 ANALYTICS_HASH_SALT=<secret long généré une seule fois>
 ANALYTICS_ADMIN_TOKEN=<secret distinct réservé au dashboard>
+ANALYTICS_RETENTION_DAYS=90
 ```
 
 Ne pas changer `ANALYTICS_HASH_SALT` pendant le pilote : les mêmes sessions
