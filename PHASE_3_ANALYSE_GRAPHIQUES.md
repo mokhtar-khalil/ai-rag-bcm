@@ -52,8 +52,17 @@ Le niveau de réflexion suit `GEMINI_THINKING_LEVEL` (`low` par défaut).
 2. Chaque PNG est envoyé à Gemini avec la question, en parallèle
    (`extract_chart_contexts_gemini` dans `api/charts.py`). Le modèle renvoie un
    JSON par graphique : numéro, titre, type, axes et unités, période, séries et
-   valeurs, tendance principale, éléments illisibles. Une valeur qu’il ne peut
-   lire qu’en estimant une hauteur de barre est marquée illisible, jamais devinée.
+   valeurs, tendance principale, éléments illisibles. Une valeur imprimée est
+   recopiée ; une valeur seulement lisible sur un axe gradué est une estimation
+   arrondie (2 à 3 chiffres significatifs), affichée « ≈ … (estimation
+   visuelle) » et présentée comme approximative dans la réponse ; sans
+   graduation, elle est marquée illisible.
+2 bis. Seuls les graphiques qui correspondent à la question sont gardés : le
+   numéro cité par l’utilisateur fait foi ; sinon, le titre, les axes et les
+   séries doivent couvrir au moins 60 % des termes de la question (3 au plus),
+   et seule la figure la plus proche est retenue parmi les pages lues. Si aucune
+   ne correspond, la réponse est rédigée à partir du texte, sans
+   `chart_analysis`.
 3. Le JSON est mis en forme en un bloc « Lecture visuelle de la page PDF N »
    placé **en tête des preuves** du générateur habituel (OpenAI ou Gemini).
    L’explication par règles `explain_chart_locally` n’est pas utilisée : la
@@ -66,26 +75,48 @@ Le niveau de réflexion suit `GEMINI_THINKING_LEVEL` (`low` par défaut).
    lecture valide est mise en cache.
 5. Les appels sont journalisés dans la consommation du pilote sous l’opération
    `chart_vision`.
-6. En cas d’erreur (clé absente, quota, délai, JSON invalide, sortie tronquée),
-   l’API journalise `chart_analysis_failed backend=gemini_vision` et répond par
+6. Une erreur 5xx de Gemini (surcharge, fréquente : 2 sur 8 appels lors des
+   essais) est retentée une fois après 1,5 s. En cas d’erreur persistante (clé
+   absente, quota, délai de 45 s, JSON invalide, sortie tronquée), l’API journalise `chart_analysis_failed backend=gemini_vision` et répond par
    la voie documentaire habituelle, à partir du texte du rapport. Si une page
    sur deux échoue, l’autre est conservée.
 
-### Coût et latence estimés
+### Coût et latence mesurés
 
-Par page lue (première lecture, sans cache) :
+Mesures du 21/10/2026 en local, `gemini-3.6-flash`, rédaction par OpenAI, sur
+les questions des graphiques 23, 76, 82 et dépôts/crédits (8 lectures de page) :
 
-- entrée : image d’une page rendue à 170 dpi (≈ 1 100 à 3 000 tokens selon le
-  modèle et la résolution retenue par Google) + ≈ 700 tokens de consignes ;
-- sortie : ≈ 600 à 1 200 tokens de JSON + quelques centaines de tokens de
-  réflexion (`low`) ;
+- entrée : ≈ 1 650 à 1 800 tokens par page (double page à 170 dpi + consignes) ;
+- sortie : ≈ 950 à 2 750 tokens de JSON (une page de quatre graphiques coûte le
+  plus), plus 0 à 850 tokens de réflexion ;
 - au tarif public d’un Gemini Flash de la génération 3 (≈ 0,50 $ par million de
   tokens en entrée, ≈ 3 $ en sortie — à vérifier sur la grille Google en
-  vigueur), soit **≈ 0,005 à 0,01 $ par page**, **≈ 0,01 à 0,02 $ par question**
-  sur deux pages. Le bloc ajouté au générateur (≈ 500 à 1 500 tokens) est
-  marginal ;
-- latence : **+3 à 8 s** par question au premier passage, les pages étant lues
-  en parallèle ; quelques millisecondes si la lecture est en cache.
+  vigueur), soit **≈ 0,004 à 0,011 $ par page**, **≈ 0,01 à 0,02 $ par question**
+  (deux pages lues). Le bloc ajouté au générateur est marginal ;
+- latence : **6 à 16 s par lecture** ; les deux pages sont lues en parallèle,
+  donc **+8 à 16 s par question** au premier passage. Question complète
+  (planification, lecture, rédaction OpenAI) : **25 à 36 s**. Une lecture en
+  cache ne coûte que quelques millisecondes.
+
+### Fiabilité des valeurs estimées — à valider avant production
+
+Comparées à une lecture humaine du graphique 76 (virements ACH mensuels, barres
+sans étiquettes), les estimations visuelles ne sont **pas encore fiables** :
+
+- une lecture a donné ≈ 127 000 en janvier pour une barre réelle d’environ 5 000 ;
+- une autre, après consigne d’arrondi, situe bien le début et la fin d’année,
+  mais s’écarte de 30 à 40 % sur juin, juillet, septembre et novembre.
+
+Les valeurs imprimées (titres, légendes, tendances, chiffres du texte) sont en
+revanche bien restituées. Piste à tester : envoyer l’image en
+`media_resolution` haute ou découper la double page, le graphique n’occupant
+qu’une petite partie des ≈ 1 100 tokens d’image par défaut. L’essai n’a pas pu
+être mené : la clé locale, sur l’offre gratuite de Gemini, a atteint son quota
+journalier (`429 RESOURCE_EXHAUSTED`).
+
+**Offre gratuite à proscrire en production** : quota de requêtes très bas, et
+les données envoyées peuvent servir à Google pour améliorer ses produits. Une
+clé d’un projet facturé est requise.
 
 Le cache vit dans le conteneur : sur Railway sans volume, il repart à vide à
 chaque redéploiement.

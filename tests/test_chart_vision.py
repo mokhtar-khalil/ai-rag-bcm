@@ -8,10 +8,13 @@ from types import SimpleNamespace
 import pytest
 
 from api.app import create_app
+from google.genai import errors as genai_errors
+
 from api.charts import (
     extract_chart_contexts_gemini,
     format_chart_vision_context,
     parse_chart_vision_json,
+    select_relevant_charts,
 )
 from api.usage import begin_usage_collection, reset_usage_collection, usage_snapshot
 from core.config import ConfigurationError, get_settings
@@ -40,6 +43,12 @@ VISION_JSON = {
                         {"etiquette": "2023", "valeur": "120,4", "lisible": True},
                         {"etiquette": "2024", "valeur": None, "lisible": False},
                         {"etiquette": "2025", "valeur": "141,9", "lisible": True},
+                        {
+                            "etiquette": "2026",
+                            "valeur": "150",
+                            "lisible": True,
+                            "approximatif": True,
+                        },
                     ],
                 }
             ],
@@ -61,6 +70,9 @@ class _FakeModels:
         image = contents[0]
         data = image.inline_data.data
         outcome = self._responses[data.decode("utf-8")]
+        if isinstance(outcome, list):
+            # Suite de réponses successives pour une même page (nouvelle tentative).
+            outcome = outcome.pop(0)
         if isinstance(outcome, Exception):
             raise outcome
         return SimpleNamespace(
@@ -115,7 +127,10 @@ def test_format_marks_unreadable_values_without_inventing_them() -> None:
     assert text.splitlines()[0] == "[Lecture visuelle de la page PDF 42]"
     assert "Graphique 12 : Évolution des dépôts et des crédits" in text
     assert "ordonnée = Encours (milliards de MRU)" in text
-    assert "2023 = 120,4; 2024 = illisible; 2025 = 141,9" in text
+    assert (
+        "2023 = 120,4; 2024 = illisible; 2025 = 141,9; "
+        "2026 ≈ 150 (estimation visuelle)"
+    ) in text
     assert "Éléments illisibles (ne pas deviner) : valeur des dépôts en 2024" in text
     assert "Gemini" not in text
 
@@ -179,6 +194,112 @@ def test_extract_raises_and_caches_nothing_when_every_page_fails(
         reset_usage_collection(token)
     assert not list(tmp_path.glob("*.vision.json"))
     assert {call["success"] for call in usage} == {False, True}
+    # Une erreur qui n'est pas une panne serveur n'est pas retentée.
+    assert len(models.calls) == 2
+
+
+def test_extract_retries_once_on_server_error(tmp_path, monkeypatch) -> None:
+    monkeypatch.setattr("api.charts.CHART_VISION_RETRY_DELAY_S", 0)
+    panne = genai_errors.ServerError(
+        503, {"error": {"message": "surcharge", "status": "UNAVAILABLE"}}
+    )
+    models = _FakeModels({"p42": [panne, json.dumps(VISION_JSON)]})
+    _install_fake_client(monkeypatch, models)
+    token = begin_usage_collection()
+    try:
+        contexts = extract_chart_contexts_gemini(
+            "Explique le graphique des dépôts",
+            [_page(tmp_path, 42, "p42")],
+            "fake-key",
+            "m",
+        )
+        usage = usage_snapshot()
+    finally:
+        reset_usage_collection(token)
+    assert [context["pdf_page"] for context in contexts] == [42]
+    assert len(models.calls) == 2
+    assert [call["success"] for call in usage] == [False, True]
+
+
+def test_extract_gives_up_after_two_server_errors(tmp_path, monkeypatch) -> None:
+    monkeypatch.setattr("api.charts.CHART_VISION_RETRY_DELAY_S", 0)
+    panne = genai_errors.ServerError(
+        500, {"error": {"message": "interne", "status": "INTERNAL"}}
+    )
+    models = _FakeModels({"p42": [panne, panne]})
+    _install_fake_client(monkeypatch, models)
+    with pytest.raises(genai_errors.ServerError):
+        extract_chart_contexts_gemini(
+            "Explique le graphique", [_page(tmp_path, 42, "p42")], "fake-key", "m"
+        )
+    assert len(models.calls) == 2
+
+
+def _chart(numero: str, titre: str, axe: str = "", series: tuple[str, ...] = ()) -> dict:
+    return {
+        "numero": numero,
+        "titre": titre,
+        "axes": {"ordonnee": {"libelle": axe, "unite": None}},
+        "series": [{"nom": nom, "valeurs": []} for nom in series],
+    }
+
+
+def test_relevance_keeps_the_requested_chart_number() -> None:
+    charts = [
+        _chart("Graphique 22", "Taux des opérations de politique monétaire"),
+        _chart("Graphique 23", "Évolution de la liquidité bancaire depuis 2022"),
+    ]
+    kept = select_relevant_charts("Explique le graphique 23 sur la liquidité.", charts)
+    assert [chart["numero"] for chart in kept] == ["Graphique 23"]
+
+
+def test_relevance_drops_neighbouring_charts_sharing_one_or_two_words() -> None:
+    # Cas réel : la question vise dépôts, crédits et intermédiation ; la page
+    # retenue ne porte que des graphiques sur la transformation par banque.
+    charts = [
+        _chart(
+            "Graphique 46",
+            "Taux de transformation par banque avant et après retrait de 100% "
+            "des dépôts publics et semi-publics",
+            series=("Banques avec FPN impactés",),
+        ),
+        _chart("Graphique 47", "Crédits Bruts et Fonds propres nets par banque"),
+    ]
+    question = (
+        "Explique le graphique sur l'évolution des dépôts, des crédits "
+        "et du taux d'intermédiation."
+    )
+    assert select_relevant_charts(question, charts) == []
+
+
+def test_relevance_prefers_the_closest_twin_chart() -> None:
+    charts = [
+        _chart("Graphique 74", "RTGS, total paiements client SCCT par jour", "Volume"),
+        _chart("Graphique 76", "ACH, Virements volume et valeur par mois en 2025"),
+        _chart(
+            "Graphique 77",
+            "ACH, Chèques volume et valeur par mois en 2025",
+            "Volume Transferts",
+        ),
+    ]
+    kept = select_relevant_charts(
+        "Explique le volume des virements par mois en 2025.", charts
+    )
+    assert [chart["numero"] for chart in kept] == ["Graphique 76"]
+
+
+def test_extract_returns_nothing_when_no_chart_matches(tmp_path, monkeypatch) -> None:
+    models = _FakeModels({"p42": json.dumps(VISION_JSON)})
+    _install_fake_client(monkeypatch, models)
+    contexts = extract_chart_contexts_gemini(
+        "Explique le graphique sur l'inflation et les prix alimentaires",
+        [_page(tmp_path, 42, "p42")],
+        "fake-key",
+        "m",
+    )
+    assert contexts == []
+    # La lecture de la page est mise en cache même si rien ne correspond.
+    assert len(list(tmp_path.glob("*.vision.json"))) == 1
 
 
 def test_extract_keeps_readable_pages_when_another_fails(tmp_path, monkeypatch) -> None:

@@ -68,6 +68,8 @@ Règles obligatoires :
 17. Distingue toujours l'observation du graphique de l'explication économique donnée dans le texte.
     Les blocs « Lecture visuelle » décrivent les graphiques lus sur l'image de la page : cite leur
     page PDF comme celle d'un passage normal et présente leurs valeurs comme lues sur le graphique.
+    Une valeur notée « ≈ … (estimation visuelle) » est lue sur l'axe, pas imprimée : présente-la
+    comme approximative (« environ ») et jamais comme un chiffre publié par la BCM.
 18. Si une valeur ou une légende OCR n'est pas suffisamment lisible, ou qu'une lecture visuelle la
     marque « illisible », signale-le sans la deviner.
 19. Une question contenant « cette section », « ce sujet », « ce graphique » ou une expression

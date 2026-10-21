@@ -33,6 +33,12 @@ CHART_VISION_MODEL=gemini-3.6-flash    # facultatif
 GEMINI_API_KEY=...                     # secret, requis même si GENERATION_PROVIDER=openai
 ```
 
+Utiliser une clé d'un projet Google **facturé** : l'offre gratuite plafonne vite
+les requêtes (quota atteint pendant les essais) et peut réutiliser les données
+envoyées. Coût mesuré : ≈ 0,01 à 0,02 $ et +8 à 16 s par question sur un
+graphique au premier passage. Les valeurs estimées à l'œil sur les barres non
+étiquetées restent à fiabiliser (voir `PHASE_3_ANALYSE_GRAPHIQUES.md`).
+
 ⚠️ **Les images des pages du rapport public sont alors envoyées à Google.**
 C'est un choix à faire valider par la BCM avant activation. Sans clé ou en cas
 d'erreur Gemini, l'API répond comme aujourd'hui à partir du texte du rapport.

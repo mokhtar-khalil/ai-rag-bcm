@@ -12,9 +12,11 @@ from __future__ import annotations
 import contextvars
 import hashlib
 import json
+import math
 import re
 import shutil
 import subprocess
+import time
 import unicodedata
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -844,8 +846,30 @@ def extract_document_page_contexts(
 
 # Version des consignes de lecture visuelle. Elle entre dans la clé du cache :
 # modifier les consignes invalide d'elles-mêmes les descriptions déjà stockées.
-CHART_VISION_PROMPT_VERSION = "v1"
+CHART_VISION_PROMPT_VERSION = "v3"
 CHART_VISION_TIMEOUT_MS = 45_000
+# Une erreur 5xx de Gemini est le plus souvent passagère : une seconde tentative
+# après une courte pause évite de basculer trop vite sur la voie documentaire.
+CHART_VISION_ATTEMPTS = 2
+CHART_VISION_RETRY_DELAY_S = 1.5
+
+# Termes trop généraux pour dire qu'un graphique lu correspond à la question.
+VISION_GENERIC_TERMS = GENERIC_CHART_TERMS | {
+    "analyse",
+    "analyser",
+    "dans",
+    "decris",
+    "decrire",
+    "entre",
+    "evolution",
+    "page",
+    "pour",
+    "quel",
+    "quelle",
+    "quelles",
+    "quels",
+    "sont",
+}
 
 CHART_VISION_INSTRUCTIONS = """Tu lis l'image d'une page du Rapport annuel 2025 de la Banque
 Centrale de Mauritanie pour décrire fidèlement les graphiques qu'elle contient.
@@ -854,9 +878,15 @@ Règles obligatoires :
 1. Décris uniquement ce qui est visible sur l'image. N'utilise aucune connaissance externe.
 2. Recopie les nombres, unités, années et libellés tels qu'ils sont imprimés (virgule décimale
    comprise). N'arrondis pas et ne convertis pas.
-3. N'invente jamais une valeur. Une valeur que l'on ne peut lire qu'en estimant la hauteur d'une
-   barre ou la position d'un point sur une courbe porte "lisible": false et "valeur": null ; un
-   libellé ou une légende illisible est cité dans "elements_illisibles".
+3. N'invente jamais une valeur. Trois cas seulement :
+   - la valeur est imprimée sur le graphique : recopie-la, "approximatif": false ;
+   - elle n'est pas imprimée mais se lit sur un axe gradué (hauteur d'une barre, position d'un
+     point) : donne une estimation arrondie à deux ou trois chiffres significatifs (« 320 000 »,
+     jamais « 317 743 », qui ferait croire à une valeur imprimée), "approximatif": true ;
+   - aucune graduation ne permet de la situer : "lisible": false et "valeur": null.
+   Pour des barres empilées trop denses, donne au moins le total de chaque barre, imprimé ou estimé
+   sur l'axe, dans une série nommée « Total ». Un libellé ou une légende illisible est cité dans
+   "elements_illisibles".
 4. Traite chaque graphique de la page séparément, y compris sur une double page. Ignore les
    tableaux de texte, photos et logos qui ne sont pas des graphiques, sauf un organigramme ou un
    état financier explicitement demandé.
@@ -876,7 +906,8 @@ Retourne uniquement un JSON valide de la forme :
   "periode": "...",
   "source": "..." ou null,
   "series": [{"nom": "...", "unite": "..." ou null,
-              "valeurs": [{"etiquette": "2024", "valeur": "12,5", "lisible": true}]}],
+              "valeurs": [{"etiquette": "2024", "valeur": "12,5", "lisible": true,
+                           "approximatif": false}]}],
   "tendance_principale": "...",
   "elements_illisibles": ["..."]
 }]}
@@ -937,6 +968,60 @@ def parse_chart_vision_json(text: str) -> list[dict[str, Any]]:
             continue
         valid.append(chart)
     return valid
+
+
+def _vision_terms(value: str) -> set[str]:
+    """Termes distinctifs, au singulier, pour rapprocher question et graphique."""
+    return {
+        re.sub(r"[sx]$", "", term)
+        for term in _terms(value)
+        if term not in VISION_GENERIC_TERMS
+    }
+
+
+def _chart_number(chart: dict[str, Any]) -> int | None:
+    """Numéro du graphique tel que le modèle l'a lu (« Graphique 76 » -> 76)."""
+    match = re.search(r"\d{1,3}", str(chart.get("numero") or ""))
+    return int(match.group(0)) if match else None
+
+
+def select_relevant_charts(
+    question: str, charts: list[dict[str, Any]]
+) -> list[dict[str, Any]]:
+    """Garde les graphiques lus qui correspondent réellement à la question.
+
+    Une page sélectionnée sur son texte porte souvent plusieurs figures, et
+    parfois aucune qui réponde. Un numéro cité par l'utilisateur fait foi ;
+    sinon, le titre, les séries et les axes du graphique doivent couvrir une
+    part suffisante des termes de la question. Une figure voisine qui n'en
+    partage qu'un ou deux (« taux », « dépôts ») est écartée plutôt que
+    présentée comme le graphique demandé.
+    """
+    wanted = explicit_chart_numbers(question)
+    if wanted:
+        return [chart for chart in charts if _chart_number(chart) in wanted]
+    query_terms = _vision_terms(question)
+    if not query_terms:
+        return charts
+    required = min(3, max(1, math.ceil(0.6 * len(query_terms))))
+    scored: list[tuple[int, dict[str, Any]]] = []
+    for chart in charts:
+        described = " ".join(
+            [
+                str(chart.get("titre") or ""),
+                _vision_text(chart.get("axes")),
+                *(str(series.get("nom") or "") for series in chart["series"]),
+            ]
+        )
+        overlap = len(query_terms & _vision_terms(described))
+        if overlap >= required:
+            scored.append((overlap, chart))
+    if not scored:
+        return []
+    # Deux figures jumelles (virements et chèques ACH par mois) partagent leurs
+    # axes : seule celle qui couvre le mieux la question est conservée.
+    best = max(overlap for overlap, _ in scored)
+    return [chart for overlap, chart in scored if overlap == best]
 
 
 def _vision_text(value: Any) -> str:
@@ -1011,6 +1096,8 @@ def format_chart_vision_context(
                 value = _vision_text(point.get("valeur"))
                 if point.get("lisible") is False or not value:
                     values.append(f"{tag} = illisible")
+                elif point.get("approximatif") is True:
+                    values.append(f"{tag} ≈ {value} (estimation visuelle)")
                 else:
                     values.append(f"{tag} = {value}")
             suffix = f" ({unit})" if unit else ""
@@ -1045,6 +1132,7 @@ def _read_chart_vision(
         return parse_chart_vision_json(json.dumps(cached, ensure_ascii=False))
 
     from google import genai
+    from google.genai import errors as genai_errors
     from google.genai import types
 
     # Délai borné : une lecture bloquée doit laisser place au repli documentaire
@@ -1056,27 +1144,37 @@ def _read_chart_vision(
     thinking: dict[str, Any] = {}
     if thinking_level:
         thinking["thinking_config"] = types.ThinkingConfig(thinking_level=thinking_level)
-    started = model_call_started()
-    try:
-        response = client.models.generate_content(
-            model=model,
-            contents=[
-                types.Part.from_bytes(
-                    data=image_path.read_bytes(), mime_type="image/png"
+    for attempt in range(1, CHART_VISION_ATTEMPTS + 1):
+        started = model_call_started()
+        try:
+            response = client.models.generate_content(
+                model=model,
+                contents=[
+                    types.Part.from_bytes(
+                        data=image_path.read_bytes(), mime_type="image/png"
+                    ),
+                    "QUESTION UTILISATEUR (indication de priorité uniquement) :\n"
+                    f"{question}",
+                ],
+                config=types.GenerateContentConfig(
+                    system_instruction=CHART_VISION_INSTRUCTIONS,
+                    max_output_tokens=max_output_tokens,
+                    temperature=0.0,
+                    response_mime_type="application/json",
+                    **thinking,
                 ),
-                f"QUESTION UTILISATEUR (indication de priorité uniquement) :\n{question}",
-            ],
-            config=types.GenerateContentConfig(
-                system_instruction=CHART_VISION_INSTRUCTIONS,
-                max_output_tokens=max_output_tokens,
-                temperature=0.0,
-                response_mime_type="application/json",
-                **thinking,
-            ),
-        )
-    except Exception as exc:
-        record_model_error("chart_vision", "gemini", model, exc, started)
-        raise
+            )
+        except Exception as exc:
+            record_model_error("chart_vision", "gemini", model, exc, started)
+            # Seule une panne côté Google mérite une seconde tentative : une clé
+            # invalide ou un quota épuisé échouerait de la même façon.
+            if attempt < CHART_VISION_ATTEMPTS and isinstance(
+                exc, genai_errors.ServerError
+            ):
+                time.sleep(CHART_VISION_RETRY_DELAY_S)
+                continue
+            raise
+        break
     record_model_response("chart_vision", "gemini", model, response, started)
     candidates = getattr(response, "candidates", None) or []
     finish_reason = str(getattr(candidates[0], "finish_reason", "")) if candidates else ""
@@ -1109,6 +1207,8 @@ def extract_chart_contexts_gemini(
     de contexte, mais l'image de la page est envoyée à Google. Les pages sont
     lues en parallèle ; une page en échec est ignorée tant qu'une autre a pu
     être lue, sinon l'erreur remonte pour déclencher le repli documentaire.
+    Seuls les graphiques qui correspondent à la question sont retenus : une
+    liste vide signifie qu'aucune page lue ne porte le graphique demandé.
     """
     if not api_key:
         raise RuntimeError("GEMINI_API_KEY est requis pour la lecture visuelle.")
@@ -1131,14 +1231,25 @@ def extract_chart_contexts_gemini(
             executor.submit(contextvars.copy_context().run, read, image_path)
             for _, image_path in pages
         ]
-    contexts: list[dict[str, Any]] = []
+    readings: list[tuple[int, Path, list[dict[str, Any]]]] = []
     first_error: Exception | None = None
     for (page, image_path), future in zip(pages, futures):
         try:
-            charts = future.result()
+            readings.append((page, image_path, future.result()))
         except Exception as exc:
             first_error = first_error or exc
-            continue
+    # Le cache conserve la lecture complète de chaque page. Le tri porte sur
+    # l'ensemble des pages lues : une figure moins proche de la question sur
+    # la seconde page ne doit pas accompagner le graphique demandé.
+    kept = {
+        id(chart)
+        for chart in select_relevant_charts(
+            question, [chart for _, _, charts in readings for chart in charts]
+        )
+    }
+    contexts: list[dict[str, Any]] = []
+    for page, image_path, charts in readings:
+        charts = [chart for chart in charts if id(chart) in kept]
         if not charts:
             continue
         text = format_chart_vision_context(page, charts, maximum_chars=maximum_chars)
