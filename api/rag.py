@@ -39,6 +39,29 @@ FRENCH_STOP_WORDS = {
 INDEX_SCHEMA_VERSION = 10
 
 
+def _has_table_rows(text: str) -> bool:
+    """Indique si un passage contient au moins deux lignes de valeurs tabulées."""
+    rows = [
+        line
+        for line in text.splitlines()
+        if len(re.findall(r"(?<![\w,])-?\d+(?:,\d+)?%?", line)) >= 3
+    ]
+    return len(rows) >= 2
+
+
+def _is_year_header(line: str, years: set[str]) -> bool:
+    """Reconnaît une ligne d'en-tête de tableau annuel couvrant les années demandées."""
+    line_years = set(re.findall(r"(?<!\d)(?:19|20)\d{2}(?!\d)", line))
+    if len(line_years) < 3 or not years <= line_years:
+        return False
+    if not re.search(r"[A-Za-zÀ-ÿ]{4,}", line):
+        return False
+    # Une ligne de données porte des valeurs ; un en-tête n'en porte aucune
+    # autre que ses années (« Libellé Pond. 2023 2024 2025 Var.2023… »).
+    other_numbers = re.findall(r"(?<!\d)\d+(?:,\d+)?(?!\d)", line)
+    return len([value for value in other_numbers if value not in line_years]) == 0
+
+
 @dataclass(frozen=True)
 class Chunk:
     """Passage indexé, rattaché à son unité citable et à sa source d'origine.
@@ -715,6 +738,78 @@ class RAGIndex:
                 if len(expanded) >= max_results:
                     return expanded
         return expanded
+
+    def year_table_passages(
+        self,
+        pages: list[int],
+        years: set[str],
+        maximum_pages: int = 2,
+    ) -> list[dict[str, Any]]:
+        """Joint le tableau annuel d'une page retenue qui couvre les années demandées.
+
+        Un tableau comme « Libellé Pond. 2023 2024 2025 Var.2023… » est découpé
+        en plusieurs passages : la ligne « INDICE GLOBAL … 2,5% 1,6% » perd son
+        en-tête de colonnes et, plafonnée à deux passages par page, n'atteint
+        jamais le générateur. La page, elle, est trouvée par son commentaire
+        narratif. On ajoute donc le passage qui porte l'en-tête et sa suite
+        immédiate, celle-ci précédée de l'en-tête pour rester lisible seule.
+        """
+        if not years:
+            return []
+        by_id = {chunk.chunk_id: chunk for chunk in self.chunks}
+        passages: list[dict[str, Any]] = []
+        matched_pages = 0
+        for page in pages:
+            page_chunks = sorted(
+                (
+                    chunk
+                    for chunk in self.chunks
+                    if int(chunk.pdf_page) == page and chunk.kind != "table_row"
+                ),
+                key=lambda chunk: chunk.chunk_id,
+            )
+            # Les passages se chevauchent : l'en-tête peut figurer dans deux
+            # d'entre eux. Le dernier qui le porte est celui que suivent les
+            # lignes du tableau.
+            holders: list[tuple[Chunk, str]] = []
+            for candidate in page_chunks:
+                for line in candidate.text.splitlines():
+                    if _is_year_header(line, years):
+                        holders.append((candidate, line.strip()))
+                        break
+            if not holders:
+                continue
+            chunk, header = holders[-1]
+            passages.append(
+                {
+                    "chunk_id": chunk.chunk_id,
+                    "pdf_page": chunk.pdf_page,
+                    "text": chunk.text,
+                    "kind": chunk.kind,
+                    "header": header,
+                }
+            )
+            for offset in (1, 2):
+                following = by_id.get(chunk.chunk_id + offset)
+                if (
+                    following is None
+                    or following.pdf_page != chunk.pdf_page
+                    or not _has_table_rows(following.text)
+                ):
+                    break
+                passages.append(
+                    {
+                        "chunk_id": following.chunk_id,
+                        "pdf_page": following.pdf_page,
+                        "text": f"En-tête du tableau : {header}\n{following.text}",
+                        "kind": following.kind,
+                        "header": header,
+                    }
+                )
+            matched_pages += 1
+            if matched_pages >= maximum_pages:
+                break
+        return passages
 
     def decorate(
         self, results: list[dict[str, Any]], language: str = "fr"
