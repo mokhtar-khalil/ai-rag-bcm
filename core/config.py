@@ -112,6 +112,9 @@ class Settings:
     min_semantic_score: float
     embedding_batch_size: int
     chart_analysis_enabled: bool
+    chart_analysis_backend: str
+    chart_vision_model: str
+    chart_vision_max_output_tokens: int
     chart_cache_path: Path
     chart_render_dpi: int
     chart_max_pages: int
@@ -184,6 +187,23 @@ def get_settings(environ: Mapping[str, str] | None = None) -> Settings:
             "GEMINI_THINKING_LEVEL doit valoir low, medium, high, ou rester vide."
         )
 
+    chart_analysis_enabled = _boolean(env, "CHART_ANALYSIS_ENABLED", app_env != "test")
+    chart_backend = _text(env, "CHART_ANALYSIS_BACKEND", "local_ocr").casefold()
+    if chart_backend not in {"local_ocr", "gemini_vision"}:
+        raise ConfigurationError(
+            "CHART_ANALYSIS_BACKEND doit valoir local_ocr ou gemini_vision."
+        )
+    if (
+        chart_analysis_enabled
+        and chart_backend == "gemini_vision"
+        and not gemini_api_key
+        and app_env == "production"
+    ):
+        raise ConfigurationError(
+            "GEMINI_API_KEY est requis en production lorsque "
+            "CHART_ANALYSIS_BACKEND vaut gemini_vision."
+        )
+
     top_k = _integer(env, "TOP_K", 5, 1, 10)
     # Le budget de candidats était calibré sur un corpus d'un seul document. Le
     # corpus réunit désormais le rapport annuel et les Lettres d'information :
@@ -251,8 +271,19 @@ def get_settings(environ: Mapping[str, str] | None = None) -> Settings:
         semantic_weight=_decimal(env, "SEMANTIC_WEIGHT", 0.45, 0.0, 1.0),
         min_semantic_score=_decimal(env, "MIN_SEMANTIC_SCORE", 0.88, 0.0, 1.0),
         embedding_batch_size=_integer(env, "EMBEDDING_BATCH_SIZE", 64, 1, 256),
-        chart_analysis_enabled=_boolean(
-            env, "CHART_ANALYSIS_ENABLED", app_env != "test"
+        chart_analysis_enabled=chart_analysis_enabled,
+        # « local_ocr » : OCR Apple Vision, macOS uniquement, aucune image ne
+        # quitte la machine. « gemini_vision » : la page rendue est envoyée à
+        # Gemini au moment de la question ; seule voie disponible sous Linux
+        # (Docker, Railway), au prix d'un envoi des images à Google.
+        chart_analysis_backend=chart_backend,
+        # Modèle de lecture des images, distinct du modèle de rédaction : un
+        # Flash suffit à lire axes et valeurs et coûte nettement moins cher.
+        chart_vision_model=_text(env, "CHART_VISION_MODEL", "gemini-3.6-flash"),
+        # La réflexion du modèle est décomptée de ce budget, comme pour
+        # GEMINI_MAX_OUTPUT_TOKENS : une description JSON coupée est inexploitable.
+        chart_vision_max_output_tokens=_integer(
+            env, "CHART_VISION_MAX_OUTPUT_TOKENS", 6000, 1000, 32000
         ),
         chart_cache_path=_path(
             env, "CHART_CACHE_PATH", PROJECT_ROOT / "storage" / "chart_pages"

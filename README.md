@@ -100,9 +100,14 @@ Configuration facultative :
 
 ```dotenv
 CHART_ANALYSIS_ENABLED=true
+CHART_ANALYSIS_BACKEND=local_ocr   # gemini_vision sur un serveur Linux
 CHART_RENDER_DPI=170
 CHART_MAX_PAGES=2
 ```
+
+Sur un serveur Linux (Docker, Railway), l’OCR Apple Vision n’existe pas :
+`CHART_ANALYSIS_BACKEND=gemini_vision` fait lire la page rendue par Gemini Flash,
+ce qui envoie son image à Google (voir `PHASE_3_ANALYSE_GRAPHIQUES.md`).
 
 ## Lettres d'information
 

@@ -51,7 +51,10 @@ ni accès réseau au premier appel. Mettre à jour le corpus = redéployer.
 | `INTERNAL_ACCESS_PASSWORD` | secret long | idem, laisser vide = page ouverte à qui a le lien |
 | `REINDEX_TOKEN` | … | **secret** |
 | `RATE_LIMIT_ASK` | `20 per minute` | |
-| `CHART_ANALYSIS_ENABLED` | `false` | |
+| `CHART_ANALYSIS_ENABLED` | `false` | `true` pour lire les graphiques — voir § 5 |
+| `CHART_ANALYSIS_BACKEND` | `gemini_vision` | déjà fixé dans l'image |
+| `CHART_VISION_MODEL` | `gemini-3.6-flash` | facultatif |
+| `GEMINI_API_KEY` | … | **secret**, requis si l'analyse des graphiques est activée |
 | `WEB_CONCURRENCY` | `1` | **ne pas augmenter — voir ci-dessous** |
 | `GUNICORN_THREADS` | `4` | |
 
@@ -316,8 +319,12 @@ redéploiement.
 
 ## 5. Limites connues
 
-- **Analyse des graphiques désactivée.** Elle repose sur Swift et Apple Vision,
-  disponibles seulement sur macOS. `CHART_ANALYSIS_ENABLED=false` en production
-  tant qu'un moteur OCR multiplateforme ne l'a pas remplacée.
+- **Analyse des graphiques désactivée par défaut.** L'OCR local repose sur
+  Swift et Apple Vision, disponibles seulement sur macOS. Sur Railway, la
+  lecture visuelle Gemini (`CHART_ANALYSIS_BACKEND=gemini_vision`) le remplace :
+  `CHART_ANALYSIS_ENABLED=true` + `GEMINI_API_KEY` suffisent. Les images des
+  pages de graphique du rapport sont alors **envoyées à Google** : activer
+  seulement après accord de la BCM. Détails, coût et latence :
+  `PHASE_3_ANALYSE_GRAPHIQUES.md`.
 - **Une seule réplique.** Voir la note sur la mémoire et le limiteur de débit.
 - **Pas de journalisation centralisée.** Les journaux restent dans Railway.

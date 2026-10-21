@@ -48,8 +48,11 @@ assert e.metadata['chunks'] > 2000, 'index incomplet'"
 
 # L'OCR local des graphiques (api/charts.py, scripts/build_chart_ocr.sh) repose
 # sur Swift + Apple Vision, disponibles uniquement sur macOS. Cette image Linux
-# ne peut pas l'activer : CHART_ANALYSIS_ENABLED doit rester "false" tant qu'un
-# moteur OCR multiplateforme ne l'a pas remplacé (roadmap, au-delà de la Phase 1).
+# utilise donc la lecture visuelle Gemini (CHART_ANALYSIS_BACKEND=gemini_vision) :
+# les pages de graphique sont rendues ici par poppler puis envoyées à Google au
+# moment de la question. L'analyse reste désactivée par défaut : l'envoi des
+# images du rapport à Google doit être validé par la BCM. Pour l'activer :
+# CHART_ANALYSIS_ENABLED=true et GEMINI_API_KEY au runtime.
 # torch dimensionne son parallélisme sur le nombre de cœurs annoncés par l'hôte,
 # pas sur le quota du conteneur. Sur une plateforme comme Railway, ses threads se
 # disputent alors la même fraction de CPU. Mesuré sur cette image : une question
@@ -62,7 +65,8 @@ ENV OMP_NUM_THREADS=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     API_HOST=0.0.0.0 \
     API_PORT=5000 \
-    CHART_ANALYSIS_ENABLED=false
+    CHART_ANALYSIS_ENABLED=false \
+    CHART_ANALYSIS_BACKEND=gemini_vision
 
 RUN useradd --create-home --uid 1000 bcm \
     && chown -R bcm:bcm /app

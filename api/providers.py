@@ -66,7 +66,10 @@ Règles obligatoires :
 16. Les blocs marqués « OCR local » décrivent les libellés et valeurs visibles avec des coordonnées
     normalisées. Utilise les positions uniquement pour relier titres, légendes, années et valeurs.
 17. Distingue toujours l'observation du graphique de l'explication économique donnée dans le texte.
-18. Si une valeur ou une légende OCR n'est pas suffisamment lisible, signale-le sans la deviner.
+    Les blocs « Lecture visuelle » décrivent les graphiques lus sur l'image de la page : cite leur
+    page PDF comme celle d'un passage normal et présente leurs valeurs comme lues sur le graphique.
+18. Si une valeur ou une légende OCR n'est pas suffisamment lisible, ou qu'une lecture visuelle la
+    marque « illisible », signale-le sans la deviner.
 19. Une question contenant « cette section », « ce sujet », « ce graphique » ou une expression
     similaire vise le sujet actif précisé dans la question et dans l'historique. Ne redemande pas
     ce sujet lorsqu'il est déjà identifiable.

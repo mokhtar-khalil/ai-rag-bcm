@@ -41,6 +41,7 @@ from api.charts import (
     extract_document_page_contexts,
     is_chart_existence_question,
     extract_chart_contexts,
+    extract_chart_contexts_gemini,
     is_chart_question,
     render_chart_pages,
     select_chart_pages,
@@ -1401,8 +1402,12 @@ def create_app(
 
         # Étape 4 : pour une question graphique, rendre les pages PDF en images,
         # extraire leurs libellés par OCR et conserver les graphiques pertinents.
+        # Deux moteurs : l'OCR local (macOS) alimente l'explication par règles ;
+        # la lecture visuelle Gemini alimente le générateur habituel.
         chart_pages: list[int] = []
         chart_contexts: list[dict[str, Any]] = []
+        vision_contexts: list[dict[str, Any]] = []
+        chart_backend = settings.chart_analysis_backend
         if chart_requested and settings.chart_analysis_enabled:
             try:
                 chart_analysis_question = enrich_chart_query(question)
@@ -1422,6 +1427,21 @@ def create_app(
                         dpi=settings.chart_render_dpi,
                         renderer_path=settings.pdf_renderer_path,
                     )
+                if chart_pages and chart_backend == "gemini_vision":
+                    vision_contexts = extract_chart_contexts_gemini(
+                        retrieval_question if followup else question,
+                        rendered_pages,
+                        api_key=settings.gemini_api_key,
+                        model=settings.chart_vision_model,
+                        thinking_level=settings.gemini_thinking_level,
+                        max_output_tokens=settings.chart_vision_max_output_tokens,
+                        maximum_chars=settings.chart_ocr_max_chars,
+                    )
+                    if vision_contexts:
+                        chart_pages = [
+                            int(context["pdf_page"]) for context in vision_contexts
+                        ]
+                elif chart_pages:
                     chart_contexts = extract_chart_contexts(
                         chart_analysis_question,
                         rendered_pages,
@@ -1481,17 +1501,26 @@ def create_app(
                         ]
             except Exception as exc:
                 app.logger.warning(
-                    "request_id=%s chart_analysis_failed error_type=%s",
+                    "request_id=%s chart_analysis_failed backend=%s error_type=%s",
                     g.request_id,
+                    chart_backend,
                     type(exc).__name__,
                 )
                 chart_contexts = []
+                vision_contexts = []
 
         # Étape 5 : ajouter les passages voisins pour redonner au générateur le
         # contexte parfois coupé par le découpage du PDF.
         generation_results = engine.decorate(
             engine.expand_with_neighbors(results, max_results=12), language
         )
+        # La lecture visuelle passe en tête des preuves : le générateur la cite
+        # avec la page du graphique, et le texte voisin en donne l'explication.
+        if vision_contexts:
+            generation_results = [
+                *engine.decorate(vision_contexts, language),
+                *generation_results,
+            ]
 
         # Une page déjà citée peut être entièrement scannée : son index contient
         # alors le titre, mais pas le texte à résumer. Pour un suivi comme
@@ -1505,6 +1534,9 @@ def create_app(
             and followup_pages
             and _content_followup(question)
             and settings.chart_analysis_enabled
+            # L'OCR documentaire repose sur Apple Vision : sans lui, l'appel
+            # échouerait à coup sûr et ne ferait que bruiter les journaux.
+            and chart_backend == "local_ocr"
         ):
             sparse_pages: list[int] = []
             for page in followup_pages[:2]:
@@ -1554,6 +1586,14 @@ def create_app(
             for page in chart_pages
             for item in search_results
             if int(item["pdf_page"]) == page
+        ]
+        # Une page de graphique lue sans passage texte retenu reste une source :
+        # la réponse la cite, l'utilisateur doit pouvoir l'ouvrir.
+        chart_source_pages = {int(item["pdf_page"]) for item in chart_source_items}
+        chart_source_items += [
+            context
+            for context in vision_contexts
+            if int(context["pdf_page"]) not in chart_source_pages
         ]
         for item in [*chart_source_items, *results]:
             page = int(item["pdf_page"])
@@ -1649,7 +1689,11 @@ def create_app(
                 )
                 return
 
-        if chart_requested and is_chart_existence_question(question):
+        if (
+            chart_requested
+            and is_chart_existence_question(question)
+            and not vision_contexts
+        ):
             if chart_pages:
                 pages_text = ", ".join(str(page) for page in sorted(set(chart_pages)))
                 yield _evenement_reponse(
@@ -1699,9 +1743,11 @@ def create_app(
             )
             return
 
-        if not results or not engine.is_relevant(
+        # Une page de graphique lue avec succès est en soi une preuve pertinente,
+        # même si les scores du texte environnant restent sous le seuil.
+        if not vision_contexts and (not results or not engine.is_relevant(
             search_results, settings.min_relevance_score, settings.min_semantic_score
-        ):
+        )):
             # Rien de pertinent n'a été trouvé. Seules les pistes tirées des
             # libellés réellement présents dans le corpus ont un sens ici : les
             # reformulations produites par le planificateur sont de simples
@@ -1808,8 +1854,10 @@ def create_app(
                 "grounded": cite_une_source,
                 "clarification_needed": False,
                 "suggestions": [],
-                "chart_analysis": False,
-                "chart_pages": [],
+                "chart_analysis": bool(vision_contexts),
+                "chart_pages": sorted(
+                    {int(context["pdf_page"]) for context in vision_contexts}
+                ),
                 "memory_used": followup,
                 "language": language,
             }
