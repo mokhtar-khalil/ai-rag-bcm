@@ -46,6 +46,7 @@ from api.charts import (
     render_chart_pages,
     select_chart_pages,
 )
+from api.ambiguity import lexical_ambiguity
 from api.analytics import (
     analytics_snapshot,
     ensure_schema,
@@ -225,9 +226,16 @@ def _explicit_report_reference_pages(
 
 
 def _clarification_answer(
-    suggestions: list[str], missing: bool = False, language: str = "fr"
+    suggestions: list[str],
+    missing: bool = False,
+    language: str = "fr",
+    lead: str | None = None,
 ) -> str:
-    """Construit la réponse demandant à l'utilisateur de préciser son intention."""
+    """Construit la réponse demandant à l'utilisateur de préciser son intention.
+
+    `lead` remplace la phrase d'introduction générique : pour un terme dont les
+    sens sont connus, mieux vaut expliquer en quoi la question est ambiguë.
+    """
     if language == "ar":
         lead = (
             "لا أجد تطابقًا دقيقًا بما يكفي للإجابة دون مخاطرة."
@@ -240,11 +248,12 @@ def _clarification_answer(
             + "\n".join(lines)
         )
         return format_arabic_bidi(answer)
-    lead = (
-        "Je ne trouve pas de correspondance suffisamment précise pour répondre sans risque."
-        if missing
-        else "Votre question peut correspondre à plusieurs indicateurs du rapport."
-    )
+    if lead is None:
+        lead = (
+            "Je ne trouve pas de correspondance suffisamment précise pour répondre sans risque."
+            if missing
+            else "Votre question peut correspondre à plusieurs indicateurs du rapport."
+        )
     lines = [f"{index}. {value}" for index, value in enumerate(suggestions, start=1)]
     return f"{lead}\n\nPouvez-vous confirmer l'une de ces formulations ?\n\n" + "\n".join(lines)
 
@@ -1368,6 +1377,18 @@ def create_app(
             and bool(query_plan.get("ambiguous"))
             and len(evidence_suggestions) >= 2
         )
+        # Termes dont tous les sens figurent dans les documents (« dépôts des
+        # banques », « solde », « réserves », « le taux ») : la clarification
+        # ne dépend plus du seul jugement du planificateur, qui choisissait en
+        # silence une interprétation.
+        lexical_clarification = (
+            lexical_ambiguity(question)
+            if language == "fr" and not chart_requested and not followup
+            else None
+        )
+        if lexical_clarification:
+            clarification_needed = True
+            suggestions = list(lexical_clarification["suggestions"])
         results = engine.decorate(
             _select_results(search_results, wanted_results, engine.source_registry),
             language,
@@ -1628,9 +1649,17 @@ def create_app(
             yield _evenement_reponse(
                 {
                     "answer": _clarification_answer(
-                        suggestions, language=language
+                        suggestions,
+                        language=language,
+                        lead=(
+                            str(lexical_clarification["explanation"])
+                            if lexical_clarification
+                            else None
+                        ),
                     ),
-                    "sources": sources,
+                    # Une question de précision n'affirme rien : afficher des
+                    # sources laisserait croire qu'elles appuient une réponse.
+                    "sources": [] if lexical_clarification else sources,
                     "grounded": False,
                     "clarification_needed": True,
                     "suggestions": suggestions,
