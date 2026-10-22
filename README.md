@@ -350,13 +350,13 @@ OLLAMA_MODEL=llama3.2:3b
 État de l’index :
 
 ```bash
-curl http://127.0.0.1:5000/health
+curl http://127.0.0.1:5050/health
 ```
 
 Question :
 
 ```bash
-curl -X POST http://127.0.0.1:5000/api/ask \
+curl -X POST http://127.0.0.1:5050/api/ask \
   -H 'Content-Type: application/json' \
   -d '{"question":"Quel a été le taux de croissance du PIB réel en 2025 ?","language":"fr"}'
 ```
@@ -364,7 +364,7 @@ curl -X POST http://127.0.0.1:5000/api/ask \
 Reconstruire l’index après remplacement du PDF :
 
 ```bash
-curl -X POST http://127.0.0.1:5000/api/reindex
+curl -X POST http://127.0.0.1:5050/api/reindex
 ```
 
 ## Remplacer le rapport
