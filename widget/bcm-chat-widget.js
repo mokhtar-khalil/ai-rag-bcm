@@ -93,6 +93,8 @@
       launcherLabel: "Ouvrir l’assistant des publications de la BCM",
       closeLabel: "Fermer",
       disclaimer: "L’assistant peut se tromper. Vérifiez les informations importantes.",
+      copyLabel: "Copier la réponse",
+      copied: "Copié",
       feedbackUp: "Bonne réponse",
       feedbackDown: "Réponse à améliorer",
       feedbackThanks: "Merci pour votre retour.",
@@ -145,6 +147,8 @@
       launcherLabel: "افتح مساعد منشورات البنك المركزي",
       closeLabel: "إغلاق",
       disclaimer: "قد يخطئ المساعد. تحقق من المعلومات المهمة.",
+      copyLabel: "نسخ الإجابة",
+      copied: "تم النسخ",
       feedbackUp: "إجابة جيدة",
       feedbackDown: "إجابة تحتاج تحسيناً",
       feedbackThanks: "شكراً على ملاحظتك.",
@@ -581,6 +585,7 @@
     ".bcm-feedback-actif:disabled{color:" +
     CONFIG.accentColor +
     ";}" +
+    ".bcm-copy-btn.bcm-copie{color:#16a34a;}" +
     ".bcm-feedback-merci{font-size:10.5px;color:#9ca3af;margin-inline-start:4px;}" +
     ".bcm-feedback-reasons{display:flex;flex-wrap:wrap;gap:5px;width:100%;margin-top:5px;}" +
     ".bcm-feedback-question{width:100%;font-size:10.5px;color:#6b7280;}" +
@@ -918,21 +923,25 @@
       // La question associée est le tour précédent : pas d'identifiant de
       // message à faire correspondre, le texte des deux suffit au retour.
       var precedent = typeof index === "number" ? state.history[index - 1] : null;
+      var actions;
       if (
         precedent &&
         precedent.role === "user" &&
         turn.responseId &&
         turn.feedbackToken
       ) {
-        bubble.appendChild(
-          renderFeedback(
-            precedent.content,
-            turn.content,
-            turn.responseId || "",
-            turn.feedbackToken || ""
-          )
+        actions = renderFeedback(
+          precedent.content,
+          turn.content,
+          turn.responseId || "",
+          turn.feedbackToken || ""
         );
+      } else {
+        actions = document.createElement("div");
+        actions.className = "bcm-feedback";
       }
+      actions.insertBefore(renderCopyButton(turn.content), actions.firstChild);
+      bubble.appendChild(actions);
     }
     row.appendChild(bubble);
     return row;
@@ -942,6 +951,88 @@
     '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 21h2a1 1 0 0 0 1-1v-9a1 1 0 0 0-1-1H2v11zM22 10.5a2 2 0 0 0-2-2h-5.6l.8-3.9.03-.32c0-.4-.16-.77-.43-1.04L14.17 2 8.6 7.57C8.22 7.95 8 8.46 8 9v9a2 2 0 0 0 2 2h7c.83 0 1.54-.5 1.84-1.22l3-7.03c.1-.23.16-.48.16-.75v-1.5z"/></svg>';
   var ICON_THUMB_DOWN =
     '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 3h-2a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h2V3zM2 13.5a2 2 0 0 0 2 2h5.6l-.8 3.9-.03.32c0 .4.16.77.43 1.04L9.83 22l5.57-5.57c.38-.38.6-.89.6-1.43V6a2 2 0 0 0-2-2H8c-.83 0-1.54.5-1.84 1.22l-3 7.03c-.1.23-.16.48-.16.75v1.5z"/></svg>';
+
+  var ICON_COPY =
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 1H4a2 2 0 0 0-2 2v14h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z"/></svg>';
+  var ICON_CHECK =
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>';
+
+  // Le texte copié retire la syntaxe Markdown que le rendu masque à l'écran,
+  // pour qu'un collage dans un courriel ou un document reste lisible.
+  function plainTextForCopy(rawText) {
+    return String(rawText)
+      .split(/\n/)
+      .map(function (line) {
+        return line
+          .replace(RE_HEADING, "")
+          .replace(/^(\s*)[*+•]\s+/, "$1- ")
+          .replace(/\*\*(.+?)\*\*/g, "$1");
+      })
+      .join("\n")
+      .trim();
+  }
+
+  // navigator.clipboard exige un contexte sécurisé et peut être refusé par la
+  // page hôte (iframe, permissions) : on retombe alors sur la sélection d'une
+  // zone de texte temporaire.
+  function copyToClipboard(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      return navigator.clipboard.writeText(text).catch(function () {
+        return copyWithTextarea(text);
+      });
+    }
+    return copyWithTextarea(text);
+  }
+
+  function copyWithTextarea(text) {
+    return new Promise(function (resolve, reject) {
+      var zone = document.createElement("textarea");
+      zone.value = text;
+      zone.setAttribute("readonly", "");
+      zone.style.position = "fixed";
+      zone.style.opacity = "0";
+      document.body.appendChild(zone);
+      zone.select();
+      var ok = false;
+      try {
+        ok = document.execCommand("copy");
+      } catch (err) {
+        ok = false;
+      }
+      document.body.removeChild(zone);
+      ok ? resolve() : reject();
+    });
+  }
+
+  function renderCopyButton(content) {
+    var texts = t();
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "bcm-feedback-btn bcm-copy-btn";
+    btn.innerHTML = ICON_COPY;
+    btn.setAttribute("aria-label", texts.copyLabel);
+    btn.title = texts.copyLabel;
+    var minuterie = null;
+    btn.addEventListener("click", function () {
+      copyToClipboard(plainTextForCopy(content)).then(
+        function () {
+          btn.innerHTML = ICON_CHECK;
+          btn.classList.add("bcm-copie");
+          btn.title = texts.copied;
+          btn.setAttribute("aria-label", texts.copied);
+          clearTimeout(minuterie);
+          minuterie = setTimeout(function () {
+            btn.innerHTML = ICON_COPY;
+            btn.classList.remove("bcm-copie");
+            btn.title = texts.copyLabel;
+            btn.setAttribute("aria-label", texts.copyLabel);
+          }, 1600);
+        },
+        function () {}
+      );
+    });
+    return btn;
+  }
 
   // Envoi discret et non bloquant : le clic reste réactif même si l'API est
   // lente ou momentanément indisponible, et un échec n'affiche rien — un
@@ -1008,7 +1099,7 @@
       if (wrap.classList.contains("bcm-feedback-envoye")) return;
       wrap.classList.add("bcm-feedback-envoye");
       btn.classList.add("bcm-feedback-actif");
-      wrap.querySelectorAll("button").forEach(function (autre) {
+      wrap.querySelectorAll("button:not(.bcm-copy-btn)").forEach(function (autre) {
         autre.disabled = true;
       });
       var merci = document.createElement("span");
