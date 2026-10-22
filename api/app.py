@@ -41,10 +41,12 @@ from api.charts import (
     extract_document_page_contexts,
     is_chart_existence_question,
     extract_chart_contexts,
+    extract_chart_contexts_gemini,
     is_chart_question,
     render_chart_pages,
     select_chart_pages,
 )
+from api.ambiguity import lexical_ambiguity
 from api.analytics import (
     analytics_snapshot,
     ensure_schema,
@@ -225,9 +227,16 @@ def _explicit_report_reference_pages(
 
 
 def _clarification_answer(
-    suggestions: list[str], missing: bool = False, language: str = "fr"
+    suggestions: list[str],
+    missing: bool = False,
+    language: str = "fr",
+    lead: str | None = None,
 ) -> str:
-    """Construit la réponse demandant à l'utilisateur de préciser son intention."""
+    """Construit la réponse demandant à l'utilisateur de préciser son intention.
+
+    `lead` remplace la phrase d'introduction générique : pour un terme dont les
+    sens sont connus, mieux vaut expliquer en quoi la question est ambiguë.
+    """
     if language == "ar":
         lead = (
             "لا أجد تطابقًا دقيقًا بما يكفي للإجابة دون مخاطرة."
@@ -240,11 +249,12 @@ def _clarification_answer(
             + "\n".join(lines)
         )
         return format_arabic_bidi(answer)
-    lead = (
-        "Je ne trouve pas de correspondance suffisamment précise pour répondre sans risque."
-        if missing
-        else "Votre question peut correspondre à plusieurs indicateurs du rapport."
-    )
+    if lead is None:
+        lead = (
+            "Je ne trouve pas de correspondance suffisamment précise pour répondre sans risque."
+            if missing
+            else "Votre question peut correspondre à plusieurs indicateurs du rapport."
+        )
     lines = [f"{index}. {value}" for index, value in enumerate(suggestions, start=1)]
     return f"{lead}\n\nPouvez-vous confirmer l'une de ces formulations ?\n\n" + "\n".join(lines)
 
@@ -1492,6 +1502,18 @@ def create_app(
             and bool(query_plan.get("ambiguous"))
             and len(evidence_suggestions) >= 2
         )
+        # Termes dont tous les sens figurent dans les documents (« dépôts des
+        # banques », « solde », « réserves », « le taux ») : la clarification
+        # ne dépend plus du seul jugement du planificateur, qui choisissait en
+        # silence une interprétation.
+        lexical_clarification = (
+            lexical_ambiguity(question)
+            if language == "fr" and not chart_requested and not followup
+            else None
+        )
+        if lexical_clarification:
+            clarification_needed = True
+            suggestions = list(lexical_clarification["suggestions"])
         results = engine.decorate(
             _select_results(search_results, wanted_results, engine.source_registry),
             language,
@@ -1556,8 +1578,12 @@ def create_app(
 
         # Étape 4 : pour une question graphique, rendre les pages PDF en images,
         # extraire leurs libellés par OCR et conserver les graphiques pertinents.
+        # Deux moteurs : l'OCR local (macOS) alimente l'explication par règles ;
+        # la lecture visuelle Gemini alimente le générateur habituel.
         chart_pages: list[int] = []
         chart_contexts: list[dict[str, Any]] = []
+        vision_contexts: list[dict[str, Any]] = []
+        chart_backend = settings.chart_analysis_backend
         if chart_requested and settings.chart_analysis_enabled:
             try:
                 chart_analysis_question = enrich_chart_query(question)
@@ -1577,6 +1603,21 @@ def create_app(
                         dpi=settings.chart_render_dpi,
                         renderer_path=settings.pdf_renderer_path,
                     )
+                if chart_pages and chart_backend == "gemini_vision":
+                    vision_contexts = extract_chart_contexts_gemini(
+                        retrieval_question if followup else question,
+                        rendered_pages,
+                        api_key=settings.gemini_api_key,
+                        model=settings.chart_vision_model,
+                        thinking_level=settings.gemini_thinking_level,
+                        max_output_tokens=settings.chart_vision_max_output_tokens,
+                        maximum_chars=settings.chart_ocr_max_chars,
+                    )
+                    if vision_contexts:
+                        chart_pages = [
+                            int(context["pdf_page"]) for context in vision_contexts
+                        ]
+                elif chart_pages:
                     chart_contexts = extract_chart_contexts(
                         chart_analysis_question,
                         rendered_pages,
@@ -1636,17 +1677,26 @@ def create_app(
                         ]
             except Exception as exc:
                 app.logger.warning(
-                    "request_id=%s chart_analysis_failed error_type=%s",
+                    "request_id=%s chart_analysis_failed backend=%s error_type=%s",
                     g.request_id,
+                    chart_backend,
                     type(exc).__name__,
                 )
                 chart_contexts = []
+                vision_contexts = []
 
         # Étape 5 : ajouter les passages voisins pour redonner au générateur le
         # contexte parfois coupé par le découpage du PDF.
         generation_results = engine.decorate(
             engine.expand_with_neighbors(results, max_results=12), language
         )
+        # La lecture visuelle passe en tête des preuves : le générateur la cite
+        # avec la page du graphique, et le texte voisin en donne l'explication.
+        if vision_contexts:
+            generation_results = [
+                *engine.decorate(vision_contexts, language),
+                *generation_results,
+            ]
 
         # Une page déjà citée peut être entièrement scannée : son index contient
         # alors le titre, mais pas le texte à résumer. Pour un suivi comme
@@ -1715,6 +1765,14 @@ def create_app(
             for page in chart_pages
             for item in search_results
             if int(item["pdf_page"]) == page
+        ]
+        # Une page de graphique lue sans passage texte retenu reste une source :
+        # la réponse la cite, l'utilisateur doit pouvoir l'ouvrir.
+        chart_source_pages = {int(item["pdf_page"]) for item in chart_source_items}
+        chart_source_items += [
+            context
+            for context in vision_contexts
+            if int(context["pdf_page"]) not in chart_source_pages
         ]
         for item in [*chart_source_items, *results, *generation_results]:
             page = int(item["pdf_page"])
@@ -1802,9 +1860,17 @@ def create_app(
             yield _evenement_reponse(
                 {
                     "answer": _clarification_answer(
-                        suggestions, language=language
+                        suggestions,
+                        language=language,
+                        lead=(
+                            str(lexical_clarification["explanation"])
+                            if lexical_clarification
+                            else None
+                        ),
                     ),
-                    "sources": sources,
+                    # Une question de précision n'affirme rien : afficher des
+                    # sources laisserait croire qu'elles appuient une réponse.
+                    "sources": [] if lexical_clarification else sources,
                     "grounded": False,
                     "clarification_needed": True,
                     "suggestions": suggestions,
@@ -1872,6 +1938,7 @@ def create_app(
             chart_requested
             and settings.chart_analysis_enabled
             and is_chart_existence_question(question)
+            and not vision_contexts
         ):
             if chart_pages:
                 pages_text = ", ".join(str(page) for page in sorted(set(chart_pages)))
@@ -1922,10 +1989,10 @@ def create_app(
             )
             return
 
-        # La transcription OCR d'une page mémorisée est une preuve en soi : sans
-        # cette exception, un reranker qui écarte le titre seul de la page
-        # scannée faisait refuser une section pourtant lue.
-        if not document_contexts and (
+        # Une page de graphique lue avec succès, ou la transcription OCR d'une
+        # page mémorisée, est une preuve en soi : sans cette exception, un
+        # reranker qui écarte le texte environnant ferait refuser une page lue.
+        if not vision_contexts and not document_contexts and (
             not results
             or not engine.is_relevant(
                 search_results, settings.min_relevance_score, settings.min_semantic_score
@@ -2047,8 +2114,10 @@ def create_app(
                 "grounded": cite_une_source,
                 "clarification_needed": False,
                 "suggestions": [],
-                "chart_analysis": False,
-                "chart_pages": [],
+                "chart_analysis": bool(vision_contexts),
+                "chart_pages": sorted(
+                    {int(context["pdf_page"]) for context in vision_contexts}
+                ),
                 "memory_used": followup or elliptical_followup,
                 "language": language,
             }

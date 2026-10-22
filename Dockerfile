@@ -53,9 +53,12 @@ assert e.metadata['chunks'] > 2000, 'index incomplet'"
 # OCR des pages scannées (ex. rapport de l'auditeur externe, p. PDF 119) par
 # Tesseract, au même format de sortie qu'Apple Vision. Les pages peu textuelles
 # du rapport sont lues dès le build : la première question qui les vise ne paie
-# ni le rendu ni l'OCR. L'analyse des graphiques (CHART_ANALYSIS_ENABLED) reste
-# désactivée : Tesseract lit bien une page de texte, moins sûrement les petits
-# libellés et valeurs d'un graphique, qu'il faut d'abord valider.
+# ni le rendu ni l'OCR.
+# Les graphiques ne passent pas par Tesseract, qui lit mal leurs petits libellés :
+# ils utilisent la lecture visuelle Gemini (CHART_ANALYSIS_BACKEND=gemini_vision),
+# qui envoie les pages rendues à Google au moment de la question. Elle reste
+# désactivée par défaut tant que la BCM n'a pas validé cet envoi. Pour l'activer :
+# CHART_ANALYSIS_ENABLED=true et GEMINI_API_KEY au runtime.
 ENV CHART_OCR_PATH=/app/scripts/tesseract_ocr.py \
     DOCUMENT_OCR_ENABLED=true \
     CHART_ANALYSIS_ENABLED=false
@@ -74,7 +77,8 @@ ENV OMP_NUM_THREADS=1 \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     API_HOST=0.0.0.0 \
-    API_PORT=5000
+    API_PORT=5000 \
+    CHART_ANALYSIS_BACKEND=gemini_vision
 
 RUN useradd --create-home --uid 1000 bcm \
     && chown -R bcm:bcm /app

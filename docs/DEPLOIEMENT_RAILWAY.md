@@ -51,7 +51,10 @@ ni accès réseau au premier appel. Mettre à jour le corpus = redéployer.
 | `INTERNAL_ACCESS_PASSWORD` | secret long | idem, laisser vide = page ouverte à qui a le lien |
 | `REINDEX_TOKEN` | … | **secret** |
 | `RATE_LIMIT_ASK` | `20 per minute` | |
-| `CHART_ANALYSIS_ENABLED` | `false` | analyse des graphiques, non validée avec Tesseract |
+| `CHART_ANALYSIS_ENABLED` | `false` | `true` pour lire les graphiques — voir § 5 |
+| `CHART_ANALYSIS_BACKEND` | `gemini_vision` | déjà fixé dans l'image |
+| `CHART_VISION_MODEL` | `gemini-3.6-flash` | facultatif |
+| `GEMINI_API_KEY` | … | **secret**, requis si l'analyse des graphiques est activée |
 | `DOCUMENT_OCR_ENABLED` | `true` (défaut de l'image) | lecture des pages scannées par Tesseract |
 | `WEB_CONCURRENCY` | `1` | **ne pas augmenter — voir ci-dessous** |
 | `GUNICORN_THREADS` | `4` | |
@@ -325,9 +328,12 @@ redéploiement.
   pages peu textuelles du rapport (p. PDF 119, rapport de l'auditeur, etc.)
   sont lues dès le build par `scripts/precompute_document_ocr.py` ; un suivi
   comme « résume cette section » les exploite sans attente.
-- **Analyse des graphiques encore désactivée.** Tesseract lit bien une page de
-  texte, moins sûrement les petits libellés et valeurs d'un graphique.
-  `CHART_ANALYSIS_ENABLED=false` jusqu'à validation des réponses sur les
-  graphiques ; le chatbot répond alors depuis le texte qui les annonce.
+- **Analyse des graphiques désactivée par défaut.** Tesseract lit mal les
+  petits libellés et valeurs d'un graphique ; sur Railway, la lecture visuelle
+  Gemini (`CHART_ANALYSIS_BACKEND=gemini_vision`) s'en charge :
+  `CHART_ANALYSIS_ENABLED=true` + `GEMINI_API_KEY` suffisent. Les images des
+  pages de graphique du rapport sont alors **envoyées à Google** : activer
+  seulement après accord de la BCM. Détails, coût et latence :
+  `PHASE_3_ANALYSE_GRAPHIQUES.md`.
 - **Une seule réplique.** Voir la note sur la mémoire et le limiteur de débit.
 - **Pas de journalisation centralisée.** Les journaux restent dans Railway.

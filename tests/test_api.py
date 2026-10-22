@@ -380,8 +380,11 @@ def test_ambiguous_question_requests_confirmation(
     assert response.json["grounded"] is False
     assert response.json["clarification_needed"] is True
     assert len(response.json["suggestions"]) >= 2
-    assert any("Dépôts de la clientèle" in value for value in response.json["suggestions"])
-    assert any("Banques et établissements financiers" in value for value in response.json["suggestions"])
+    assert any(
+        "dépôts de la clientèle" in value.casefold()
+        for value in response.json["suggestions"]
+    )
+    assert any("Banque Centrale" in value for value in response.json["suggestions"])
     assert all("absent" not in value for value in response.json["suggestions"])
     assert "134,0" not in response.json["answer"]
     assert all(value in response.json["answer"] for value in response.json["suggestions"])

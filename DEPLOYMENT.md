@@ -19,6 +19,31 @@ Deux documents dédiés ont été écrits pour cette voie et font désormais ré
 Le reste de ce document décrit les scénarios locaux, Docker et VM, qui restent
 valables pour le développement et les essais.
 
+### Analyse des graphiques sur un serveur Linux (Docker, Railway, VM)
+
+L'OCR local des graphiques (Apple Vision) n'existe que sous macOS. L'image
+Docker fixe donc `CHART_ANALYSIS_BACKEND=gemini_vision` : la page de graphique
+est rendue par poppler dans le conteneur, puis envoyée à Gemini Flash au moment
+de la question. L'analyse reste désactivée par défaut. Pour l'activer :
+
+```dotenv
+CHART_ANALYSIS_ENABLED=true
+CHART_ANALYSIS_BACKEND=gemini_vision   # déjà la valeur de l'image
+CHART_VISION_MODEL=gemini-3.6-flash    # facultatif
+GEMINI_API_KEY=...                     # secret, requis même si GENERATION_PROVIDER=openai
+```
+
+Utiliser une clé d'un projet Google **facturé** : l'offre gratuite plafonne vite
+les requêtes (quota atteint pendant les essais) et peut réutiliser les données
+envoyées. Coût mesuré : ≈ 0,01 à 0,02 $ et +8 à 16 s par question sur un
+graphique au premier passage. Les valeurs estimées à l'œil sur les barres non
+étiquetées restent à fiabiliser (voir `PHASE_3_ANALYSE_GRAPHIQUES.md`).
+
+⚠️ **Les images des pages du rapport public sont alors envoyées à Google.**
+C'est un choix à faire valider par la BCM avant activation. Sans clé ou en cas
+d'erreur Gemini, l'API répond comme aujourd'hui à partir du texte du rapport.
+Coût, latence et fonctionnement : `PHASE_3_ANALYSE_GRAPHIQUES.md`.
+
 ## 1. Vue d'ensemble
 
 ```
