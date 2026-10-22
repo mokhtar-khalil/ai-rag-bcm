@@ -1045,6 +1045,7 @@ def create_app(
             {
                 "status": "ok",
                 "chart_analysis_enabled": settings.chart_analysis_enabled,
+                "document_ocr_enabled": settings.document_ocr_enabled,
                 "documents": engine.metadata.get("documents", 0),
                 "pages_par_source": engine.metadata.get("pages_par_source", {}),
                 "pdf_pages": engine.metadata.get("pdf_pages", 0),
@@ -1671,7 +1672,7 @@ def create_app(
                     scanned_pages.append(page)
             sparse_pages = _report_units(sparse_pages, engine.source_registry)
             scanned_pages = _report_units(scanned_pages, engine.source_registry)
-            if sparse_pages and settings.chart_analysis_enabled:
+            if sparse_pages and settings.document_ocr_enabled:
                 try:
                     rendered_document_pages = render_chart_pages(
                         settings.report_path,
