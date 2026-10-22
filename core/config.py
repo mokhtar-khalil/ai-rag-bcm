@@ -112,6 +112,7 @@ class Settings:
     min_semantic_score: float
     embedding_batch_size: int
     chart_analysis_enabled: bool
+    document_ocr_enabled: bool
     chart_cache_path: Path
     chart_render_dpi: int
     chart_max_pages: int
@@ -195,6 +196,7 @@ def get_settings(environ: Mapping[str, str] | None = None) -> Settings:
     # variable PORT, choisie au démarrage du conteneur. Elle prime donc sur
     # API_PORT, qui reste la valeur de référence en local et en Docker.
     api_port = _integer(env, "PORT", _integer(env, "API_PORT", 5000, 1, 65535), 1, 65535)
+    chart_analysis_enabled = _boolean(env, "CHART_ANALYSIS_ENABLED", app_env != "test")
     return Settings(
         app_env=app_env,
         log_level=_text(env, "LOG_LEVEL", "INFO").upper(),
@@ -252,8 +254,13 @@ def get_settings(environ: Mapping[str, str] | None = None) -> Settings:
         semantic_weight=_decimal(env, "SEMANTIC_WEIGHT", 0.45, 0.0, 1.0),
         min_semantic_score=_decimal(env, "MIN_SEMANTIC_SCORE", 0.88, 0.0, 1.0),
         embedding_batch_size=_integer(env, "EMBEDDING_BATCH_SIZE", 64, 1, 256),
-        chart_analysis_enabled=_boolean(
-            env, "CHART_ANALYSIS_ENABLED", app_env != "test"
+        chart_analysis_enabled=chart_analysis_enabled,
+        # Lire une page de texte scannée est bien plus fiable que lire les
+        # petits libellés d'un graphique : la production peut activer l'OCR
+        # documentaire (Tesseract) sans encore confier les graphiques au même
+        # moteur. Par défaut, les deux suivent le même réglage.
+        document_ocr_enabled=_boolean(
+            env, "DOCUMENT_OCR_ENABLED", chart_analysis_enabled
         ),
         chart_cache_path=_path(
             env, "CHART_CACHE_PATH", PROJECT_ROOT / "storage" / "chart_pages"

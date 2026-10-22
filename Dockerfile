@@ -5,10 +5,14 @@
 FROM python:3.12-slim
 
 # poppler-utils : rendu des pages PDF (pdftoppm) utilisé par l'analyse des graphiques.
+# tesseract-ocr, tesseract-ocr-fra : OCR multiplateforme des pages scannées
+#   (scripts/tesseract_ocr.py), qui remplace Apple Vision, absent sous Linux.
 # curl : sondes de santé (HEALTHCHECK, scripts d'exploitation).
 # zsh : run_api_prod.sh et les autres scripts d'exploitation sont écrits pour zsh.
 RUN apt-get update && apt-get install -y --no-install-recommends \
         poppler-utils \
+        tesseract-ocr \
+        tesseract-ocr-fra \
         curl \
         zsh \
     && rm -rf /var/lib/apt/lists/*
@@ -46,10 +50,19 @@ s = get_settings(); e = RAGIndex(s.report_path, s.index_path).load(); \
 print('corpus indexé :', e.metadata['documents'], 'documents,', e.metadata['chunks'], 'passages'); \
 assert e.metadata['chunks'] > 2000, 'index incomplet'"
 
-# L'OCR local des graphiques (api/charts.py, scripts/build_chart_ocr.sh) repose
-# sur Swift + Apple Vision, disponibles uniquement sur macOS. Cette image Linux
-# ne peut pas l'activer : CHART_ANALYSIS_ENABLED doit rester "false" tant qu'un
-# moteur OCR multiplateforme ne l'a pas remplacé (roadmap, au-delà de la Phase 1).
+# OCR des pages scannées (ex. rapport de l'auditeur externe, p. PDF 119) par
+# Tesseract, au même format de sortie qu'Apple Vision. Les pages peu textuelles
+# du rapport sont lues dès le build : la première question qui les vise ne paie
+# ni le rendu ni l'OCR. L'analyse des graphiques (CHART_ANALYSIS_ENABLED) reste
+# désactivée : Tesseract lit bien une page de texte, moins sûrement les petits
+# libellés et valeurs d'un graphique, qu'il faut d'abord valider.
+ENV CHART_OCR_PATH=/app/scripts/tesseract_ocr.py \
+    DOCUMENT_OCR_ENABLED=true \
+    CHART_ANALYSIS_ENABLED=false
+RUN chmod +x scripts/tesseract_ocr.py \
+    && APP_ENV=production GENERATION_PROVIDER=extractive \
+        python scripts/precompute_document_ocr.py
+
 # torch dimensionne son parallélisme sur le nombre de cœurs annoncés par l'hôte,
 # pas sur le quota du conteneur. Sur une plateforme comme Railway, ses threads se
 # disputent alors la même fraction de CPU. Mesuré sur cette image : une question
@@ -61,8 +74,7 @@ ENV OMP_NUM_THREADS=1 \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     API_HOST=0.0.0.0 \
-    API_PORT=5000 \
-    CHART_ANALYSIS_ENABLED=false
+    API_PORT=5000
 
 RUN useradd --create-home --uid 1000 bcm \
     && chown -R bcm:bcm /app

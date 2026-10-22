@@ -51,7 +51,8 @@ ni accès réseau au premier appel. Mettre à jour le corpus = redéployer.
 | `INTERNAL_ACCESS_PASSWORD` | secret long | idem, laisser vide = page ouverte à qui a le lien |
 | `REINDEX_TOKEN` | … | **secret** |
 | `RATE_LIMIT_ASK` | `20 per minute` | |
-| `CHART_ANALYSIS_ENABLED` | `false` | |
+| `CHART_ANALYSIS_ENABLED` | `false` | analyse des graphiques, non validée avec Tesseract |
+| `DOCUMENT_OCR_ENABLED` | `true` (défaut de l'image) | lecture des pages scannées par Tesseract |
 | `WEB_CONCURRENCY` | `1` | **ne pas augmenter — voir ci-dessous** |
 | `GUNICORN_THREADS` | `4` | |
 
@@ -307,8 +308,9 @@ python scripts/ocr_lettres_information.py      # macOS uniquement
 git add data/lettres_information && git commit && git push
 ```
 
-Railway reconstruit et redéploie. L'OCR reste une étape locale sur macOS ; ses
-fichiers texte sont versionnés, et Railway n'a jamais besoin du moteur OCR.
+Railway reconstruit et redéploie. L'OCR des Lettres reste une étape locale sur
+macOS ; ses fichiers texte sont versionnés. Les pages scannées du rapport annuel
+sont, elles, lues dans l'image par Tesseract (voir ci-dessous).
 
 `POST /api/reindex` existe mais reconstruit dans un conteneur éphémère : son
 effet disparaît au prochain redémarrage. Il dépanne, il ne remplace pas un
@@ -316,8 +318,16 @@ redéploiement.
 
 ## 5. Limites connues
 
-- **Analyse des graphiques désactivée.** Elle repose sur Swift et Apple Vision,
-  disponibles seulement sur macOS. `CHART_ANALYSIS_ENABLED=false` en production
-  tant qu'un moteur OCR multiplateforme ne l'a pas remplacée.
+- **OCR en production : Tesseract.** Apple Vision n'existant que sur macOS,
+  l'image installe Tesseract (`tesseract-ocr`, `tesseract-ocr-fra`) et
+  `scripts/tesseract_ocr.py`, qui produit le même format que le script Swift
+  (`CHART_OCR_PATH=/app/scripts/tesseract_ocr.py`, réglé dans l'image). Les
+  pages peu textuelles du rapport (p. PDF 119, rapport de l'auditeur, etc.)
+  sont lues dès le build par `scripts/precompute_document_ocr.py` ; un suivi
+  comme « résume cette section » les exploite sans attente.
+- **Analyse des graphiques encore désactivée.** Tesseract lit bien une page de
+  texte, moins sûrement les petits libellés et valeurs d'un graphique.
+  `CHART_ANALYSIS_ENABLED=false` jusqu'à validation des réponses sur les
+  graphiques ; le chatbot répond alors depuis le texte qui les annonce.
 - **Une seule réplique.** Voir la note sur la mémoire et le limiteur de débit.
 - **Pas de journalisation centralisée.** Les journaux restent dans Railway.

@@ -692,6 +692,68 @@ def _contextualize_followup(
     return f"{question}. Sujet actif : {subject}.{page_hint}"
 
 
+_YEAR_PATTERN = re.compile(r"\b(?:19|20)\d{2}\b")
+
+
+def _elliptical_followup(question: str, history: list[dict[str, str]]) -> str:
+    """Reconstitue une relance elliptique qui ne change que la période.
+
+    « Et en 2024 ? » après « Quel a été le taux d'inflation moyen en 2025 ? »
+    vise le même indicateur pour une autre année. Concaténer les deux questions
+    laisse 2025 dominer la recherche et le générateur ne reçoit que « Et en
+    2024 ? » : la ligne du tableau qui porte la valeur 2024 n'est jamais
+    retrouvée. Substituer l'année dans la question précédente produit au
+    contraire une demande autonome, recherchée comme une question neuve.
+    """
+    new_years = list(dict.fromkeys(_YEAR_PATTERN.findall(question)))
+    if not new_years or not history:
+        return question
+    folded = re.sub(r"[^\w]+", " ", _fold_text(question), flags=re.UNICODE).strip()
+    if len(folded.split()) > 6 or not re.match(
+        r"^(?:et|ou|pour|qu en est il|و|وفي|وماذا|ماذا عن)\b", folded
+    ):
+        return question
+    previous_users = [item["content"] for item in history if item["role"] == "user"]
+    if not previous_users:
+        return question
+    previous = previous_users[-1].strip()
+    old_years = list(dict.fromkeys(_YEAR_PATTERN.findall(previous)))
+    if len(old_years) != 1 or len(new_years) != 1 or old_years == new_years:
+        return question
+    return _YEAR_PATTERN.sub(new_years[0], previous)
+
+
+_DEFINITION_MARKERS = (
+    "que signifie",
+    "que veut dire",
+    "signification",
+    "definition",
+    "definir",
+    "c est quoi",
+    "qu est ce que",
+    "qu est ce qu",
+    "que designe",
+    "ماذا يعني",
+    "ما معنى",
+    "ما هو",
+    "ما هي",
+)
+
+
+def _definition_term(question: str) -> str:
+    """Renvoie le sigle dont la question demande le sens, sinon une chaîne vide."""
+    folded = re.sub(r"[^\w]+", " ", _fold_text(question), flags=re.UNICODE)
+    if not any(marker in folded for marker in _DEFINITION_MARKERS):
+        return ""
+    acronyms = re.findall(r"\b[A-Z][A-Z0-9]{2,}\b", question)
+    return acronyms[0] if acronyms else ""
+
+
+# Une page dont l'index ne contient presque rien (un titre, un numéro) est une
+# image numérisée : son contenu n'est accessible que par OCR.
+_SCANNED_PAGE_MAX_CHARS = 200
+
+
 def _report_units(
     pages: list[int], registry: dict[int, dict[str, Any]]
 ) -> list[int]:
@@ -986,6 +1048,7 @@ def create_app(
             {
                 "status": "ok",
                 "chart_analysis_enabled": settings.chart_analysis_enabled,
+                "document_ocr_enabled": settings.document_ocr_enabled,
                 "documents": engine.metadata.get("documents", 0),
                 "pages_par_source": engine.metadata.get("pages_par_source", {}),
                 "pdf_pages": engine.metadata.get("pdf_pages", 0),
@@ -1084,6 +1147,12 @@ def create_app(
                 return
 
         history = _safe_history(payload.get("history", []), settings.max_history_messages)
+        # Une relance qui ne change que l'année devient une question autonome :
+        # la suite du pipeline la traite exactement comme si elle avait été posée
+        # en entier, de la recherche jusqu'à la génération.
+        rewritten_question = _elliptical_followup(question, history)
+        elliptical_followup = rewritten_question != question
+        question = rewritten_question
         retrieval_question = _contextualize_followup(question, history)
         followup = retrieval_question != question
         focus_user, focus_answer = _followup_focus(question, history) if followup else ("", "")
@@ -1337,6 +1406,59 @@ def create_app(
                 ],
             ]
 
+        # Une question datée trouve souvent la bonne page par son commentaire,
+        # sans la ligne du tableau qui porte la valeur de l'année demandée. Le
+        # tableau annuel de cette page rejoint alors les candidats, juste après
+        # le premier passage de sa page.
+        question_years = set(_YEAR_PATTERN.findall(question))
+        if question_years and not chart_requested:
+            candidate_pages = list(
+                dict.fromkeys(
+                    int(item["pdf_page"])
+                    for item in search_results[:10]
+                    if engine.source_registry.get(int(item["pdf_page"]), {}).get(
+                        "source_type", SOURCE_TYPE_PDF
+                    )
+                    == SOURCE_TYPE_PDF
+                )
+            )
+            table_passages = engine.year_table_passages(candidate_pages, question_years)
+            if table_passages:
+                table_ids = {int(item["chunk_id"]) for item in table_passages}
+                search_results = [
+                    item
+                    for item in search_results
+                    if int(item["chunk_id"]) not in table_ids
+                ]
+                query_terms = _matching_terms(retrieval_question)
+                for table_item in reversed(table_passages):
+                    page = int(table_item["pdf_page"])
+                    anchor = next(
+                        (
+                            index
+                            for index, item in enumerate(search_results)
+                            if int(item["pdf_page"]) == page
+                        ),
+                        len(search_results) - 1,
+                    )
+                    reference = search_results[anchor] if search_results else {}
+                    search_results.insert(
+                        anchor + 1,
+                        {
+                            **table_item,
+                            "score": float(reference.get("score", 0.0)),
+                            "lexical_score": float(
+                                reference.get("lexical_score", reference.get("score", 0.0))
+                            ),
+                            "semantic_score": reference.get("semantic_score"),
+                            "retrieval_mode": "page_year_table",
+                            "keyword_overlap": len(
+                                query_terms & _matching_terms(table_item["text"])
+                            ),
+                            "query_keyword_count": max(len(query_terms), 1),
+                        },
+                    )
+
         planned_rephrasings = [
             value
             for value in query_plan.get("queries", [])[1:]
@@ -1388,6 +1510,36 @@ def create_app(
             yield ("stage", "selection")
             try:
                 results = rerank_openai(retrieval_question, search_results, settings)
+                # Le reranker juge chaque passage isolément et rejette celui qui
+                # ne contient pas la réponse telle quelle. Deux cas légitimes en
+                # sortent vides, ce qui provoquait un refus sec :
+                # - la page mémorisée d'un suivi, souvent réduite à son titre
+                #   quand elle est scannée, désigne pourtant le sujet actif ;
+                # - un sigle jamais développé dans le corpus (« SENAD ») est
+                #   tout de même décrit par les passages qui le mentionnent.
+                kept_ids = {int(item["chunk_id"]) for item in results}
+                memory_items = [
+                    item
+                    for item in search_results
+                    if item.get("memory_page")
+                    and int(item["chunk_id"]) not in kept_ids
+                ]
+                if memory_items:
+                    results = [*memory_items, *results]
+                definition_term = _definition_term(question)
+                if not results and definition_term:
+                    results = engine.decorate(
+                        [
+                            item
+                            for item in search_results
+                            if re.search(
+                                rf"\b{re.escape(definition_term)}\b",
+                                item["text"],
+                                flags=re.IGNORECASE,
+                            )
+                        ][:wanted_results],
+                        language,
+                    )
             except Exception as exc:
                 app.logger.warning(
                     "request_id=%s reranking_failed error_type=%s",
@@ -1502,12 +1654,12 @@ def create_app(
         # on injecte leur OCR avant les autres extraits. Ce traitement est
         # générique et repose sur la page mémorisée, jamais sur un cas codé en dur.
         document_contexts: list[dict[str, Any]] = []
+        scanned_pages: list[int] = []
         if (
             followup
             and not chart_requested
             and followup_pages
             and _content_followup(question)
-            and settings.chart_analysis_enabled
         ):
             sparse_pages: list[int] = []
             for page in followup_pages[:2]:
@@ -1519,8 +1671,11 @@ def create_app(
                 native_text = " ".join(sorted(page_texts))
                 if len(native_text) < 1_200:
                     sparse_pages.append(page)
+                if len(native_text) < _SCANNED_PAGE_MAX_CHARS:
+                    scanned_pages.append(page)
             sparse_pages = _report_units(sparse_pages, engine.source_registry)
-            if sparse_pages:
+            scanned_pages = _report_units(scanned_pages, engine.source_registry)
+            if sparse_pages and settings.document_ocr_enabled:
                 try:
                     rendered_document_pages = render_chart_pages(
                         settings.report_path,
@@ -1549,7 +1704,10 @@ def create_app(
                         g.request_id,
                         type(exc).__name__,
                     )
-        sources = []
+        # Le réservoir dépasse les cinq sources affichées : la page que la
+        # réponse cite finalement peut venir d'un passage moins bien classé,
+        # elle doit alors remonter dans la liste au lieu d'en être absente.
+        source_pool: list[dict[str, Any]] = []
         seen_source_pages: set[int] = set()
         source_query = " ".join(retrieval_queries)
         chart_source_items = [
@@ -1558,16 +1716,16 @@ def create_app(
             for item in search_results
             if int(item["pdf_page"]) == page
         ]
-        for item in [*chart_source_items, *results]:
+        for item in [*chart_source_items, *results, *generation_results]:
             page = int(item["pdf_page"])
             if page in seen_source_pages:
                 continue
             seen_source_pages.add(page)
             entry = engine.source_registry.get(page, {})
-            sources.append(
+            source_pool.append(
                 {
                     "pdf_page": page,
-                    "score": item["score"],
+                    "score": item.get("score", 0.0),
                     "excerpt": _source_excerpt(item["text"], source_query),
                     "citation": citation_label(
                         entry.get("source_type", SOURCE_TYPE_PDF),
@@ -1584,8 +1742,61 @@ def create_app(
                     "source_date": entry.get("published_at", ""),
                 }
             )
-            if len(sources) >= 5:
+            if len(source_pool) >= 12:
                 break
+        sources = source_pool[:5]
+
+        # Une page scannée dont l'OCR est indisponible (production Linux) ou n'a
+        # rien rendu ne peut pas être résumée. Le générateur, privé de son
+        # contenu, concluait à l'absence de l'information : il faut au contraire
+        # dire que la section existe mais n'est lisible que sous forme d'image.
+        unread_scanned_pages = [
+            page
+            for page in scanned_pages
+            if not any(
+                int(context["pdf_page"]) == page for context in document_contexts
+            )
+        ]
+        if unread_scanned_pages and not document_contexts:
+            titles = re.findall(r"«\s*([^»]{5,160}?)\s*»", focus_answer)
+            pages_text = ", ".join(str(page) for page in unread_scanned_pages)
+            citations = " ".join(f"[p. PDF {page}]" for page in unread_scanned_pages)
+            if language == "ar":
+                answer = (
+                    f"هذا القسم موجود في صفحة PDF {pages_text}، لكن هذه الصفحة "
+                    "مُدرجة في التقرير كصورة ممسوحة ضوئياً، ولا يمكن لهذه النسخة من "
+                    "المساعد قراءة نصها، لذلك لا أستطيع تلخيص محتواها. يمكنكم "
+                    f"الاطلاع عليها مباشرة في التقرير. {citations}"
+                )
+                answer = format_arabic_bidi(answer)
+            else:
+                section = f"La section « {titles[0]} »" if titles else "Cette section"
+                answer = (
+                    f"{section} figure à la page PDF {pages_text}, mais cette page est "
+                    "insérée dans le rapport sous forme d'image numérisée : son texte "
+                    "n'est pas lisible par cette version de l'assistant, qui ne peut "
+                    "donc pas en résumer le contenu. Vous pouvez la consulter "
+                    f"directement dans le rapport. {citations}"
+                )
+            scanned_sources = [
+                source
+                for source in sources
+                if int(source["pdf_page"]) in unread_scanned_pages
+            ]
+            yield _evenement_reponse(
+                {
+                    "answer": answer,
+                    "sources": scanned_sources,
+                    "grounded": bool(scanned_sources),
+                    "clarification_needed": False,
+                    "suggestions": [],
+                    "chart_analysis": False,
+                    "chart_pages": [],
+                    "memory_used": True,
+                    "language": language,
+                }
+            )
+            return
 
         if clarification_needed:
             yield _evenement_reponse(
@@ -1652,7 +1863,16 @@ def create_app(
                 )
                 return
 
-        if chart_requested and is_chart_existence_question(question):
+        # Sans analyse visuelle (production Linux, sans OCR Apple Vision), aucune
+        # page graphique n'est examinée : conclure « Non » affirmerait l'absence
+        # d'un graphique que personne n'a cherché. Le texte du rapport annonce
+        # souvent ses graphes (« les graphes suivants présentent… ») : la voie
+        # documentaire répond alors à partir de ces passages.
+        if (
+            chart_requested
+            and settings.chart_analysis_enabled
+            and is_chart_existence_question(question)
+        ):
             if chart_pages:
                 pages_text = ", ".join(str(page) for page in sorted(set(chart_pages)))
                 yield _evenement_reponse(
@@ -1702,8 +1922,14 @@ def create_app(
             )
             return
 
-        if not results or not engine.is_relevant(
-            search_results, settings.min_relevance_score, settings.min_semantic_score
+        # La transcription OCR d'une page mémorisée est une preuve en soi : sans
+        # cette exception, un reranker qui écarte le titre seul de la page
+        # scannée faisait refuser une section pourtant lue.
+        if not document_contexts and (
+            not results
+            or not engine.is_relevant(
+                search_results, settings.min_relevance_score, settings.min_semantic_score
+            )
         ):
             # Rien de pertinent n'a été trouvé. Seules les pistes tirées des
             # libellés réellement présents dans le corpus ont un sens ici : les
@@ -1804,6 +2030,16 @@ def create_app(
         # candidats laisserait croire qu'ils appuient l'affirmation — le widget
         # affichait « cette information est absente » suivi de cinq sources.
         cite_une_source = bool(re.search(r"\[[^\]\n]{2,80}\]", answer))
+        cited_sources = [
+            source
+            for source in source_pool
+            if re.search(rf"{re.escape(source['citation'])}(?!\d)", answer)
+        ]
+        if cited_sources:
+            sources = [
+                *cited_sources,
+                *[source for source in source_pool if source not in cited_sources],
+            ][:5]
         yield _evenement_reponse(
             {
                 "answer": answer,
@@ -1813,7 +2049,7 @@ def create_app(
                 "suggestions": [],
                 "chart_analysis": False,
                 "chart_pages": [],
-                "memory_used": followup,
+                "memory_used": followup or elliptical_followup,
                 "language": language,
             }
         )
