@@ -14,7 +14,7 @@ elif command -v gunicorn >/dev/null 2>&1; then
   PYTHON_BIN="python3"
   GUNICORN_BIN="gunicorn"
 else
-  echo "Dépendances absentes. Lancez d'abord : ./setup.sh (ou installez requirements.txt)."
+  echo "Dépendances absentes. Lancez d'abord : ./setup.sh (ou installez requirements-api.txt)."
   exit 1
 fi
 

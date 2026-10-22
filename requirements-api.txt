@@ -6,7 +6,9 @@ gunicorn>=23.0,<24
 joblib>=1.4,<2
 numpy>=2.0,<3
 openai>=2.0,<3
-Pillow>=12.0,<13
+# Pillow 13 corrige une série de failles publiées en octobre 2026 (TIFF, PDF,
+# JPEG, GIF…) : les versions 12.x sont signalées par pip-audit.
+Pillow>=13.0,<14
 pypdf>=6.0,<7
 python-dotenv>=1.0,<2
 psycopg[binary]>=3.1,<4

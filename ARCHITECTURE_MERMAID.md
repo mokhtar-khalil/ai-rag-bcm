@@ -212,7 +212,7 @@ bcm_rag_chatbot/
 │   ├── test_config.py
 │   └── test_rag.py
 ├── .env                    # Configuration locale et secrets
-├── requirements.txt        # Dépendances d'exécution
+├── requirements.txt        # Démo Gradio locale (facultatif)
 ├── requirements-dev.txt    # Dépendances de test
 ├── setup.sh                # Installation et indexation initiale
 ├── run.sh                  # Démarrage local de Flask et Gradio

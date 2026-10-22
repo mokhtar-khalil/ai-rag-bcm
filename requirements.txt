@@ -1,4 +1,7 @@
-# Dépendances complètes pour le développement local (API + frontend Gradio).
-# L'image Docker de l'API utilise requirements-api.txt, plus léger, sans Gradio.
--r requirements-api.txt
+# Démo locale Gradio (frontend/app.py), à installer après requirements-dev.txt :
+#   .venv/bin/python -m pip install -r requirements.txt
+# Gradio 6 impose encore Pillow<13 : pip rétrograde alors Pillow vers une
+# version 12.x vulnérable. Ce fichier n'inclut donc pas requirements-api.txt
+# (Pillow>=13, résolution impossible) et reste hors de l'image Docker, de la CI
+# et de requirements-dev.txt. Ne jamais s'en servir pour un déploiement.
 gradio>=5.0,<7

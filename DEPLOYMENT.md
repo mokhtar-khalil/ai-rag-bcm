@@ -86,7 +86,8 @@ Coût, latence et fonctionnement : `PHASE_3_ANALYSE_GRAPHIQUES.md`.
 | `Dockerfile` | Recette de l'image Docker de l'API (Python + dépendances + index pré-construit). | Non |
 | `docker-compose.yml` | Comment lancer le conteneur (port, fichier d'env, healthcheck). | Non |
 | `requirements-api.txt` | Dépendances Python de l'API seule (utilisé par Docker). | Non |
-| `requirements.txt` | Dépendances complètes (API + Gradio), pour le dev local (`setup.sh`). | Non |
+| `requirements.txt` | Démo Gradio seule, installation locale facultative après `requirements-dev.txt` (Gradio impose encore Pillow<13, jamais déployé). | Non |
+| `requirements-dev.txt` | API + outils de test et notebooks, installé par `setup.sh` et la CI. | Non |
 | `run.sh` | Lance l'API + Gradio en local (dev), sans Docker. | Non |
 | `run_api_prod.sh` | Lance l'API seule via Gunicorn (utilisé par le Dockerfile ET en local si besoin). | Non |
 | `setup.sh` | Installe l'environnement Python local (`.venv`) pour le dev. | Non |
