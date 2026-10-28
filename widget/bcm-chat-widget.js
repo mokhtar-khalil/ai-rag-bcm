@@ -89,6 +89,8 @@
       statusDown: "Service indisponible pour le moment",
       statusChecking: "Connexion en cours…",
       errorGeneric: "Une erreur est survenue. Réessayez dans un instant.",
+      errorNetwork:
+        "La connexion a été interrompue. Vérifiez votre réseau, puis reposez votre question.",
       errorRate: "Trop de questions en peu de temps. Merci de patienter avant de réessayer.",
       launcherLabel: "Ouvrir l’assistant des publications de la BCM",
       closeLabel: "Fermer",
@@ -143,6 +145,7 @@
       statusDown: "الخدمة غير متاحة حالياً",
       statusChecking: "جارٍ الاتصال…",
       errorGeneric: "حدث خطأ. يرجى إعادة المحاولة بعد قليل.",
+      errorNetwork: "انقطع الاتصال. يرجى التحقق من الشبكة ثم إعادة طرح سؤالك.",
       errorRate: "عدد كبير من الأسئلة خلال وقت قصير. يرجى الانتظار قبل إعادة المحاولة.",
       launcherLabel: "افتح مساعد منشورات البنك المركزي",
       closeLabel: "إغلاق",
@@ -1334,7 +1337,33 @@
     });
   }
 
+  // Sur mobile, une requête échoue typiquement parce que l'écran s'est verrouillé
+  // ou que l'utilisateur a changé d'application : relancer avant son retour sur
+  // la page échouerait de la même façon.
+  function attendreReprise() {
+    return new Promise(function (resolve) {
+      function relancer() {
+        setTimeout(resolve, 1500);
+      }
+      if (document.visibilityState !== "hidden") {
+        relancer();
+        return;
+      }
+      document.addEventListener("visibilitychange", function attendre() {
+        if (document.visibilityState === "hidden") return;
+        document.removeEventListener("visibilitychange", attendre);
+        relancer();
+      });
+    });
+  }
+
   function envoiSimple(text, payloadHistory, controller, timer) {
+    return requeteSimple(text, payloadHistory, controller, timer, false).finally(
+      terminer
+    );
+  }
+
+  function requeteSimple(text, payloadHistory, controller, timer, reprise) {
     return fetch(CONFIG.apiUrl + "/api/ask", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -1358,12 +1387,29 @@
           appliquerReponse(result.data);
         }
       })
-      .catch(function () {
+      .catch(function (err) {
         clearTimeout(timer);
-        state.apiOnline = false;
-        state.history.push({ role: "assistant", content: t().errorGeneric });
-      })
-      .finally(terminer);
+        var expiree = err && err.name === "AbortError";
+        // Une coupure réseau n'est pas une panne du service : une seconde
+        // tentative, une fois la page revenue au premier plan, suffit le plus
+        // souvent. Un délai dépassé, lui, ne gagnerait rien à être relancé.
+        if (!expiree && !reprise) {
+          return attendreReprise().then(function () {
+            var relance = new AbortController();
+            var relanceTimer = setTimeout(function () {
+              relance.abort();
+            }, CONFIG.requestTimeoutMs);
+            return requeteSimple(text, payloadHistory, relance, relanceTimer, true);
+          });
+        }
+        state.history.push({
+          role: "assistant",
+          content: err instanceof TypeError ? t().errorNetwork : t().errorGeneric,
+        });
+        // L'échec d'une requête ne prouve pas que l'API est arrêtée : seul
+        // /health en décide, pour ne pas afficher « Service indisponible » à tort.
+        checkHealth();
+      });
   }
 
   // Le texte diffusé est provisoire : l'API ne valide les citations et n'applique
@@ -1453,8 +1499,8 @@
       .catch(function (err) {
         clearTimeout(timer);
         if (err && err.name === "AbortError") {
-          state.apiOnline = false;
           state.history.push({ role: "assistant", content: t().errorGeneric });
+          checkHealth();
           return;
         }
         // Un proxy peut tamponner ou refuser le flux : on retente en un seul
@@ -1570,6 +1616,17 @@
     }
   });
   els.close.addEventListener("click", closePanel);
+  // Au retour sur la page, un bandeau « indisponible » hérité d'une coupure
+  // passée doit refléter l'état réel de l'API.
+  document.addEventListener("visibilitychange", function () {
+    if (
+      document.visibilityState === "visible" &&
+      state.open &&
+      state.apiOnline === false
+    ) {
+      checkHealth();
+    }
+  });
   Array.prototype.forEach.call(els.langButtons, function (bouton) {
     bouton.addEventListener("click", function () {
       var choisie = bouton.getAttribute("data-lang");
