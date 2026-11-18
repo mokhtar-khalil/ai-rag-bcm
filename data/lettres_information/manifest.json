@@ -1,6 +1,6 @@
 {
   "source": "bo.bcm.mr — actualités taguées « lettre_d_information »",
-  "recupere_le": "2026-09-22",
+  "recupere_le": "2026-11-18",
   "editions": [
     {
       "fichier": "BCM-lettre-information-2026-01-janvier.pdf",
@@ -96,6 +96,18 @@
       "page_publique": "https://www.bcm.mr/actualite/01edf4c3-4565-46e8-80b2-a00db495230b/publication-de-la-lettre-dinformation-aout-2026",
       "image_source": "https://bo.bcm.mr/sites/default/files/2026-09/Lettre_BCM_Aout_2026.png",
       "image_dimensions": "993x11232",
+      "langue": "fr"
+    },
+    {
+      "fichier": "BCM-lettre-information-2026-09-septembre.pdf",
+      "titre": "Lettre d'information de la BCM — Septembre 2026",
+      "edition": "2026-09",
+      "pages": 8,
+      "publie_le": "2026-10-23",
+      "nid": 1365,
+      "page_publique": "https://www.bcm.mr/actualite/d3bf117a-b485-4a25-b3eb-0f21ed4c42e4/publication-de-la-lettre-dinformation-septembre-2026",
+      "image_source": "https://bo.bcm.mr/sites/default/files/2026-10/Lettre_BCM_septembre_2026.png",
+      "image_dimensions": "1241x14032",
       "langue": "fr"
     }
   ]
