@@ -28,6 +28,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from api.providers import (
     stream_answer,
     answer_with_provider,
+    format_inventaire,
     plan_queries_gemini,
     plan_queries_openai,
     rerank_openai,
@@ -2049,6 +2050,7 @@ def create_app(
                 settings,
                 language,
                 quality,
+                inventaire=format_inventaire(engine.manifest),
             ):
                 if nom_evenement == "delta":
                     yield ("delta", valeur)

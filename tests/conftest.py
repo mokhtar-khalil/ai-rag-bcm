@@ -27,7 +27,14 @@ def generation_diffusee(fausse_generation):
     """
 
     def flux(
-        provider, question, results, history, settings=None, language=None, quality=None
+        provider,
+        question,
+        results,
+        history,
+        settings=None,
+        language=None,
+        quality=None,
+        inventaire="",
     ):
         reponse = fausse_generation(
             provider, question, results, history, settings, language

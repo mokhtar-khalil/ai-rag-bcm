@@ -86,6 +86,9 @@ Règles obligatoires :
     موريتانية » et jamais « milliards de MRU ». Les sigles, normes et noms techniques officiels
     comme BCM, MRU, USD, EUR, FMI, ACH, ISO 20022, RTGS, SWIFT, GIMTEL et la citation
     [p. PDF N] peuvent rester en alphabet latin ; explique leur rôle en arabe.
+23. Le bloc « INVENTAIRE DU CORPUS » liste tous les documents indexés. Pour une question sur les
+    documents ou éditions disponibles, réponds d'après cet inventaire, sans citation. Ne conclus
+    jamais qu'une édition est absente du corpus parce qu'aucun extrait ne la mentionne.
 
 Mise en forme de la réponse. Elle est affichée dans un panneau étroit : la structure doit se lire
 d'un coup d'œil, sans faire défiler pour trouver l'essentiel.
@@ -149,12 +152,38 @@ def _citation(item: dict[str, Any]) -> str:
     return str(item.get("citation") or f"p. PDF {item['pdf_page']}")
 
 
-def _context(results: list[dict[str, Any]]) -> str:
-    """Formate les passages récupérés avec leur repère pour le générateur."""
-    return "\n\n".join(
+def format_inventaire(manifest: list[dict[str, Any]]) -> str:
+    """Résume la liste des documents indexés, à joindre aux extraits.
+
+    Les extraits ne montrent qu'une partie du corpus : sans cette liste, le
+    modèle conclut qu'une édition n'existe pas dès qu'aucun extrait ne la cite.
+    """
+    rapports = [item["title"] for item in manifest if item.get("source_type") == "pdf"]
+    lettres = [
+        re.sub(r"^Lettre d'information de la BCM\s*[—–-]\s*", "", item["title"])
+        for item in manifest
+        if item.get("source_type") == "lettre"
+    ]
+    lignes = [f"- {titre}" for titre in rapports]
+    if lettres:
+        lignes.append(
+            f"- Lettres d'information ({len(lettres)} éditions) : {', '.join(lettres)}"
+        )
+    if not lignes:
+        return ""
+    return (
+        "--- INVENTAIRE DU CORPUS (liste complète des documents indexés, à ne pas citer)\n"
+        + "\n".join(lignes)
+    )
+
+
+def _context(results: list[dict[str, Any]], inventaire: str = "") -> str:
+    """Formate l'inventaire puis les passages récupérés avec leur repère."""
+    extraits = "\n\n".join(
         f"--- EXTRAIT {i}\nRepère à citer : {_citation(item)}\nTexte :\n{item['text']}"
         for i, item in enumerate(results, start=1)
     )
+    return f"{inventaire}\n\n{extraits}" if inventaire else extraits
 
 
 def _history_text(history: list[dict[str, str]]) -> str:
@@ -403,6 +432,7 @@ def generate_openai(
     settings: Settings | None = None,
     language: str | None = None,
     quality: str | None = None,
+    inventaire: str = "",
 ) -> str:
     """Génère une réponse sourcée et rejette toute citation de page non fournie."""
     from openai import OpenAI
@@ -414,7 +444,7 @@ def generate_openai(
     client = OpenAI()
     prompt = (
         f"Historique utile (peut être vide) :\n{_history_text(history)}\n\n"
-        f"Question : {question}\n\nSources autorisées :\n{_context(results)}"
+        f"Question : {question}\n\nSources autorisées :\n{_context(results, inventaire)}"
     )
     started = model_call_started()
     try:
@@ -569,6 +599,7 @@ def generate_gemini(
     settings: Settings | None = None,
     language: str | None = None,
     quality: str | None = None,
+    inventaire: str = "",
 ) -> str:
     """Génère une réponse sourcée avec l'API Gemini (Google), même contrat que generate_openai."""
     from google import genai
@@ -581,7 +612,7 @@ def generate_gemini(
     client = genai.Client(api_key=settings.gemini_api_key)
     prompt = (
         f"Historique utile (peut être vide) :\n{_history_text(history)}\n\n"
-        f"Question : {question}\n\nSources autorisées :\n{_context(results)}"
+        f"Question : {question}\n\nSources autorisées :\n{_context(results, inventaire)}"
     )
     # Le niveau de réflexion pèse surtout sur la latence : une réponse fondée sur
     # un extrait déjà explicite demande peu de raisonnement autonome, donc le
@@ -631,6 +662,7 @@ def generate_ollama(
     history: list[dict[str, str]],
     settings: Settings | None = None,
     language: str | None = None,
+    inventaire: str = "",
 ) -> str:
     """Génère une réponse avec le serveur Ollama installé sur la machine."""
     settings = settings or get_settings()
@@ -639,7 +671,7 @@ def generate_ollama(
     )
     prompt = (
         f"Historique utile (peut être vide) :\n{_history_text(history)}\n\n"
-        f"Question : {question}\n\nSources autorisées :\n{_context(results)}"
+        f"Question : {question}\n\nSources autorisées :\n{_context(results, inventaire)}"
     )
     started = model_call_started()
     try:
@@ -1027,6 +1059,7 @@ def stream_answer(
     settings: Settings | None = None,
     language: str | None = None,
     quality: str | None = None,
+    inventaire: str = "",
 ) -> "Iterator[tuple[str, str]]":
     """Produit les fragments de réponse, puis la réponse finalisée.
 
@@ -1040,10 +1073,12 @@ def stream_answer(
     d'entrée reste identique pour tous. ``quality`` (« fast » ou « thorough »)
     reflète le choix explicite de l'utilisateur du widget entre une réponse
     rapide et une réponse qui prend le temps de recouper les extraits.
+    ``inventaire`` liste les documents indexés (voir ``format_inventaire``).
     """
     if provider != "openai":
         answer = answer_with_provider(
-            provider, question, results, history, settings, language, quality
+            provider, question, results, history, settings, language, quality,
+            inventaire=inventaire,
         )
         yield ("delta", answer)
         yield ("final", answer)
@@ -1057,7 +1092,7 @@ def stream_answer(
     )
     prompt = (
         f"Historique utile (peut être vide) :\n{_history_text(history)}\n\n"
-        f"Question : {question}\n\nSources autorisées :\n{_context(results)}"
+        f"Question : {question}\n\nSources autorisées :\n{_context(results, inventaire)}"
     )
     fragments: list[str] = []
     incomplet = False
@@ -1104,12 +1139,19 @@ def answer_with_provider(
     settings: Settings | None = None,
     language: str | None = None,
     quality: str | None = None,
+    inventaire: str = "",
 ) -> str:
     """Route la génération vers le fournisseur retenu par l'orchestrateur."""
     if provider == "openai":
-        return generate_openai(question, results, history, settings, language, quality)
+        return generate_openai(
+            question, results, history, settings, language, quality, inventaire=inventaire
+        )
     if provider == "gemini":
-        return generate_gemini(question, results, history, settings, language, quality)
+        return generate_gemini(
+            question, results, history, settings, language, quality, inventaire=inventaire
+        )
     if provider == "ollama":
-        return generate_ollama(question, results, history, settings, language)
+        return generate_ollama(
+            question, results, history, settings, language, inventaire=inventaire
+        )
     return generate_extractive(question, results)
