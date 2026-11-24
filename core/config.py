@@ -141,6 +141,8 @@ class Settings:
     analytics_retention_days: int
     internal_access_username: str = field(repr=False)
     internal_access_password: str = field(repr=False)
+    data_tools_enabled: bool
+    data_db_path: Path
 
     @property
     def widget_origin(self) -> str:
@@ -345,4 +347,11 @@ def get_settings(environ: Mapping[str, str] | None = None) -> Settings:
         # dès que l'accès doit durer.
         internal_access_username=_text(env, "INTERNAL_ACCESS_USERNAME", ""),
         internal_access_password=_text(env, "INTERNAL_ACCESS_PASSWORD", ""),
+        # Voie des données chiffrées (cours, taux directeur) : désactivée tant
+        # que la base n'est alimentée que par des séries de démonstration,
+        # afin qu'aucune valeur fictive n'atteigne un visiteur par défaut.
+        data_tools_enabled=_boolean(env, "DATA_TOOLS_ENABLED", False),
+        data_db_path=_path(
+            env, "DATA_DB_PATH", PROJECT_ROOT / "storage" / "donnees_bcm.sqlite"
+        ),
     )

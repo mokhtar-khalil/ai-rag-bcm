@@ -85,6 +85,7 @@
       kindPdf: "Rapport annuel",
       kindLettre: "Lettre d’information",
       kindWeb: "Site bcm.mr",
+      kindDonnees: "Données BCM",
       statusOk: "Interrogez les publications de la BCM",
       statusDown: "Service indisponible pour le moment",
       statusChecking: "Connexion en cours…",
@@ -141,6 +142,7 @@
       kindPdf: "التقرير السنوي",
       kindLettre: "الرسالة الإخبارية",
       kindWeb: "موقع bcm.mr",
+      kindDonnees: "بيانات البنك المركزي",
       statusOk: "استفسر عن منشورات البنك المركزي",
       statusDown: "الخدمة غير متاحة حالياً",
       statusChecking: "جارٍ الاتصال…",
@@ -310,6 +312,8 @@
       ISOLATS + "(\\d+)" + ISOLATS + "\\]",
     "g"
   );
+  // Valeur lue dans la base de séries : « [Données BCM · Cours EUR/MRU] ».
+  var CITE_DONNEES = /\[(?:Données BCM|بيانات البنك المركزي) · ([^\]]{1,40})\]/g;
 
   function renderInline(escapedText) {
     return escapedText
@@ -320,7 +324,8 @@
       .replace(/(^|[\s(])_(?!\s)([^_\n]+?)_(?=[\s.,;:!?)]|$)/g, "$1<em>$2</em>")
       .replace(CITE_PDF, '<span class="bcm-cite">p.&nbsp;$1</span>')
       .replace(CITE_LETTRE, '<span class="bcm-cite bcm-cite-lettre">$1&nbsp;· p.&nbsp;$2</span>')
-      .replace(CITE_LETTRE_AR, '<span class="bcm-cite bcm-cite-lettre">$1&nbsp;· ص.&nbsp;$2</span>');
+      .replace(CITE_LETTRE_AR, '<span class="bcm-cite bcm-cite-lettre">$1&nbsp;· ص.&nbsp;$2</span>')
+      .replace(CITE_DONNEES, '<span class="bcm-cite bcm-cite-donnees">$1</span>');
   }
 
   // Les modèles alternent les conventions de liste selon les réponses : tirets,
@@ -1187,7 +1192,13 @@
       var kindLine = document.createElement("span");
       kindLine.className = "bcm-source-kind";
       kindLine.textContent =
-        kind === "lettre" ? t().kindLettre : kind === "web" ? t().kindWeb : t().kindPdf;
+        kind === "lettre"
+          ? t().kindLettre
+          : kind === "web"
+          ? t().kindWeb
+          : kind === "donnees"
+          ? t().kindDonnees
+          : t().kindPdf;
       item.appendChild(kindLine);
 
       var pageLine = document.createElement("div");

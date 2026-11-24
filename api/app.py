@@ -11,6 +11,7 @@ import base64
 import hmac
 import json
 import re
+import sqlite3
 import unicodedata
 from pathlib import Path
 from threading import Lock
@@ -48,6 +49,15 @@ from api.charts import (
     select_chart_pages,
 )
 from api.ambiguity import lexical_ambiguity
+from api.donnees import (
+    AmbiguiteDonnees,
+    aujourd_hui,
+    charger_catalogue,
+    detecter_demande,
+    nombres_non_justifies,
+    repondre,
+    suggestions_ambiguite,
+)
 from api.analytics import (
     analytics_snapshot,
     ensure_schema,
@@ -927,6 +937,31 @@ def create_app(
                 if not engine.chunks:
                     engine.load()
 
+    data_catalogue_state: dict[str, Any] = {"charge": False, "series": ()}
+
+    def data_catalogue() -> tuple[Any, ...]:
+        """Lit une seule fois la liste des séries ; une base absente désactive la voie."""
+        if not settings.data_tools_enabled:
+            return ()
+        if not data_catalogue_state["charge"]:
+            with engine_lock:
+                if not data_catalogue_state["charge"]:
+                    try:
+                        data_catalogue_state["series"] = charger_catalogue(
+                            settings.data_db_path
+                        )
+                    except sqlite3.Error as exc:
+                        app.logger.warning(
+                            "data_catalogue_failed error_type=%s", type(exc).__name__
+                        )
+                    if not data_catalogue_state["series"]:
+                        app.logger.warning(
+                            "data_tools_enabled_without_series path=%s",
+                            settings.data_db_path,
+                        )
+                    data_catalogue_state["charge"] = True
+        return data_catalogue_state["series"]
+
     def error_payload(
         message: str, status: int, reason: str | None = None
     ) -> tuple[Any, int]:
@@ -1208,6 +1243,77 @@ def create_app(
                 }
             )
             return
+
+        # Une question chiffrée (cours, taux directeur) est servie par la base
+        # de séries : le chiffre est lu et calculé, jamais rédigé par un modèle.
+        # Toute autre question, y compris « pourquoi le taux a-t-il changé »,
+        # poursuit vers la recherche documentaire.
+        series_disponibles = data_catalogue()
+        if series_disponibles:
+            reference = aujourd_hui()
+            demande = detecter_demande(question, series_disponibles, reference, language)
+            if isinstance(demande, AmbiguiteDonnees):
+                yield _evenement_reponse(
+                    {
+                        "answer": (
+                            "عن أي سعر تتحدث؟ اختر أحد الاقتراحات."
+                            if language == "ar"
+                            else "De quel taux parlez-vous ? Choisissez une des propositions."
+                        ),
+                        "sources": [],
+                        "grounded": False,
+                        "clarification_needed": True,
+                        "suggestions": suggestions_ambiguite(language),
+                        "chart_analysis": False,
+                        "chart_pages": [],
+                        "memory_used": False,
+                        "language": language,
+                    }
+                )
+                return
+            if demande is not None:
+                yield ("stage", "donnees")
+                try:
+                    reponse = repondre(demande, settings.data_db_path, language, reference)
+                except sqlite3.Error as exc:
+                    # Base illisible : mieux vaut une réponse documentaire qu'une
+                    # erreur, le rapport contenant aussi des séries annuelles.
+                    app.logger.warning(
+                        "request_id=%s data_query_failed error_type=%s",
+                        g.request_id,
+                        type(exc).__name__,
+                    )
+                else:
+                    injustifies = nombres_non_justifies(
+                        reponse.answer, reponse.nombres_autorises
+                    )
+                    if injustifies:
+                        # Les gabarits ne citent que des nombres calculés : un
+                        # écart signale un défaut de gabarit, à corriger.
+                        app.logger.error(
+                            "request_id=%s data_answer_unsupported_numbers count=%s",
+                            g.request_id,
+                            len(injustifies),
+                        )
+                    answer = reponse.answer
+                    if language == "ar":
+                        answer = format_arabic_bidi(answer)
+                    yield _evenement_reponse(
+                        {
+                            "answer": answer,
+                            "sources": reponse.sources,
+                            "grounded": reponse.grounded,
+                            "clarification_needed": False,
+                            "suggestions": [],
+                            "chart_analysis": False,
+                            "chart_pages": [],
+                            "memory_used": False,
+                            "language": language,
+                            "data": reponse.data,
+                        }
+                    )
+                    return
+
         previous_users = [item["content"] for item in history[-4:] if item["role"] == "user"]
         if retrieval_question == question and len(question.split()) <= 8 and previous_users:
             retrieval_question = f"{previous_users[-1]} {question}"
